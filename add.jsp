@@ -9,21 +9,16 @@ String username = request.getParameter("username");
 String rating = request.getParameter("rating");
 String content = request.getParameter("content");
 
-if(productId == null || username == null || content == null){
-    response.sendRedirect("product.jsp?id=1");
-    return;
-}
-
 Class.forName("com.mysql.cj.jdbc.Driver");
 
 Connection conn = DriverManager.getConnection(
-"jdbc:mysql://localhost:3306/shopdb?useUnicode=true&characterEncoding=UTF-8",
-"root",
-"123456"
+  "jdbc:mysql://localhost:3306/shopdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC",
+  "root",
+  "1234"
 );
 
 PreparedStatement ps = conn.prepareStatement(
-"INSERT INTO product_comment(product_id,username,rating,content) VALUES(?,?,?,?)"
+  "INSERT INTO product_comment(product_id, username, rating, content) VALUES (?,?,?,?)"
 );
 
 ps.setInt(1, Integer.parseInt(productId));
@@ -36,6 +31,6 @@ ps.executeUpdate();
 ps.close();
 conn.close();
 
-/* 回商品頁 */
+// 回商品頁（超重要）
 response.sendRedirect("product.jsp?id=" + productId);
 %>
