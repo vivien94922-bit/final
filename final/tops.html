@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上裝 Tops</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<header>
+  <div class="nav-left">
+    <a href="index.jsp" class="logo">STANDARD DAY</a>
+  </div>
+
+  <div class="nav-icons">
+    <div class="search-wrapper">
+      <img src="images/search.png" alt="Search" id="searchIcon">
+      <div class="search-box" id="searchBox">
+        <div class="search-input">
+            <img src="images/search.png" alt="">
+            <input type="text" id="searchInput" placeholder="搜尋商品...">
+            <div class="search-result" id="searchResult"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-wrapper">
+      <img src="images/clothes.png" alt="Browse" id="menuIcon">
+      <div class="menu-box" id="menuBox">
+        <a href="tops.html">上裝</a>
+        <a href="bottoms.html">下裝</a>
+      </div>
+    </div>
+
+    <a href="about.html"><img src="images/info.png" alt="About"></a>
+    <a href="member.jsp"><img src="images/user.png" alt="Member"></a>
+    <a href="cart.html"><img src="images/shopping_cart.png" alt="Cart"></a>
+  </div>
+</header>
+
+<section class="products">
+  <h2>上裝 Tops</h2>
+  <div class="product-grid">
+
+    <!-- 商品 1 -->
+    <div class="product" data-id="1" data-name="夢幻粉色大衣" data-price="1280" data-img="images/01.jpg">
+      <a href="product.jsp?id=1" class="product-link">
+        <img src="images/01.jpg" alt="夢幻粉色大衣">
+        <h3 class="product-name">夢幻粉色大衣</h3>
+        <div class="product-price">NT$1,280</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+    <!-- 商品 2 -->
+    <div class="product" data-id="6" data-name="質感黑色牛仔夾克" data-price="1280" data-img="images/06.jpg">
+      <a href="product.jsp?id=6" class="product-link">
+        <img src="images/06.jpg" alt="質感黑色牛仔夾克">
+        <h3 class="product-name">質感黑色牛仔夾克</h3>
+        <div class="product-price">NT$1,280</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+    <!-- 商品 3 -->
+    <div class="product" data-id="7" data-name="紳士透膚襯衫" data-price="1280" data-img="images/07.jpg">
+      <a href="product.jsp?id=7" class="product-link">
+        <img src="images/07.jpg" alt="紳士透膚襯衫">
+        <h3 class="product-name">紳士透膚襯衫</h3>
+        <div class="product-price">NT$1,280</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+    <!-- 商品 4 -->
+    <div class="product" data-id="13" data-name="歐美紫色西裝外套" data-price="1190" data-img="images/13.jpg">
+      <a href="product.jsp?id=13" class="product-link">
+        <img src="images/13.jpg" alt="歐美紫色西裝外套">
+        <h3 class="product-name">歐美紫色西裝外套</h3>
+        <div class="product-price">NT$1,190</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+    <!-- 商品 5 -->
+    <div class="product" data-id="14" data-name="斜肩氣質荷葉邊上衣" data-price="350" data-img="images/14.jpg">
+      <a href="product.jsp?id=14" class="product-link">
+        <img src="images/14.jpg" alt="斜肩氣質荷葉邊上衣">
+        <h3 class="product-name">斜肩氣質荷葉邊上衣</h3>
+        <div class="product-price">NT$350</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+    <!-- 商品 6 -->
+    <div class="product" data-id="15" data-name="短版聯名渲染上衣" data-price="440" data-img="images/15.jpg">
+      <a href="product.jsp?id=15" class="product-link">
+        <img src="images/15.jpg" alt="短版聯名渲染上衣">
+        <h3 class="product-name">短版聯名渲染上衣</h3>
+        <div class="product-price">NT$440</div>
+      </a>
+      <img src="images/heart.png" class="favorite-icon" alt="收藏">
+      <button class="add-cart-btn">加入購物車</button>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>聯絡我們｜service@standardday.com</p>
+  <p>© 2025 STANDARD DAY. All rights reserved.</p>
+</footer>
+
+<button id="backToTop" title="回到頂部">↑</button>
+
+</body>
+</html>
