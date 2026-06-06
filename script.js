@@ -1,129 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-  //searchIcon
+
+  /* ===================== 搜尋 ===================== */
   const searchIcon = document.getElementById("searchIcon");
   const searchBox = document.getElementById("searchBox");
 
-  // 檢查 searchIcon 和 searchBox 是否存在，並綁定點擊事件
   if (searchIcon && searchBox) {
     searchIcon.addEventListener("click", () => {
-      // 切換 searchBox 顯示與隱藏
       searchBox.classList.toggle("active");
     });
   }
 
-  //menuIcon
-  const menuIcon = document.getElementById("menuIcon");
-  const menuBox = document.getElementById("menuBox");
-
-  if (menuIcon && menuBox) {
-    menuIcon.addEventListener("click", () => {
-      menuBox.classList.toggle("active"); // 切換 active 類名來顯示/隱藏菜單
-    });
-  }
-  
-  // ===== banner =====
-  let currentBannerIndex = 0; // 用來追踪當前顯示的 Banner 圖片
-  
-  const bannerImages = [
-    "images/banner1.jpg",
-    "images/banner2.jpg",
-    "images/banner3.jpg"
-  ]; // 所有 Banner 圖片的路徑
-  
-  const bannerTitles = [
-    "NEW ARRIVAL", 
-    "SUMMER SALE", 
-    "WINTER COLLECTION"
-  ]; // 各個 Banner 圖片對應的標題
-  
-  const bannerDescriptions = [
-    "秋冬新品 8 折起",
-    "夏季促銷，快來選購！",
-    "冬季系列，暖心上新！"
-  ]; // 各個 Banner 圖片的描述
-  
-  const bannerProductIds = [4, 14, 3]; // 每個 Banner 對應的商品 ID
-  
-  // 更新 Banner 顯示的函數
-  function updateBanner() {
-    const bannerImage = document.getElementById("bannerImage");
-    const bannerTitle = document.getElementById("bannerTitle");
-    const bannerDesc = document.getElementById("bannerDesc");
-    const bannerBuyNowBtn = document.getElementById("bannerBuyNowBtn");
-
-    if (!bannerImage || !bannerTitle || !bannerDesc || !bannerBuyNowBtn) {
-    console.error("Banner elements are missing!");
-    return;
-  }
-    
-    // 更新 Banner 的內容
-    bannerImage.src = bannerImages[currentBannerIndex];
-    bannerTitle.innerText = bannerTitles[currentBannerIndex];
-    bannerDesc.innerText = bannerDescriptions[currentBannerIndex];
-    
-    // 更新立即選購按鈕的行為
-    bannerBuyNowBtn.onclick = () => {
-      const productId = bannerProductIds[currentBannerIndex];
-      window.location.href = `product.html?id=${productId}`; // 重定向到相應的商品頁面
-    };
-
-    // 更新圓點顯示
-    const dotsContainer = document.getElementById("dotsContainer");
-    dotsContainer.innerHTML = ""; // 清空現有圓點
-    bannerImages.forEach((_, index) => {
-      const dot = document.createElement("span");
-      dot.classList.add("dot");
-      dot.addEventListener("click", () => {
-        currentBannerIndex = index;
-        updateBanner();
-      });
-  
-      if (index === currentBannerIndex) dot.classList.add("active");
-      dotsContainer.appendChild(dot);
-    });
-  }
-  
-  // 顯示上一張圖片
-  function prevBanner() {
-    currentBannerIndex = (currentBannerIndex - 1 + bannerImages.length) % bannerImages.length;
-    updateBanner();
-  }
-  
-  // 顯示下一張圖片
-  function nextBanner() {
-    currentBannerIndex = (currentBannerIndex + 1) % bannerImages.length;
-    updateBanner();
-  }
-  
-  // 自動輪播
-  let autoSlideInterval = setInterval(nextBanner, 5000); // 每5秒切換一次 Banner 圖片
-  
-  // 停止自動輪播，並在手動切換後重新啟動
-  function stopAutoSlide() {
-    clearInterval(autoSlideInterval);
-    autoSlideInterval = setInterval(nextBanner, 5000);
-  }
-  
-  // 初始化時更新 Banner 顯示
-  updateBanner();
-  
-  // 綁定手動切換按鈕
-  const prevBtn = document.querySelector(".prev");
-  const nextBtn = document.querySelector(".next");
-
-  if (prevBtn && nextBtn) {
-    prevBtn.addEventListener("click", () => {
-      prevBanner();
-      stopAutoSlide(); // 停止自動輪播並重新啟動
-    });
-
-    nextBtn.addEventListener("click", () => {
-      nextBanner();
-      stopAutoSlide(); // 停止自動輪播並重新啟動
-    });
-  }
-  
-  // ===== 搜尋功能 =====
   const searchInput = document.getElementById("searchInput");
   const searchResult = document.getElementById("searchResult");
 
@@ -132,175 +18,212 @@ document.addEventListener("DOMContentLoaded", () => {
       const keyword = searchInput.value.trim().toLowerCase();
       searchResult.innerHTML = "";
 
-      if (keyword === "") return;
+      if (!keyword) return;
 
       const results = products.filter(p =>
         p.name.toLowerCase().includes(keyword)
       );
 
       if (results.length === 0) {
-        searchResult.innerHTML = "<div class='search-item'>找不到商品</div>";
+        searchResult.innerHTML = "<div>找不到商品</div>";
         return;
       }
 
       results.forEach(p => {
         const a = document.createElement("a");
-        a.href = `product.html?id=${p.id}`;
-        a.className = "search-item";
+        a.href = `product.jsp?id=${p.id}`;
         a.textContent = p.name;
         searchResult.appendChild(a);
       });
     });
   }
 
-  // ===== Toast 彈出訊息 =====
-  function showToast(msg) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerText = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => document.body.removeChild(toast), 300);
-    }, 2000);
-  }
+  /* ===================== menu ===================== */
+  const menuIcon = document.getElementById("menuIcon");
+  const menuBox = document.getElementById("menuBox");
 
-  // ===== 登入檢查 =====
-  function requireLogin(redirectTo) {
-    if (localStorage.getItem("isLogin") !== "true") {
-      localStorage.setItem("redirectAfterLogin", redirectTo);
-      showToast("請先登入會員");
-      setTimeout(() => window.location.href = "member.html", 800);
-      return false;
-    }
-    return true;
-  }
-
-  // ===== header 會員顯示 =====
-  function renderUserArea() {
-    const userArea = document.getElementById("user-area");
-    if (!userArea) return;
-
-    const isLogin = localStorage.getItem("isLogin") === "true";
-    const user = localStorage.getItem("user");
-
-    if (isLogin && user) {
-      userArea.innerHTML = `
-        <div class="user-menu">
-          <img src="images/user.png" alt="Member">
-          <span class="user-name">Hi, ${user}</span>
-          <div class="dropdown">
-            <a href="member.html">會員中心</a>
-            <a href="#" id="logoutBtn">登出</a>
-          </div>
-        </div>
-      `;
-      document.getElementById("logoutBtn").addEventListener("click", e => {
-        e.preventDefault();
-        localStorage.removeItem("isLogin");
-        localStorage.removeItem("user");
-        showToast("已登出");
-        setTimeout(() => window.location.href = "index.html", 800);
-      });
-    } else {
-      userArea.innerHTML = `
-        <a href="member.html">
-          <img src="images/user.png" title="註冊 / 登入">
-        </a>
-      `;
-    }
-  }
-  renderUserArea();
-
-  // ===== 回到頂部 =====
-  const backToTopBtn = document.getElementById("backToTop");
-  if (backToTopBtn) {
-    window.addEventListener("scroll", () => {
-      backToTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
+  if (menuIcon && menuBox) {
+    menuIcon.addEventListener("click", () => {
+      menuBox.classList.toggle("active");
     });
-    backToTopBtn.addEventListener("click", () => {
+  }
+
+  /* ===================== banner ===================== */
+  let current = 0;
+
+  const images = ["images/banner1.jpg","images/banner2.jpg","images/banner3.jpg"];
+  const titles = ["NEW ARRIVAL","SUMMER SALE","WINTER COLLECTION"];
+  const descs = ["秋冬新品 8 折起","夏季促銷","冬季系列"];
+  const ids = [4,14,3];
+
+  function updateBanner() {
+    const img = document.getElementById("bannerImage");
+    const title = document.getElementById("bannerTitle");
+    const desc = document.getElementById("bannerDesc");
+    const btn = document.getElementById("bannerBuyNowBtn");
+    const dots = document.getElementById("dotsContainer");
+
+    if (!img || !title || !desc || !btn || !dots) return;
+
+    img.src = images[current];
+    title.innerText = titles[current];
+    desc.innerText = descs[current];
+
+    btn.onclick = () => {
+      location.href = `product.jsp?id=${ids[current]}`;
+    };
+
+    dots.innerHTML = "";
+    images.forEach((_, i) => {
+      const dot = document.createElement("span");
+      dot.className = i === current ? "dot active" : "dot";
+      dot.onclick = () => {
+        current = i;
+        updateBanner();
+      };
+      dots.appendChild(dot);
+    });
+  }
+
+  function next() {
+    current = (current + 1) % images.length;
+    updateBanner();
+  }
+
+  function prev() {
+    current = (current - 1 + images.length) % images.length;
+    updateBanner();
+  }
+
+  setInterval(next, 5000);
+  updateBanner();
+
+  document.querySelector(".next")?.addEventListener("click", next);
+  document.querySelector(".prev")?.addEventListener("click", prev);
+
+  /* ===================== toast ===================== */
+  function toast(msg) {
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerText = msg;
+    document.body.appendChild(t);
+
+    setTimeout(() => t.classList.add("show"), 10);
+    setTimeout(() => t.remove(), 2000);
+  }
+
+  /* ===================== header login UI ===================== */
+const userArea = document.getElementById("user-area");
+
+if (userArea) {
+  fetch("check_login.jsp")
+    .then(r => r.text())
+    .then(s => {
+      if (s.trim() === "OK") {
+        userArea.innerHTML = `
+          <a href="member.jsp">會員中心</a>
+          <a href="logout.jsp">登出</a>
+        `;
+      } else {
+        userArea.innerHTML = `
+          <a href="login.jsp">
+            <img src="images/user.png">
+          </a>
+        `;
+      }
+    });
+}
+  /* ===================== 回到頂部 ===================== */
+  const topBtn = document.getElementById("backToTop");
+
+  if (topBtn) {
+    window.addEventListener("scroll", () => {
+      topBtn.style.display = window.scrollY > 300 ? "block" : "none";
+    });
+
+    topBtn.addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
 
-  // ===== 加入購物車 =====
-  document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("add-cart-btn")) {
-      const btn = e.target;
-      const product = btn.closest(".product");
-      if (!product) return;
+  /* ===================== 加入購物車（唯一版本） ===================== */
+  document.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("add-cart-btn")) return;
 
-      if (!requireLogin(window.location.href)) return;
+    const res = await fetch("check_login.jsp");
+    const status = await res.text();
 
-      const id = product.dataset.id;
-      const name = product.dataset.name;
-      const price = parseInt(product.dataset.price);
-      const img = product.dataset.img;
-      if (!id || !name || !price || !img) return;
-
-      let cart = JSON.parse(localStorage.getItem("cart")) || {};
-      const key = id;
-
-      if (cart[key]) {
-        cart[key].quantity += 1;
-      } else {
-        cart[key] = { id, name, price, img, quantity: 1 };
-      }
-
-      localStorage.setItem("cart", JSON.stringify(cart));
-      showToast(`${name} 已加入購物車！`);
+    if (status.trim() !== "OK") {
+      alert("請先登入");
+      location.href = "login.jsp";
+      return;
     }
+
+    const p = e.target.closest(".product");
+    if (!p) return;
+
+    const id = p.dataset.id;
+    const name = p.dataset.name;
+    const price = p.dataset.price;
+    const img = p.dataset.img;
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || {};
+
+    if (cart[id]) {
+      cart[id].quantity++;
+    } else {
+      cart[id] = { id, name, price, img, quantity: 1 };
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert(name + " 已加入購物車");
   });
 
-  // ===================== 收藏功能 =====================
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  favorites = favorites.filter(item => item && item.id);
+  /* ===================== 收藏 ===================== */
+  let fav = JSON.parse(localStorage.getItem("favorites")) || [];
 
-  window.toggleFavorite = function(el) {
-    if (!el) return;
-    const product = el.closest(".product");
-    if (!product) return;
+  window.toggleFavorite = function (el) {
+    const p = el.closest(".product");
+    const id = p.dataset.id;
 
-    const id = String(product.dataset.id);
-    const name = product.dataset.name;
-    const price = product.dataset.price;
-    const img = product.dataset.img;
-    if (!id || !name || !price || !img) return;
-
-    const index = favorites.findIndex(item => String(item.id) === id);
+    const index = fav.findIndex(x => x.id === id);
 
     if (el.src.includes("heart.png")) {
       el.src = "images/love.png";
-      if (index === -1) favorites.push({ id, name, price, img });
-      showToast("已加入收藏");
+      if (index === -1) fav.push({
+        id,
+        name: p.dataset.name,
+        price: p.dataset.price,
+        img: p.dataset.img
+      });
+      toast("已加入收藏");
     } else {
       el.src = "images/heart.png";
-      if (index !== -1) favorites.splice(index, 1);
-      showToast("已移除收藏");
+      if (index !== -1) fav.splice(index, 1);
+      toast("已移除收藏");
     }
 
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    localStorage.setItem("favorites", JSON.stringify(fav));
   };
 
-  // 初始化收藏 icon
-  document.querySelectorAll(".product").forEach(product => {
-    const id = String(product.dataset.id);
-    const icon = product.querySelector(".favorite-icon");
+  document.querySelectorAll(".product").forEach(p => {
+    const icon = p.querySelector(".favorite-icon");
     if (!icon) return;
-    icon.addEventListener("click", () => toggleFavorite(icon));
-    if (favorites.some(item => String(item.id) === id)) icon.src = "images/love.png";
-    else icon.src = "images/heart.png";
+
+    const id = p.dataset.id;
+
+    if (fav.some(x => x.id === id)) {
+      icon.src = "images/love.png";
+    }
+
+    icon.onclick = () => toggleFavorite(icon);
   });
 
 });
 
+/* ===================== intro ===================== */
 window.addEventListener("load", () => {
   const intro = document.getElementById("intro");
-
-  if (!intro) return;
-
-  setTimeout(() => {
-    intro.remove(); 
-  }, 2000);
+  if (intro) setTimeout(() => intro.remove(), 2000);
 });
