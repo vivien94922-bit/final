@@ -68,6 +68,15 @@ try{
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>STANDARD DAY Clothing Store</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+.visitor{
+    width:200px;
+    margin:10px auto;
+    padding:5px;
+    text-align:center;
+    font-size:18px;
+}
+</style>
 </head>
 <body>
   <%
@@ -272,11 +281,6 @@ alert("您已成功登出");
   </footer>
 
   <!-- 回到頂部 -->
-  <button id="backToTop" title="回到頂部">↑</button>
-
-</body>
-</html>
-
   <button id="backToTop" title="回到頂部">↑</button>
 
 </body>
