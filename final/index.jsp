@@ -1,5 +1,66 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-</script>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<%@ page import="java.sql.*" %>
+
+<%
+Connection con = null;
+Statement stmt = null;
+ResultSet rs = null;
+
+int count = 0;
+
+try{
+
+    // 載入驅動
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    // 連線資料庫
+    con = DriverManager.getConnection(
+        "jdbc:mysql://localhost:3306/counter?serverTimezone=Asia/Taipei&characterEncoding=UTF-8",
+        "root",
+        "1234"
+    );
+
+    stmt = con.createStatement();
+
+    // 第一次訪問才增加
+    if(session.getAttribute("visited") == null){
+
+        session.setAttribute("visited", "yes");
+
+        stmt.executeUpdate(
+            "UPDATE counter SET count = count + 1"
+        );
+    }
+
+    // 查詢目前人數
+    rs = stmt.executeQuery(
+        "SELECT count FROM counter"
+    );
+
+    if(rs.next()){
+        count = rs.getInt("count");
+    }
+
+}catch(Exception e){
+    out.println("錯誤：" + e.getMessage());
+}finally{
+
+    try{
+        if(rs != null) rs.close();
+    }catch(Exception e){}
+
+    try{
+        if(stmt != null) stmt.close();
+    }catch(Exception e){}
+
+    try{
+        if(con != null) con.close();
+    }catch(Exception e){}
+}
+%>
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -96,7 +157,9 @@ alert("您已成功登出");
     <button class="next">›</button>
   </section>
 
-
+  <div class="visitor">
+    您是本站第 <b><%= count %></b> 位訪客
+  </div>
   <!-- 商品區 -->
   <section class="products">
     <h2>熱門商品</h2>
@@ -209,6 +272,11 @@ alert("您已成功登出");
   </footer>
 
   <!-- 回到頂部 -->
+  <button id="backToTop" title="回到頂部">↑</button>
+
+</body>
+</html>
+
   <button id="backToTop" title="回到頂部">↑</button>
 
 </body>
