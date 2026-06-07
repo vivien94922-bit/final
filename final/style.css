@@ -160,36 +160,55 @@ nav a:hover {
 }
 
 
-/* 搜尋輸入 */
+/* 搜尋輸入與外框整體結構 */
 .search-input {
   display: flex;
   align-items: center;
   gap: 5px;
+  position: relative;
 }
 
 .search-input input {
   border: 1px solid #ccc;
   padding: 5px;
   width: 120px;
+  border-radius: 4px;
+}
+
+.search-input img {
+  width: 16px;
+  height: auto;
+  filter: none;
 }
 
 .search-result {
+  position: absolute;
+  top: 100%; /* 剛好緊貼在輸入框正下方 */
+  left: 0;
+  width: 100%; /* 寬度與輸入框加放大鏡一樣寬 */
   background: #fff;
   border: 1px solid #ddd;
+  border-radius: 4px;
   margin-top: 5px;
   max-height: 250px;
   overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
 }
 
-.search-item {
+.search-result a,
+.search-result div {
   display: block;
   padding: 8px 12px;
-  color: #333;
+  color: #333 !important;
   text-decoration: none;
+  font-size: 14px;
+  text-align: left;
 }
 
-.search-item:hover {
+.search-result a:hover {
   background-color: #f4f4f4;
+  color: #000 !important; 
 }
 
 
@@ -199,12 +218,12 @@ nav a:hover {
   top: 60px;
   right: 0;
   background: #222;
-  padding: 10px;
+  padding: 15px;
   border-radius: 8px;
 
   display: none;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   z-index: 999;
 }
 
@@ -216,19 +235,21 @@ nav a:hover {
   width: 90px;
   height: auto;
   display: block;
-  filter: none;
+  filter: invert(1); 
   transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
 .menu-box a {
   display: block;
-  padding: 5px 0;
+  padding: 5px 10px;
   text-decoration: none;
-  color: #333;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
 }
 
 .menu-box a:hover {
-  color: #000;
+  color: #fff;
   font-weight: bold;
 }
 
@@ -238,7 +259,7 @@ nav a:hover {
 }
 
 .menu-item:hover img {
-  filter: brightness(0) invert(1);
+  filter: invert(1) opacity(0.8); 
 }
 
 /* banner */
@@ -388,6 +409,7 @@ nav a:hover {
   font-weight: bold;
   margin: 0 15px 10px 15px;
 }
+
 /* 加入購物車按鈕 */
 .add-cart-btn {
   width: calc(100% - 32px);
