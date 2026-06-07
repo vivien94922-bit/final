@@ -68,26 +68,42 @@
     }
     
     .team-card img {
-        width: 220px;
-        height: 220px;
+        width: 180px;
+        height: 180px;
         object-fit: cover;
         border-radius: 50%;
     }
-    .team-card p {
-    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-    font-size: 15px;
-    line-height: 1.8;
-    color: #444;
-    text-align: justify;        
-    margin-top: 12px;
-}
+    
+    .student-id {
+        font-size: 13px;
+        color: #888;
+        margin: 10px 0 2px 0;
+    }
+
     .team-card h3 {
-        margin: 10px 0 5px;
+        margin: 0 0 5px 0;
+        font-size: 20px;
     }
     
-    .team-card h2 {
+    .team-card h4 {
         font-size: 14px;
-        color: #555;
+        color: #565254;
+        background: #eee;
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin: 5px 0;
+    }
+
+    .team-card p {
+        font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #444;
+        text-align: justify;        
+        margin-top: 12px;
+        border-top: 1px dashed #eee;
+        padding-top: 10px;
     }
     
     /* ===== 工作分配進度條 ===== */
@@ -117,25 +133,33 @@
         border-radius: 10px;
         transition: width 1.5s ease;
     }
+
     #backToTop {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      z-index: 1000;
-      background-color: #333;
-      color: #fff;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      display: none; /* 一開始隱藏 */
-      transition: background 0.3s, transform 0.2s;
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 1000;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 20px;
+        display: none;
+        transition: background 0.3s, transform 0.2s;
     }
 
     #backToTop:hover {
-      background-color: #555;
-      transform: scale(1.1);
+        background-color: #555;
+        transform: scale(1.1);
+    }
+
+    /* RWD 響應式優化：手機版自動變單欄，卡片才不會被擠扁 */
+    @media (max-width: 768px) {
+        .team-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
     }
 </style>
 </head>
@@ -149,10 +173,10 @@
     
       <div class="nav-icons">
         <div class="search-wrapper">
-          <img src="images/search.png" alt="Search" id="searchIcon">
+          <img src="../images/search.png" alt="Search" id="searchIcon">
           <div class="search-box" id="searchBox">
             <div class="search-input">
-                <img src="images/search.png" alt="">
+                <img src="../images/search.png" alt="">
                 <input type="text" id="searchInput" placeholder="搜尋商品...">
                 <div class="search-result" id="searchResult"></div>
             </div>
@@ -160,28 +184,27 @@
         </div>
     
         <div class="menu-wrapper">
-          <img src="images/clothes.png" alt="Browse" id="menuIcon">
+          <img src="../images/clothes.png" alt="Browse" id="menuIcon">
            <div class="menu-box" id="menuBox">
                 <a href="tops.html" class="menu-item">
-                  <img src="images/tops.png" alt="Tops">
+                  <img src="../images/tops.png" alt="Tops">
                 </a>
                 <a href="bottoms.html" class="menu-item">
-                  <img src="images/bottoms.png" alt="Bottoms">
+                  <img src="../images/bottoms.png" alt="Bottoms">
                 </a>
           </div>
         </div>
     
         <a href="about.html" title="關於我們">
-          <img src="images/info.png" alt="About">
+          <img src="../images/info.png" alt="About">
         </a>
     
-        <!-- user-area -->
         <a href="member.jsp" title="會員中心">
-          <img src="images/user.png" alt="Member">
+          <img src="../images/user.png" alt="Member">
         </a>
 
         <a href="cart.html" title="購物車">
-          <img src="images/shopping_cart.png" alt="Cart">
+          <img src="../images/shopping_cart.png" alt="Cart">
         </a>
       </div>
     </header>
@@ -190,7 +213,6 @@
   <h1 class="animated-title">關於我們</h1>
 </section>
 
-<!-- 主內容 -->
 <main class="about-container">
   <section class="about-section">
     <h2>品牌故事</h2>
@@ -212,7 +234,7 @@
     <div class="team-grid">
 
       <div class="team-card">
-        <img src="images/member1.jpg" alt="翁逸岑">
+        <img src="../images/member1.jpg" alt="翁逸岑">
         <div class="student-id">11344231</div>
         <h3>翁逸岑</h3>
         <h4>前端整合與商品展示 (組員A)</h4>
@@ -226,7 +248,7 @@
       </div>
 
       <div class="team-card">
-        <img src="images/member2.jpg" alt="蕭小雯">
+        <img src="../images/member2.jpg" alt="蕭小雯">
         <div class="student-id">11344222</div>
         <h3>蕭小雯</h3>
         <h4>後端核心 / 交易邏輯 (組員B)</h4>
@@ -240,7 +262,7 @@
       </div>
 
       <div class="team-card">
-        <img src="images/member3.jpg" alt="簡嘉葳">
+        <img src="../images/member3.jpg" alt="簡嘉葳">
         <div class="student-id">11344218</div>
         <h3>簡嘉葳</h3>
         <h4>會員系統與互動功能 (組員C)</h4>
@@ -254,7 +276,7 @@
       </div>
 
       <div class="team-card">
-        <img src="images/member4.jpg" alt="神林俊希">
+        <img src="../images/member4.jpg" alt="神林俊希">
         <div class="student-id">11150214</div>
         <h3>神林俊希</h3>
         <h4>資料庫與全站安全 (組員D)</h4>
@@ -271,44 +293,40 @@
   </section>
 </main>
 
-    <footer>
-      <p>聯絡我們｜service@standardday.com</p>
-      <p>© 2025 STANDARD DAY</p>
-    </footer>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          document.querySelectorAll(".progress-fill").forEach(bar => {
-            const percent = bar.dataset.percent;
-            setTimeout(() => {
-              bar.style.width = percent + "%";
-            }, 300);
-          });
-        });
-        // 取得按鈕
-        const backToTopBtn = document.getElementById("backToTop");
-        
-        // 當滾動超過 200px 顯示按鈕
-        window.onscroll = function() {
-          if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-            backToTopBtn.style.display = "block";
-          } else {
-            backToTopBtn.style.display = "none";
-          }
-        };
-        
-        // 點擊平滑回到頂部
-        backToTopBtn.addEventListener("click", () => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        });
+<footer>
+  <p>聯絡我們｜service@standardday.com</p>
+  <p>© 2025 STANDARD DAY</p>
+</footer>
 
-    </script>
+<button id="backToTop" title="回到頂部">↑</button>
 
-    <script src="products.js"></script>
-    <script src="script.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".progress-fill").forEach(bar => {
+        const percent = bar.dataset.percent;
+        setTimeout(() => {
+          bar.style.width = percent + "%";
+        }, 300);
+      });
+    });
+
+    const backToTopBtn = document.getElementById("backToTop");
     
-    <!-- 回到頂部按鈕 -->
-    <button id="backToTop" title="回到頂部">↑</button>
+    window.onscroll = function() {
+      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        backToTopBtn.style.display = "block";
+      } else {
+        backToTopBtn.style.display = "none";
+      }
+    };
+    
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+</script>
+
+<script src="products.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
