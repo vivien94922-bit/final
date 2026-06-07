@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
+<%@ page import="util.DBUtil" %>
 <%
 Integer userId = (Integer) session.getAttribute("user_id");
 boolean isLogin = (userId != null);
@@ -16,13 +17,8 @@ if (isLogin) {
     ResultSet rs = null;
 
     try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-
-        conn = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/shopdb?useUnicode=true&characterEncoding=UTF-8",
-            "root",
-            "1234"
-        );
+        // 統一連線（組員D：DBUtil）
+        conn = DBUtil.getConnection();
 
         String sql = "SELECT name, email, phone FROM members WHERE id=?";
         ps = conn.prepareStatement(sql);
@@ -708,6 +704,9 @@ if (isLogin) {
 }
 });
   </script>
+
+  <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
+  <script src="cookie-consent.js" defer></script>
 
 </body>
 </html>

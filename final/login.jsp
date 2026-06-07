@@ -7,3 +7,5 @@
 <div onclick="location.href='member.jsp#register'">
   還沒註冊？立即註冊
 </div>
+<!-- Cookie 同意提示（組員D：個資法/Cookie） -->
+<script src="cookie-consent.js" defer></script>

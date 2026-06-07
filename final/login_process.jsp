@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="util.DBUtil" %>
+<%@ page import="util.PasswordUtil" %>
 <%
 request.setCharacterEncoding("UTF-8");
 
@@ -11,25 +13,42 @@ if(username == null || password == null){
     return;
 }
 
-Class.forName("com.mysql.cj.jdbc.Driver");
+Connection conn = null;
+PreparedStatement ps = null;
+ResultSet rs = null;
+boolean ok = false;
 
-Connection conn = DriverManager.getConnection(
-    "jdbc:mysql://localhost:3306/shopdb",
-    "root",
-    "1234"
-);
+try {
+    // 統一連線（組員D：DBUtil）
+    conn = DBUtil.getConnection();
 
-String sql = "SELECT * FROM members WHERE username=? AND password=?";
-PreparedStatement ps = conn.prepareStatement(sql);
-ps.setString(1, username);
-ps.setString(2, password);
+    // 只用帳號查詢，再以加鹽 SHA-256 比對密碼（不再比對明文）
+    String sql = "SELECT id, username, password, salt FROM members WHERE username=?";
+    ps = conn.prepareStatement(sql);
+    ps.setString(1, username);
 
-ResultSet rs = ps.executeQuery();
+    rs = ps.executeQuery();
 
-if(rs.next()){
-    session.setAttribute("user_id", rs.getInt("id"));
-    session.setAttribute("username", rs.getString("username"));
-    session.setAttribute("isLogin", "true");
+    if(rs.next()){
+        String storedHash = rs.getString("password");
+        String storedSalt = rs.getString("salt");
+
+        if(PasswordUtil.verify(password, storedSalt, storedHash)){
+            ok = true;
+            session.setAttribute("user_id", rs.getInt("id"));
+            session.setAttribute("username", rs.getString("username"));
+            session.setAttribute("isLogin", "true");
+        }
+    }
+} catch(Exception e){
+    out.println("錯誤：" + e.getMessage());
+} finally {
+    if(rs != null) try { rs.close(); } catch(Exception e){}
+    if(ps != null) try { ps.close(); } catch(Exception e){}
+    if(conn != null) try { conn.close(); } catch(Exception e){}
+}
+
+if(ok){
     response.sendRedirect("member.jsp");
 } else {
     out.println("<script>alert('登入失敗'); history.back();</script>");

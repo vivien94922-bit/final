@@ -2,39 +2,36 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="java.sql.*" %>
+<%@ page import="util.DBUtil" %>
 
 <%
 Connection con = null;
-Statement stmt = null;
+PreparedStatement psUpd = null;
+PreparedStatement psSel = null;
 ResultSet rs = null;
 
 int count = 0;
 
 try{
-    // 載入驅動
-    Class.forName("com.mysql.cj.jdbc.Driver");
+    // 統一連線（組員D：DBUtil，counter 已併入 shopdb）
+    con = DBUtil.getConnection();
 
-    // 連線資料庫
-    con = DriverManager.getConnection(
-        "jdbc:mysql://localhost:3306/counter?serverTimezone=Asia/Taipei&characterEncoding=UTF-8",
-        "root",
-        "1234"
-    );
-
-    stmt = con.createStatement();
-
-    // 第一次訪問才增加
+    // 第一次訪問才增加（PreparedStatement 統一）
     if(session.getAttribute("visited") == null){
         session.setAttribute("visited", "yes");
-        stmt.executeUpdate(
-            "UPDATE counter SET count = count + 1"
+        psUpd = con.prepareStatement(
+            "UPDATE counter SET count = count + 1 WHERE id = ?"
         );
+        psUpd.setInt(1, 1);
+        psUpd.executeUpdate();
     }
 
     // 查詢目前人數
-    rs = stmt.executeQuery(
-        "SELECT count FROM counter"
+    psSel = con.prepareStatement(
+        "SELECT count FROM counter WHERE id = ?"
     );
+    psSel.setInt(1, 1);
+    rs = psSel.executeQuery();
 
     if(rs.next()){
         count = rs.getInt("count");
@@ -48,7 +45,11 @@ try{
     }catch(Exception e){}
 
     try{
-        if(stmt != null) stmt.close();
+        if(psUpd != null) psUpd.close();
+    }catch(Exception e){}
+
+    try{
+        if(psSel != null) psSel.close();
     }catch(Exception e){}
 
     try{
@@ -270,9 +271,12 @@ alert("您已成功登出");
   <footer>
     <p>聯絡我們｜service@standardday.com</p>
     <p>© 2025 STANDARD DAY. All rights reserved.</p>
+    <p><a href="privacy.html" style="color:#bbb;">隱私權政策</a></p>
   </footer>
 
   <button id="backToTop" title="回到頂部">↑</button>
 
+  <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>
