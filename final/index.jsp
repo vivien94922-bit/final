@@ -222,4 +222,57 @@ alert("您已成功登出");
       <div class="product" data-id="6" data-name="質感黑色牛仔夾克" data-price="1280" data-img="../images/06.jpg">
         <a href="product.jsp?id=6" class="product-link">
           <img src="../images/06.jpg" alt="質感黑色牛仔夾克">
-          <h3 class="product-
+          <h3 class="product-name">質感黑色牛仔夾克</h3>
+          <div class="product-price">NT$1,280</div>
+        </a>
+        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
+        <button class="add-cart-btn">加入購物車</button>
+      </div>
+
+    </div>
+
+    <h2>下裝</h2>
+    <div class="product-grid">
+      
+      <div class="product" data-id="2" data-name="百搭基礎牛仔褲" data-price="960" data-img="../images/02.jpg">
+        <a href="product.jsp?id=2" class="product-link">
+          <img src="../images/02.jpg" alt="百搭基礎牛仔褲">
+          <h3 class="product-name">百搭基礎牛仔褲</h3>
+          <div class="product-price">NT$960</div>
+        </a>
+        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
+        <button class="add-cart-btn">加入購物車</button>
+      </div>
+
+      <div class="product" data-id="3" data-name="時尚週限定條紋長裙" data-price="840" data-img="../images/03.jpg">
+        <a href="product.jsp?id=3" class="product-link">
+          <img src="../images/03.jpg" alt="時尚週限定條紋長裙">
+          <h3 class="product-name">時尚週限定條紋長裙</h3>
+          <div class="product-price">NT$840</div>
+        </a>
+        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
+        <button class="add-cart-btn">加入購物車</button>
+      </div>
+
+      <div class="product" data-id="4" data-name="學院格紋顯身短裙" data-price="590" data-img="../images/04.jpg">
+        <a href="product.jsp?id=4" class="product-link">
+          <img src="../images/04.jpg" alt="學院格紋顯身短裙">
+          <h3 class="product-name">學院格紋顯身短裙</h3>
+          <div class="product-price">NT$590</div>
+        </a>
+        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
+        <button class="add-cart-btn">加入購物車</button>
+      </div>
+
+    </div>
+  </section>
+  
+  <footer>
+    <p>聯絡我們｜service@standardday.com</p>
+    <p>© 2025 STANDARD DAY. All rights reserved.</p>
+  </footer>
+
+  <button id="backToTop" title="回到頂部">↑</button>
+
+</body>
+</html>
