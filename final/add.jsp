@@ -1,30 +1,33 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
+<%@ page import="util.DBUtil" %>
 
 <%
 request.setCharacterEncoding("UTF-8");
 
 String productId = request.getParameter("product_id");
+String userIdParam = request.getParameter("user_id");
 String username = request.getParameter("username");
 String rating = request.getParameter("rating");
 String content = request.getParameter("content");
 
-Class.forName("com.mysql.cj.jdbc.Driver");
+// 統一連線（組員D：DBUtil）
+Connection conn = DBUtil.getConnection();
 
-Connection conn = DriverManager.getConnection(
-  "jdbc:mysql://localhost:3306/shopdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC",
-  "root",
-  "1234"
-);
-
+// 一併寫入 user_id，讓留言可對應會員（供留言刪除使用）
 PreparedStatement ps = conn.prepareStatement(
-  "INSERT INTO product_comment(product_id, username, rating, content) VALUES (?,?,?,?)"
+  "INSERT INTO product_comment(product_id, user_id, username, rating, content) VALUES (?,?,?,?,?)"
 );
 
 ps.setInt(1, Integer.parseInt(productId));
-ps.setString(2, username);
-ps.setInt(3, Integer.parseInt(rating));
-ps.setString(4, content);
+if(userIdParam != null && !userIdParam.isEmpty()){
+  ps.setInt(2, Integer.parseInt(userIdParam));
+} else {
+  ps.setNull(2, java.sql.Types.INTEGER);
+}
+ps.setString(3, username);
+ps.setInt(4, Integer.parseInt(rating));
+ps.setString(5, content);
 
 ps.executeUpdate();
 
