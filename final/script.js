@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ===================== banner ===================== */
   let current = 0;
 
-  const images = ["images/banner1.jpg","images/banner2.jpg","images/banner3.jpg"];
+  const images = ["../images/banner1.jpg","../images/banner2.jpg","../images/banner3.jpg"];
   const titles = ["NEW ARRIVAL","SUMMER SALE","WINTER COLLECTION"];
   const descs = ["秋冬新品 8 折起","夏季促銷","冬季系列"];
   const ids = [4,14,3];
@@ -127,7 +127,7 @@ if (userArea) {
       } else {
         userArea.innerHTML = `
           <a href="login.jsp">
-            <img src="images/user.png">
+            <img src="../images/user.png">
           </a>
         `;
       }
@@ -190,7 +190,7 @@ if (userArea) {
     const index = fav.findIndex(x => x.id === id);
 
     if (el.src.includes("heart.png")) {
-      el.src = "images/love.png";
+      el.src = "../images/love.png";
       if (index === -1) fav.push({
         id,
         name: p.dataset.name,
@@ -199,7 +199,7 @@ if (userArea) {
       });
       toast("已加入收藏");
     } else {
-      el.src = "images/heart.png";
+      el.src = "../images/heart.png";
       if (index !== -1) fav.splice(index, 1);
       toast("已移除收藏");
     }
@@ -214,7 +214,7 @@ if (userArea) {
     const id = p.dataset.id;
 
     if (fav.some(x => x.id === id)) {
-      icon.src = "images/love.png";
+      icon.src = "../images/love.png";
     }
 
     icon.onclick = () => toggleFavorite(icon);
