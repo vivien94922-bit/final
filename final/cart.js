@@ -34,12 +34,36 @@ function renderCart() {
   
   function updateTotal() {
     let total = 0;
+  
     document.querySelectorAll(".cart-item").forEach(item => {
       const price = parseInt(item.dataset.price);
       const qty = parseInt(item.querySelector(".quantity").value) || 0;
       total += price * qty;
     });
-    document.getElementById("totalAmount").textContent = total.toLocaleString();
+  
+    const hint = document.getElementById("discountHint");
+  
+    let discountRate = 1;
+    let message = "";
+  
+    if (total >= 1500) {
+      discountRate = 0.88;
+      message = "已享 88 折優惠（最高折扣）";
+    } 
+    else if (total >= 1000) {
+      discountRate = 0.9;
+      message = "已享 9 折優惠，再買 NT$" + (1500 - total) + " 可升級 88 折";
+    } 
+    else {
+      message = "再買 NT$" + (1000 - total) + " 享 9 折，再買 NT$" + (1500 - total) + " 享 88 折";
+    }
+  
+    const finalTotal = Math.floor(total * discountRate);
+  
+    document.getElementById("totalAmount").textContent =
+      finalTotal.toLocaleString();
+  
+    hint.textContent = message;
   }
   
   function bindCartEvents() {
@@ -93,4 +117,9 @@ function renderCart() {
     }
   });
   document.addEventListener("DOMContentLoaded", renderCart);
-  
+  //新加入的折扣
+  function getDiscountRate(total) {
+    if (total >= 1500) return 0.88;
+    if (total >= 1000) return 0.9;
+    return 1;
+  }
