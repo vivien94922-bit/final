@@ -1,0 +1,121 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車</title>
+    <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    
+    <header>
+      <div class="nav-left">
+        <a href="index.jsp" class="logo">STANDARD DAY</a>
+      </div>
+    
+      <div class="nav-icons">
+        <div class="search-wrapper">
+          <img src="images/search.png" alt="Search" id="searchIcon">
+          <div class="search-box" id="searchBox">
+            <div class="search-input">
+                <img src="images/search.png" alt="">
+                <input type="text" id="searchInput" placeholder="搜尋商品...">
+                <div class="search-result" id="searchResult"></div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="menu-wrapper">
+          <img src="images/clothes.png" alt="Browse" id="menuIcon">
+           <div class="menu-box" id="menuBox">
+                <a href="tops.html" class="menu-item">
+                  <img src="images/tops.png" alt="Tops">
+                </a>
+                <a href="bottoms.html" class="menu-item">
+                  <img src="images/bottoms.png" alt="Bottoms">
+                </a>
+          </div>
+        </div>
+    
+        <a href="about.html" title="關於我們">
+          <img src="images/info.png" alt="About">
+        </a>
+    
+        <!-- user-area -->
+        <a href="member.jsp" title="會員中心">
+          <img src="images/user.png" alt="Member">
+        </a>
+
+        <a href="cart.html" title="購物車">
+          <img src="images/shopping_cart.png" alt="Cart">
+        </a>
+      </div>
+    </header>
+
+    <nav class="breadcrumb">
+        <a href="index.jsp">首頁</a> &gt; <span>購物車</span>
+    </nav>
+    
+    <a href="cart.html" title="購物車">
+        <img src="images/shopping_cart.png" alt="購物車" width="32">
+    </a>
+
+    <div class="cart-item" data-price="1280">
+        <img src="images/07.jpg" alt="紳士透膚襯衫">
+        <div class="item-info">
+            <p>紳士透膚襯衫<br>白/L</p>
+            <p>單價：NT$1,280</p>
+            <div class="quantity-controls">
+                <button class="decrease">-</button>
+                <input type="number" class="quantity" value="1" min="0">
+                <button class="increase">+</button>
+                <button class="remove-btn">刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-item" data-price="1280">
+        <img src="images/01.jpg" alt="夢幻粉色大衣">
+        <div class="item-info">
+            <p>夢幻粉色大衣<br>粉/L</p>
+            <p>單價：NT$1,280</p>
+            <div class="quantity-controls">
+                <button class="decrease">-</button>
+                <input type="number" class="quantity" value="1" min="0">
+                <button class="increase">+</button>
+                <button class="remove-btn">刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-item" data-price="1280">
+        <img src="images/06.jpg" alt="質感黑色牛仔夾克">
+        <div class="item-info">
+            <p>質感黑色牛仔夾克<br>黑/XL</p>
+            <p>單價：NT$1,280</p>
+            <div class="quantity-controls">
+                <button class="decrease">-</button>
+                <input type="number" class="quantity" value="2" min="0">
+                <button class="increase">+</button>
+                <button class="remove-btn">刪除</button>
+            </div>
+        </div>
+    </div>
+    <div id="discountHint" class="discount-hint"></div>
+    <div class="total">
+        總計：NT$<span id="totalAmount">0</span>
+    </div>
+
+    <div class="checkout-container">
+    <button id="checkoutBtn" class="checkout-btn">前往結帳</button>
+</div>
+    
+    <script src="cart.js"></script>
+    <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
+    <script src="cookie-consent.js" defer></script>
+</body>
+</html>
