@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
-<%@ page import="util.DBUtil" %>
 <%@ page isErrorPage="true" %>
+<%@ include file="dbutil.jsp" %>
 <%
 try {
 %>
@@ -19,7 +19,7 @@ int currentPage = (pageStr == null) ? 1 : Integer.parseInt(pageStr);
 int offset = (currentPage - 1) * pageSize;
 
 // ================= 3. DB 連線（組員D：DBUtil 統一） =================
-Connection conn = DBUtil.getConnection();
+Connection conn = getConnection();
 
 // ================= 4. 查商品 =================
 PreparedStatement ps = conn.prepareStatement(

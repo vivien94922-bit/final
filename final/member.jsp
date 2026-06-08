@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
-<%@ page import="util.DBUtil" %>
+<%@ include file="dbutil.jsp" %>
 <%
 Integer userId = (Integer) session.getAttribute("user_id");
 boolean isLogin = (userId != null);
@@ -18,7 +18,7 @@ if (isLogin) {
 
     try {
         // 統一連線（組員D：DBUtil）
-        conn = DBUtil.getConnection();
+        conn = getConnection();
 
         String sql = "SELECT name, email, phone FROM members WHERE id=?";
         ps = conn.prepareStatement(sql);

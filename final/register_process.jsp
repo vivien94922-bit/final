@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
-<%@ page import="util.DBUtil" %>
-<%@ page import="util.PasswordUtil" %>
+<%@ include file="dbutil.jsp" %>
 
 <%
 request.setCharacterEncoding("UTF-8");
@@ -17,11 +16,11 @@ PreparedStatement ps = null;
 
 try {
     // 統一連線（組員D：DBUtil）
-    conn = DBUtil.getConnection();
+    conn = getConnection();
 
     // 密碼加鹽雜湊後再儲存（加分：password hash）
-    String salt = PasswordUtil.generateSalt();
-    String hashed = PasswordUtil.hash(password, salt);
+    String salt = generateSalt();
+    String hashed = hashPassword(password, salt);
 
     String sql = "INSERT INTO members(username, password, salt, name, email, phone) VALUES(?,?,?,?,?,?)";
     ps = conn.prepareStatement(sql);
