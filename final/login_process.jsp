@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="util.DBUtil" %>
-<%@ page import="util.PasswordUtil" %>
+<%@ include file="dbutil.jsp" %>
 <%
 request.setCharacterEncoding("UTF-8");
 
@@ -20,7 +19,7 @@ boolean ok = false;
 
 try {
     // 統一連線（組員D：DBUtil）
-    conn = DBUtil.getConnection();
+    conn = getConnection();
 
     // 只用帳號查詢，再以加鹽 SHA-256 比對密碼（不再比對明文）
     String sql = "SELECT id, username, password, salt FROM members WHERE username=?";
@@ -33,7 +32,7 @@ try {
         String storedHash = rs.getString("password");
         String storedSalt = rs.getString("salt");
 
-        if(PasswordUtil.verify(password, storedSalt, storedHash)){
+        if(verifyPassword(password, storedSalt, storedHash)){
             ok = true;
             session.setAttribute("user_id", rs.getInt("id"));
             session.setAttribute("username", rs.getString("username"));

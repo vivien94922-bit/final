@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
-<%@ page import="util.DBUtil" %>
+<%@ include file="dbutil.jsp" %>
 
 <%
 request.setCharacterEncoding("UTF-8");
@@ -12,7 +12,7 @@ String rating = request.getParameter("rating");
 String content = request.getParameter("content");
 
 // 統一連線（組員D：DBUtil）
-Connection conn = DBUtil.getConnection();
+Connection conn = getConnection();
 
 // 一併寫入 user_id，讓留言可對應會員（供留言刪除使用）
 PreparedStatement ps = conn.prepareStatement(

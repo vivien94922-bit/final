@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="java.sql.*" %>
-<%@ page import="util.DBUtil" %>
+<%@ include file="dbutil.jsp" %>
 
 <%
 Connection con = null;
@@ -14,7 +14,7 @@ int count = 0;
 
 try{
     // 統一連線（組員D：DBUtil，counter 已併入 shopdb）
-    con = DBUtil.getConnection();
+    con = getConnection();
 
     // 第一次訪問才增加（PreparedStatement 統一）
     if(session.getAttribute("visited") == null){
