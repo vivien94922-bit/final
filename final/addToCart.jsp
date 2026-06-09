@@ -1,18 +1,20 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="DBUtil.jsp" %>
+<%@ include file="dbutil.jsp" %>
 <%
-    // 需先確認 session 有 userId，這裡示範用 session
-    Integer userId = (Integer) session.getAttribute("userId");
+    Integer userId = (Integer) session.getAttribute("user_id");
     if (userId == null) {
         response.setStatus(401);
         out.print("{\"success\":false,\"msg\":\"請先登入\"}");
         return;
     }
-    int productId = Integer.parseInt(request.getParameter("product_id"));
-    int qty       = Integer.parseInt(request.getParameter("quantity") != null
-                        ? request.getParameter("quantity") : "1");
 
-    try (Connection conn = getConn()) {
+    int productId = Integer.parseInt(request.getParameter("product_id"));
+    int qty = 1;
+    if (request.getParameter("quantity") != null) {
+        qty = Integer.parseInt(request.getParameter("quantity"));
+    }
+
+    try (Connection conn = getConnection()) {
         // 檢查庫存
         PreparedStatement stockPs = conn.prepareStatement(
             "SELECT stock FROM products WHERE product_id=?");
@@ -23,7 +25,7 @@
             return;
         }
 
-        // 已在購物車就累加數量，否則新增
+        // 已在購物車就累加，否則新增
         PreparedStatement checkPs = conn.prepareStatement(
             "SELECT cart_id, quantity FROM cart WHERE user_id=? AND product_id=?");
         checkPs.setInt(1, userId);

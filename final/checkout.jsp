@@ -2,13 +2,17 @@
 <%@ include file="dbutil.jsp" %>
 <%@ page import="java.sql.*,java.util.*" %>
 <%
-    Integer userId = (Integer) session.getAttribute("userId");
-    if (userId == null) { response.setStatus(401); out.print("{\"success\":false,\"msg\":\"請先登入\"}"); return; }
+    Integer userId = (Integer) session.getAttribute("user_id");
+    if (userId == null) {
+        response.setStatus(401);
+        out.print("{\"success\":false,\"msg\":\"請先登入\"}");
+        return;
+    }
 
     Connection conn = null;
     try {
-        conn = getConn();
-        conn.setAutoCommit(false);  // ★ 開啟 Transaction
+        conn = getConnection();
+        conn.setAutoCommit(false);
 
         // 1. 讀取購物車內容
         PreparedStatement cartPs = conn.prepareStatement(
@@ -18,18 +22,17 @@
         cartPs.setInt(1, userId);
         ResultSet cartRs = cartPs.executeQuery();
 
-        List<int[]> items = new ArrayList<>();  // [product_id, quantity, price]
+        List<int[]> items = new ArrayList<>();
         List<String> names = new ArrayList<>();
         int total = 0;
         boolean hasItem = false;
 
         while (cartRs.next()) {
-            int pId  = cartRs.getInt("product_id");
-            int qty  = cartRs.getInt("quantity");
-            int price= cartRs.getInt("price");
-            int stock= cartRs.getInt("stock");
+            int pId   = cartRs.getInt("product_id");
+            int qty   = cartRs.getInt("quantity");
+            int price = cartRs.getInt("price");
+            int stock = cartRs.getInt("stock");
 
-            // 2. 即時檢查每項庫存
             if (stock < qty) {
                 conn.rollback();
                 out.print("{\"success\":false,\"msg\":\"" + cartRs.getString("name") + " 庫存不足\"}");
@@ -40,18 +43,25 @@
             total += price * qty;
             hasItem = true;
         }
+
         if (!hasItem) {
             conn.rollback();
             out.print("{\"success\":false,\"msg\":\"購物車是空的\"}");
             return;
         }
 
+        // 2. 折扣計算（與 cart.js 一致）
+        double discountRate = 1.0;
+        if (total >= 1500) discountRate = 0.88;
+        else if (total >= 1000) discountRate = 0.9;
+        int finalTotal = (int) Math.floor(total * discountRate);
+
         // 3. 建立訂單主表
         PreparedStatement orderPs = conn.prepareStatement(
             "INSERT INTO orders(user_id, total_price) VALUES(?,?)",
             Statement.RETURN_GENERATED_KEYS);
         orderPs.setInt(1, userId);
-        orderPs.setInt(2, total);
+        orderPs.setInt(2, finalTotal);
         orderPs.executeUpdate();
         ResultSet genKeys = orderPs.getGeneratedKeys();
         genKeys.next();
@@ -65,14 +75,13 @@
 
         for (int i = 0; i < items.size(); i++) {
             int[] item = items.get(i);
-            // 明細
             itemPs.setInt(1, orderId);
             itemPs.setInt(2, item[0]);
             itemPs.setString(3, names.get(i));
             itemPs.setInt(4, item[2]);
             itemPs.setInt(5, item[1]);
             itemPs.addBatch();
-            // 扣庫存（加 stock>=qty 防止超賣）
+
             stockPs.setInt(1, item[1]);
             stockPs.setInt(2, item[0]);
             stockPs.setInt(3, item[1]);
@@ -80,9 +89,12 @@
         }
         itemPs.executeBatch();
         int[] stockResults = stockPs.executeBatch();
-        // 確認每筆扣減都有成功（affectedRows=1）
         for (int r : stockResults) {
-            if (r == 0) { conn.rollback(); out.print("{\"success\":false,\"msg\":\"庫存扣減失敗\"}"); return; }
+            if (r == 0) {
+                conn.rollback();
+                out.print("{\"success\":false,\"msg\":\"庫存扣減失敗，請重新確認\"}");
+                return;
+            }
         }
 
         // 5. 清空購物車
@@ -91,13 +103,13 @@
         clearPs.setInt(1, userId);
         clearPs.executeUpdate();
 
-        conn.commit();  // ★ 全部成功才 commit
-        out.print("{\"success\":true,\"order_id\":" + orderId + ",\"total\":" + total + "}");
+        conn.commit();
+        out.print("{\"success\":true,\"order_id\":" + orderId + ",\"total\":" + finalTotal + "}");
 
     } catch (Exception e) {
-        if (conn != null) conn.rollback();
+        if (conn != null) try { conn.rollback(); } catch (Exception ex) {}
         out.print("{\"success\":false,\"msg\":\"" + e.getMessage() + "\"}");
     } finally {
-        if (conn != null) { conn.setAutoCommit(true); conn.close(); }
+        if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (Exception ex) {}
     }
 %>

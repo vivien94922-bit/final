@@ -1,13 +1,13 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="dbutil.jsp" %>
 <%
-    Integer userId = (Integer) session.getAttribute("userId");
+    Integer userId = (Integer) session.getAttribute("user_id");
     if (userId == null) { response.setStatus(401); out.print("{\"success\":false}"); return; }
 
     int cartId = Integer.parseInt(request.getParameter("cart_id"));
     int qty    = Integer.parseInt(request.getParameter("quantity"));
 
-    try (Connection conn = getConn()) {
+    try (Connection conn = getConnection()) {
         if (qty <= 0) {
             PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM cart WHERE cart_id=? AND user_id=?");
