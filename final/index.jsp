@@ -137,7 +137,7 @@ alert("您已成功登出");
         </a>
       </div>
 
-      <a href="cart.html" title="購物車" id="cartLink">
+      <a href="cart.jsp" title="購物車" id="cartLink">
         <img src="../images/shopping_cart.png" alt="Cart">
       </a>
     </div>
