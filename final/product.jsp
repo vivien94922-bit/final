@@ -625,6 +625,28 @@ if(currentPage < totalPages){
       document.getElementById(targetId).classList.add('active');
     });
   });
+
+  // 加入購物車
+async function addToCart(productId) {
+    const res = await fetch('addToCart.jsp', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `product_id=${productId}&quantity=1`
+    });
+    const data = await res.json();
+    alert(data.msg);
+}
+
+// 結帳
+async function checkout() {
+    const res = await fetch('checkout.jsp', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+        location.href = `orderSuccess.jsp?order_id=${data.order_id}`;
+    } else {
+        alert(data.msg);
+    }
+}
 </script>
 <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
 <script src="cookie-consent.js" defer></script>
