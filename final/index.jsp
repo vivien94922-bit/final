@@ -6,32 +6,39 @@
 
 <%
 Connection con = null;
-PreparedStatement psUpd = null;
-PreparedStatement psSel = null;
+PreparedStatement ps = null;
 ResultSet rs = null;
 
 int count = 0;
 
 try{
-    // 統一連線（組員D：DBUtil，counter 已併入 shopdb）
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
     con = getConnection();
 
-    // 第一次訪問才增加（PreparedStatement 統一）
-    if(session.getAttribute("visited") == null){
-        session.setAttribute("visited", "yes");
-        psUpd = con.prepareStatement(
-            "UPDATE counter SET count = count + 1 WHERE id = ?"
+    // 不是刷新才增加
+    if(session.getAttribute("refresh") == null){
+
+        ps = con.prepareStatement(
+            "UPDATE counter SET count = count + 1 WHERE id = 1"
         );
-        psUpd.setInt(1, 1);
-        psUpd.executeUpdate();
+        ps.executeUpdate();
+        ps.close();
+
+        session.setAttribute("refresh","yes");
+
+    }else{
+
+        // 刷新後把標記清掉
+        session.removeAttribute("refresh");
     }
 
-    // 查詢目前人數
-    psSel = con.prepareStatement(
-        "SELECT count FROM counter WHERE id = ?"
+    ps = con.prepareStatement(
+        "SELECT count FROM counter WHERE id = 1"
     );
-    psSel.setInt(1, 1);
-    rs = psSel.executeQuery();
+
+    rs = ps.executeQuery();
 
     if(rs.next()){
         count = rs.getInt("count");
@@ -40,24 +47,20 @@ try{
 }catch(Exception e){
     out.println("錯誤：" + e.getMessage());
 }finally{
+
     try{
-        if(rs != null) rs.close();
+        if(rs!=null) rs.close();
     }catch(Exception e){}
 
     try{
-        if(psUpd != null) psUpd.close();
+        if(ps!=null) ps.close();
     }catch(Exception e){}
 
     try{
-        if(psSel != null) psSel.close();
-    }catch(Exception e){}
-
-    try{
-        if(con != null) con.close();
+        if(con!=null) con.close();
     }catch(Exception e){}
 }
 %>
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -159,7 +162,7 @@ alert("您已成功登出");
   </section>
 
   <div class="visitor">
-    您是本站第 <b><%= count %></b> 位訪客
+    您是本站第 <b><%= count %></b>位訪客
   </div>
   <section class="products">
     <h2>熱門商品</h2>
@@ -302,3 +305,4 @@ async function checkout() {
 </script>
 </body>
 </html>
+
