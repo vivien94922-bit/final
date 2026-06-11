@@ -5,33 +5,43 @@
 <%
 try {
 %>
-
 <%
-    // ================= 1. 取得商品 ID =================
-    String idStr = request.getParameter("id");
-    if (idStr == null) idStr = "1";
-    int id = Integer.parseInt(idStr);
+Connection conn = null;
+PreparedStatement ps1 = null;
+PreparedStatement ps2 = null;
+ResultSet rs1 = null;
+ResultSet rs2 = null;
 
-    // ================= 2. 分頁設定 =================
+String name = "";
+int price = 0;
+int stock = 0;
+int total = 0;
+String nameImage = "";
+int id = Integer.parseInt(request.getParameter("id"));
+%>
+<%
+    if (rs1 != null && rs1.next()) {
+        name = rs1.getString("name");
+        price = rs1.getInt("price");
+        stock = rs1.getInt("stock");
+        nameImage = rs1.getString("image"); 
+    }
     int pageSize = 5;
 
     String pageStr = request.getParameter("page");
     int currentPage = (pageStr == null) ? 1 : Integer.parseInt(pageStr);
+
     int offset = (currentPage - 1) * pageSize;
-
-    // ================= 3. DB 連線 =================
-    Connection conn = getConnection();
-
-    // ================= 4. 查商品 =================
-    PreparedStatement ps = conn.prepareStatement(
-        "SELECT * FROM product WHERE  product_id=?"
+    ps2 = conn.prepareStatement(
+    "SELECT * FROM product_comment WHERE product_id=? ORDER BY create_time DESC"
     );
-    ps.setInt(1, id);
-    ResultSet rs = ps.executeQuery();
-    int stock = 0;
-
-    if (rs.next()) {
-      stock = rs.getInt("stock");
+    ps2.setInt(1, id);
+    rs2 = ps2.executeQuery();
+    while (rs2.next()) {
+      String username = rs2.getString("username");
+      int rating = rs2.getInt("rating");
+      String content = rs2.getString("content");
+      String time = rs2.getString("create_time");
 %>
 
 <!DOCTYPE html>
@@ -48,14 +58,10 @@ try {
 </html>
 
 <%
-        rs.close();
-        ps.close();
-        conn.close();
         return;
     }
 
     // ================= 5. 評論總數 =================
-    int total = 0;
 
     try {
         PreparedStatement psCount = conn.prepareStatement(
@@ -84,7 +90,7 @@ try {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><%=rs.getString("name")%> - STANDARD DAY</title>
+<title><%=name%> - STANDARD DAY</title>
 
 <style>
 /* ================= 基礎設定 ================= */
@@ -348,18 +354,18 @@ header .nav-icons img {
 <main class="product-container">
 
     <div class="product-images fade-up">
-        <img src="<%=rs.getString("image")%>" alt="<%=rs.getString("name")%>">
+      <img src="<%=nameImage%>" alt="<%=name%>">
     </div>
 
     <div class="product-info fade-up">
-        <h1><%=rs.getString("name")%></h1>
+        <h1><%=name%></h1>
 
         <div class="product-desc">
-            <%=rs.getString("description")%>
+          <%=rs1.getString("description")%>
         </div>
 
         <div class="price">
-            NT$ <%=rs.getInt("price")%>
+            NT$ <%=price%>
         </div>
 
         <div class="form-group">
@@ -384,7 +390,7 @@ header .nav-icons img {
 
               <button type="button"
                       class="add-cart"
-                      onclick="addToCart(<%=rs.getInt("id")%>)">
+                      onclick="addToCart(<%=id%>)">
                 加入購物車
               </button>
 
@@ -474,18 +480,16 @@ if (userId != -1) {
 <div class="feedback-list">
 
 <%
-PreparedStatement ps2 = null;
-ResultSet rs2 = null;
 
 try {
-
     String sql =
-        "SELECT * FROM product_comment " +
-        "WHERE product_id=? " +
-        "ORDER BY create_time DESC " +
-        "LIMIT ?, ?";
+    "SELECT * FROM product_comment " +
+    "WHERE product_id=? " +
+    "ORDER BY create_time DESC " +
+    "LIMIT ?, ?";
 
     ps2 = conn.prepareStatement(sql);
+
     ps2.setInt(1, id);
     ps2.setInt(2, offset);
     ps2.setInt(3, pageSize);
@@ -619,9 +623,11 @@ async function addToCart(productId) {
 
 <%
     // ===== 關閉連線 =====
-    try { if (rs != null) rs.close(); } catch (Exception e) {}
-    try { if (ps != null) ps.close(); } catch (Exception e) {}
-    try { if (conn != null) conn.close(); } catch (Exception e) {}
+    try { if (rs1 != null) rs1.close(); } catch (Exception e) {}
+try { if (rs2 != null) rs2.close(); } catch (Exception e) {}
+try { if (ps1 != null) ps1.close(); } catch (Exception e) {}
+try { if (ps2 != null) ps2.close(); } catch (Exception e) {}
+try { if (conn != null) conn.close(); } catch (Exception e) {}
 %>
 
 <%
