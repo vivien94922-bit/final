@@ -109,9 +109,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%=name%> - STANDARD DAY</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="product.css">
 <script src="cookie-consent.js" defer></script>
-<script src="script.js" defer></script>
+<script src="product.js" defer></script>
 </head>
 <body>
 
