@@ -305,4 +305,3 @@ async function checkout() {
 </script>
 </body>
 </html>
-
