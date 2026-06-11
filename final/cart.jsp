@@ -18,34 +18,34 @@
       </div>
       <div class="nav-icons">
         <div class="search-wrapper">
-          <img src="images/search.png" alt="Search" id="searchIcon">
+          <img src="../images/search.png" alt="Search" id="searchIcon">
           <div class="search-box" id="searchBox">
             <div class="search-input">
-                <img src="images/search.png" alt="">
+                <img src="../images/search.png" alt="">
                 <input type="text" id="searchInput" placeholder="搜尋商品...">
                 <div class="search-result" id="searchResult"></div>
             </div>
           </div>
         </div>
         <div class="menu-wrapper">
-          <img src="images/clothes.png" alt="Browse" id="menuIcon">
+          <img src="../images/clothes.png" alt="Browse" id="menuIcon">
            <div class="menu-box" id="menuBox">
                 <a href="tops.html" class="menu-item">
-                  <img src="images/tops.png" alt="Tops">
+                  <img src="../images/tops.png" alt="Tops">
                 </a>
                 <a href="bottoms.html" class="menu-item">
-                  <img src="images/bottoms.png" alt="Bottoms">
+                  <img src="../images/bottoms.png" alt="Bottoms">
                 </a>
           </div>
         </div>
         <a href="about.html" title="關於我們">
-          <img src="images/info.png" alt="About">
+          <img src="../images/info.png" alt="About">
         </a>
         <a href="member.jsp" title="會員中心">
-          <img src="images/user.png" alt="Member">
+          <img src="../images/user.png" alt="Member">
         </a>
         <a href="cart.jsp" title="購物車">
-          <img src="images/shopping_cart.png" alt="Cart">
+          <img src="../images/shopping_cart.png" alt="Cart">
         </a>
       </div>
     </header>
