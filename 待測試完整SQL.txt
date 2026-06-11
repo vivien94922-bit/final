@@ -1,0 +1,185 @@
+-- =============================================================
+-- STANDARD DAY 電商網站 統一資料庫結構
+-- -------------------------------------------------------------
+-- 完全保留所有原始欄位、資料與資料表名稱，不作任何修改與更動
+-- =============================================================
+
+CREATE DATABASE IF NOT EXISTS shopdb
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
+
+USE shopdb;
+
+-- 重建時依相依順序先刪除
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cart;
+DROP TABLE IF EXISTS product_comment;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS members;
+DROP TABLE IF EXISTS counter;
+
+-- -------------------------------------------------------------
+-- 會員（members）
+-- -------------------------------------------------------------
+CREATE TABLE members (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  username    VARCHAR(50)  NOT NULL UNIQUE,
+  password    VARCHAR(255) NOT NULL,
+  salt        VARCHAR(64)  NOT NULL,
+  name        VARCHAR(50)  DEFAULT NULL,
+  email       VARCHAR(100) DEFAULT NULL,
+  phone       VARCHAR(20)  DEFAULT NULL,
+  role        VARCHAR(10)  NOT NULL DEFAULT 'user',
+  created_at  TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 商品（product）
+-- -------------------------------------------------------------
+CREATE TABLE product (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100) NOT NULL,
+  price       INT          NOT NULL,
+  image       VARCHAR(255) DEFAULT NULL,
+  description TEXT,
+  category    VARCHAR(20)  DEFAULT NULL,
+  stock       INT          NOT NULL DEFAULT '0',
+  created_at  TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 商品表二（products）
+-- -------------------------------------------------------------
+CREATE TABLE products (
+  product_id  INT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100) NOT NULL,
+  price       INT          NOT NULL,
+  stock       INT          NOT NULL DEFAULT '0',
+  image       VARCHAR(255) DEFAULT NULL,
+  description TEXT
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 商品留言 / 評價（product_comment）
+-- -------------------------------------------------------------
+CREATE TABLE product_comment (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  product_id  INT          NOT NULL,
+  user_id     INT          NOT NULL,
+  username    VARCHAR(50)  NOT NULL,
+  rating      INT          NOT NULL,
+  content     TEXT         NOT NULL,
+  create_time TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_comment_member  FOREIGN KEY (user_id)    REFERENCES members (`id`),
+  CONSTRAINT fk_comment_product FOREIGN KEY (product_id) REFERENCES product (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 購物車表（cart）
+-- -------------------------------------------------------------
+CREATE TABLE cart (
+  cart_id     INT          NOT NULL AUTO_INCREMENT,
+  user_id     INT          NOT NULL,
+  product_id  INT          NOT NULL,
+  quantity    INT          DEFAULT '1',
+  create_time TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (cart_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 訪客計數器（counter）
+-- -------------------------------------------------------------
+CREATE TABLE counter (
+  id          INT          NOT NULL,
+  count       INT          NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 訂單（orders）
+-- -------------------------------------------------------------
+CREATE TABLE orders (
+  order_id    INT          NOT NULL AUTO_INCREMENT,
+  user_id     INT          NOT NULL,
+  total_price INT          NOT NULL,
+  status      VARCHAR(20)  DEFAULT '待處理',
+  create_time TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (order_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- -------------------------------------------------------------
+-- 訂單明細（order_items）
+-- -------------------------------------------------------------
+CREATE TABLE order_items (
+  item_id     INT          NOT NULL AUTO_INCREMENT,
+  order_id    INT          NOT NULL,
+  product_id  INT          NOT NULL,
+  name        VARCHAR(100) NOT NULL,
+  price       INT          NOT NULL,
+  quantity    INT          NOT NULL,
+  PRIMARY KEY (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- =============================================================
+-- 種子資料（Seed Data）
+-- =============================================================
+
+-- 計數器初始化
+INSERT INTO counter VALUES (1,14);
+
+-- 會員資料
+INSERT INTO members VALUES 
+(1,'admin','d74ce70c3de590d522ddc28c0e80380fd9c193fc866899a68c52215595569089','a1b2c3d4e5f60718','管理員','admin@standardday.com','0900000000','admin','2026-06-10 07:53:35'),
+(2,'demo','2b6eb4b86c9996febd1b89f901a9efccfdb23a63a04c8ef079d06ab21f78ddd3','1122334455667788','示範會員','demo@standardday.com','0911111111','user','2026-06-10 07:53:35'),
+(3,'vivien','8d76f6a1596ac79dee2ed235f4c18d15462ba96aacbbceab494214f9f87908a3','2ec974b53f0ea192838581155f670c9b','簡嘉葳','vivien94922@gmail.com','0958293922','user','2026-06-10 08:00:10');
+
+-- 商品資料一（product）
+INSERT INTO product VALUES 
+(1,'夢幻粉色大衣',1280,'../images/01.jpg','柔軟保暖的粉色長版大衣，剪裁俐落，秋冬穿搭首選。','tops',20,'2026-06-10 07:53:35'),
+(2,'百搭基礎牛仔褲',960,'../images/02.jpg','經典直筒牛仔褲，彈性布料舒適好穿，百搭不退流行。','bottoms',30,'2026-06-10 07:53:35'),
+(3,'時尚週限定條紋長裙',840,'../images/03.jpg','飄逸條紋長裙，垂墜感佳，展現優雅氣質。','bottoms',18,'2026-06-10 07:53:35'),
+(4,'學院格紋顯身短裙',590,'../images/04.jpg','學院風格紋短裙，顯瘦版型，青春有型。','bottoms',25,'2026-06-10 07:53:35'),
+(5,'質感牛仔夾克',1100,'../images/05.jpg','經典藍色牛仔夾克，耐穿百搭，四季皆宜。','tops',15,'2026-06-10 07:53:35'),
+(6,'質感黑色牛仔夾克',1280,'../images/06.jpg','黑色水洗牛仔夾克，個性剪裁，街頭風必備。','tops',15,'2026-06-10 07:53:35'),
+(7,'紳士透膚襯衫',1280,'../images/07.jpg','輕透材質紳士襯衫，簡約有型，正式休閒兩相宜。','tops',22,'2026-06-10 07:53:35'),
+(8,'超前衛運動上衣',590,'../images/08.jpg','機能排汗運動上衣，彈性十足，運動更自在。','tops',40,'2026-06-10 07:53:35'),
+(9,'象牙白打底上衣',690,'../images/09.jpg','象牙白基礎打底上衣，柔軟親膚，簡約耐看。','tops',35,'2026-06-10 07:53:35'),
+(10,'復古垂感束腳工裝褲',690,'../images/10.jpg','復古工裝束腳褲，垂墜版型，休閒有型。','bottoms',28,'2026-06-10 07:53:35'),
+(11,'男裝天絲彈力直筒卡其褲',730,'../images/11.jpg','天絲彈力卡其褲，透氣舒適，低調百搭。','bottoms',26,'2026-06-10 07:53:35'),
+(12,'亮鑽百褶網紗白色長裙',730,'../images/12.jpg','亮鑽點綴百褶網紗長裙，浪漫吸睛，宴會場合首選。','bottoms',12,'2026-06-10 07:53:35'),
+(13,'歐美紫色西裝外套',1190,'../images/13.jpg','歐美剪裁紫色西裝外套，氣場十足，展現專業時尚。','tops',14,'2026-06-10 07:53:35'),
+(14,'斜肩氣質荷葉邊上衣',350,'../images/14.jpg','斜肩荷葉邊設計上衣，甜美修飾肩線，約會穿搭推薦。','tops',33,'2026-06-10 07:53:35'),
+(15,'短版聯名渲染上衣',440,'../images/15.jpg','聯名渲染印花短版上衣，個性獨特，穿出時尚態度。','tops',31,'2026-06-10 07:53:35');
+
+-- 商品資料二（products）
+INSERT INTO products (product_id, name, price, stock, image, description) VALUES
+(1,  '夢幻粉色大衣',            1280, 10, 'images/01.jpg', '這款夢幻粉色大衣採用柔軟羊毛混紡面料，手感細膩、保暖性絕佳。寬鬆版型修飾身形，搭配同色系或白色內搭均展現高雅氣質。雙排釦設計增添復古時髦感，是秋冬衣櫥的必備單品。'),
+(2,  '百搭基礎牛仔褲',          960,  10, 'images/02.jpg', '經典直筒剪裁，彈性丹寧布料提供舒適彈力，久穿不易變形。百搭深藍水洗色系，無論搭配T恤、衛衣或正式上衣皆游刃有餘。標準五口袋設計，機能與時尚兼顧，男女皆適穿。'),
+(3,  '時尚週限定條紋長裙',       840,  10, 'images/03.jpg', '靈感源自米蘭時尚週伸展台，採用流暢雪紡布料，穿起來輕盈飄逸。細膩黑白條紋排列賦予視覺延伸效果，高腰剪裁拉長比例，裙擺寬闊方便行走，搭配素色上衣即可輕鬆完成時髦造型。'),
+(4,  '學院格紋顯身短裙',         550,  10, 'images/04.jpg', '採用英倫學院風格紋面料，A字剪裁從腰部向下自然展開，完美修飾臀部曲線。隱藏式側拉鍊穿脫方便，褲頭鬆緊設計舒適服貼。搭配Polo衫或針織毛衣，輕鬆駕獄校園甜美風格。'),
+(5,  '質感牛仔夾克',            1100, 10, 'images/05.jpg', '精選12oz重磅純棉丹寧布料，質感厚實耐穿，水洗舊化處理呈現自然復古紋理。修身版型不顯臃腫，胸前雙口袋與側開口袋兼具實用性。四季皆宜的外搭單品，越洗越有個性風味。'),
+(6,  '質感黑色牛仔夾克',          1280, 10, 'images/06.jpg', '以精緻黑色丹寧面料打造的進階版牛仔夾克，染色均勻、色澤飽和不易褪色。同款藍色夾克的沉穩升級版，更顯都會率性。可單穿或疊搭連帽衛衣，打造多層次街頭風格，是全年度最具造型感的外套選擇。'),
+(7,  '紳士透膚襯衫',            1280, 10, 'images/07.jpg', '採用高透氣感雪紡梭織布料，輕薄透膚卻不失優雅。標準領口設計搭配精緻貝殼釦，呈現紳士細節品味。修身版型利落有型，適合商務或約會場合。內搭素色背心可完美詮釋半透明的層次美感。'),
+(8,  '超前衛運動上衣',            590,  10, 'images/08.jpg', '融合運動機能與街頭美學的前衛設計，採用速乾彈力布料，吸汗透氣效果出色。非對稱剪裁與撞色拼接細節打破傳統運動服框架，無論是健身房訓練或日常街頭穿搭皆能駕馭，展現獨特個人風格。'),
+(9,  '象牙白打底上衣',            690,  10, 'images/09.jpg', '以優質莫代爾棉混紡布料製成，觸感極致柔軟貼膚。象牙白色系溫潤不刺眼，百搭任何顏色下裝或外套。圓領設計貼合鎖骨線條，微修身剪裁輕鬆展現身型，是四季衣櫥最不可或缺的基本款打底單品。'),
+(10, '復古垂感束腳工裝褲',         690,  10, 'images/10.jpg', '靈感取材自 90 年代工裝美學，多口袋設計機能十足，側邊立體口袋可容納手機、錢包等隨身物品。垂感面料搭配束口設計，在寬鬆輪廓中保有利落線條。搭配寬版上衣即可打造休閒街頭造型。'),
+(11, '男裝天絲彈力直筒卡其褲',      730,  10, 'images/11.jpg', '採用 TENCEL™ 天絲纖維混紡彈力布料，兼具柔軟垂墜與舒適彈性。卡其色系百搭易穿，直筒版型從腰至褲腳比例流暢，修飾腿型效果顯著。適合商務休閒或日常通勤，洗後快乾不易起皺，打理輕鬆。'),
+(12, '亮鑽百褶網紗白色長裙',       730,  10, 'images/12.jpg', '多層次百褶網紗設計，裙擺豐盈有層次感，行走間輕盈飄動如夢境。裙身點綴細緻亮鑽裝飾，在光線下閃爍迷人光澤。高腰設計拉長身形比例，搭配簡約上衣即可化身宴會或約會的焦點。'),
+(13, '歐美紫色西裝外套',           1190, 10, 'images/13.jpg', '靈感源自歐美時尚街拍，以高飽和丁香紫色調打造搶眼造型。精梳羊毛混紡面料挺括有型，雙釦正式剪裁兼顧職場與宴會場合。搭配白色或黑色內搭，輕鬆呈現大膽又不失品味的歐式時尚氣場。'),
+(14, '斜肩氣質荷葉邊上衣',          350,  20, 'images/14.jpg', '浪漫一字領斜肩設計突顯鎖骨與肩頸線條，層疊荷葉邊裝飾增添女性柔美氣息。雪紡材質輕盈垂順，穿起來透氣舒適。版型略為寬鬆，適合各種體型，搭配高腰長褲或短裙均能展現迷人的氣質韻味。'),
+(15, '短版聯名渲染上衣',            440,  20, 'images/15.jpg', '品牌聯名企劃獨家推出，手工渲染暈染技法使每件作品色彩獨一無二。短版剪裁搭配高腰褲或裙裝展現比例美感，純棉材質親膚透氣。渲染色彩豐富多層，打造潮流感十足的街頭藝術穿搭風格。');
+
+-- 商品留言
+INSERT INTO product_comment (id, product_id, user_id, username, rating, content, create_time) VALUES
+(1, 1, 2, 'demo', 5, '這件粉色大衣超暖又好看！', '2026-06-01 10:00:00'),
+(2, 1, 2, 'demo', 4, '質感不錯，但尺碼偏大一點。',  '2026-06-03 14:30:00'),
+(3, 1, 2, 'demo', 5, '穿出去被朋友狂問哪裡買！',   '2026-06-05 09:15:00'),
+(4, 1, 1, 'admin', 5, '這件大衣很好看！', CURRENT_TIMESTAMP),
+(5, 1, 2, 'Amy',   4, '質感不錯，穿起來很舒服', CURRENT_TIMESTAMP),
+(6, 2, 1, 'admin', 5, '牛仔褲版型很好', CURRENT_TIMESTAMP);
+
+-- 驗證查詢
+SELECT * FROM product;
