@@ -44,43 +44,114 @@ header {
   opacity: 0.7;
 }
 
-.search-wrapper, .menu-wrapper {
+/* ==================== 搜尋與選單外層貨櫃 ==================== */
+.search-wrapper,
+.menu-wrapper {
   position: relative;
 }
 
-/* 下拉選單區塊 */
-.search-box, .menu-box {
+/* ==================== 搜尋框（Search Box） ==================== */
+.search-box {
   position: absolute;
-  top: 130%;
+  top: 130%; /* 留一點點下垂空間，視覺上比較舒適 */
   left: 50%;
   transform: translateX(-50%);
   background: white;
   border: 1px solid #ddd;
-  padding: 10px;
-  display: none;
+  padding: 12px;
+  display: none; /* 預設隱藏 */
   min-width: 180px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 加上陰影更有層次 */
+  z-index: 1000;
+}
+
+/* 🎯 關鍵補強：讓 script.js 的 searchBox.classList.toggle("active") 真正生效 */
+.search-box.active {
+  display: block !important;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input img {
+  width: 16px;
+  height: 16px;
+  filter: none !important; /* 確保輸入框裡的小放大鏡不會變成白色不見 */
+}
+
+.search-input input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  width: 140px;
+  color: #000;
+  font-size: 13px;
+  outline: none;
+}
+
+.search-input input:focus {
+  border-color: #222; /* 聚焦時變深色 */
+}
+
+/* ==================== 下拉分類選單（Menu Box） ==================== */
+.menu-box {
+  position: absolute;
+  top: 130%;
+  left: 50%; /* 💡 修正：改成 50% 搭配 translateX(-50%) 才能完美居中 */
+  transform: translateX(-50%);
+  background: #222; 
+  border: 1px solid #444; /* 深色背景配深色邊框比較有質感 */
+  padding: 10px;
+  display: none; /* 預設隱藏 */
+  min-width: 160px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   z-index: 2000;
 }
 
-.menu-box {
-  background: #222;
-  border: 1px solid #444;
+/* 🎯 完美對接：讓 script.js 的 menuBox.classList.toggle("active") 真正生效 */
+.menu-box.active,
+.menu-wrapper.active .menu-box {
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px;
 }
 
+/* 選單內的超連結項目 */
 .menu-box a {
   display: block;
   padding: 8px 12px;
-  color: #ccc;
   text-decoration: none;
+  color: #ccc;
   text-align: center;
   font-size: 14px;
+  border-radius: 2px;
+  transition: background 0.2s, color 0.2s;
 }
 
 .menu-box a:hover {
   color: #fff;
-  background-color: #333;
+  background-color: #333; /* 滑過時有深灰色底色提示 */
+}
+
+/* 如果妳是用圖片當作選單項目 */
+.menu-box .menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin: 4px 0;
+  padding: 5px;
+}
+
+.menu-box .menu-item img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  filter: none !important; /* 確保下拉選單裡的衣服圖片不會被強行反白 */
 }
 
 /* ==================== 商品展示區網格 (RWD) ==================== */
