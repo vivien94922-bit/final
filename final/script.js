@@ -154,31 +154,29 @@ if (userArea) {
     const status = await res.text();
 
     if (status.trim() !== "OK") {
-      alert("請先登入");
-      location.href = "login.jsp";
-      return;
+        alert("請先登入");
+        location.href = "login.jsp";
+        return;
     }
 
     const p = e.target.closest(".product");
     if (!p) return;
 
     const id = p.dataset.id;
-    const name = p.dataset.name;
-    const price = p.dataset.price;
-    const img = p.dataset.img;
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || {};
+    // 👉 改成直接寫 DB
+    const addRes = await fetch("addToCart.jsp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `product_id=${id}&quantity=1`
+    });
 
-    if (cart[id]) {
-      cart[id].quantity++;
-    } else {
-      cart[id] = { id, name, price, img, quantity: 1 };
-    }
+    const data = await addRes.json();
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    alert(name + " 已加入購物車");
-  });
+    alert(data.msg || "已加入購物車");
+});
 
   /* ===================== 收藏 ===================== */
   let fav = JSON.parse(localStorage.getItem("favorites")) || [];
