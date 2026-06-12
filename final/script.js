@@ -205,17 +205,20 @@ if (userArea) {
     localStorage.setItem("favorites", JSON.stringify(fav));
   };
 
+  /* ===================== 修正後的綁定 ===================== */
   document.querySelectorAll(".product").forEach(p => {
-    const icon = p.querySelector(".favorite-icon");
-    if (!icon) return;
+      const container = p.querySelector(".favorite-icon");
+      const iconImg = container ? container.querySelector("img") : null;
+      if (!iconImg) return;
 
-    const id = p.dataset.id;
+      const id = p.dataset.id;
+      // 檢查是否已收藏，如果是則變為紅色
+      if (fav.some(x => x.id === id)) {
+          iconImg.src = "../images/love.png";
+      }
 
-    if (fav.some(x => x.id === id)) {
-      icon.src = "../images/love.png";
-    }
-
-    icon.onclick = () => toggleFavorite(icon);
+      // 將點擊事件直接綁定在 <img> 標籤上
+      iconImg.onclick = (e) => toggleFavorite(iconImg, e);
   });
 
 });
