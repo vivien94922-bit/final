@@ -1,66 +1,34 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-
-<%@ page import="java.sql.*" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, java.util.*" %>
 <%@ include file="dbutil.jsp" %>
 
 <%
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    int visitorCount = 0;
 
-int count = 0;
-
-try{
-
-    Class.forName("com.mysql.cj.jdbc.Driver");
-
-    con = getConnection();
-
-    // 不是刷新才增加
-    if(session.getAttribute("refresh") == null){
-
-        ps = con.prepareStatement(
-            "UPDATE counter SET count = count + 1 WHERE id = 1"
-        );
-        ps.executeUpdate();
+    try {
+        con = getConnection();
+        // 訪客計數邏輯
+        if (session.getAttribute("refresh") == null) {
+            ps = con.prepareStatement("UPDATE counter SET count = count + 1 WHERE id = 1");
+            ps.executeUpdate();
+            ps.close();
+            session.setAttribute("refresh", "yes");
+        } else {
+            session.removeAttribute("refresh");
+        }
+        ps = con.prepareStatement("SELECT count FROM counter WHERE id = 1");
+        rs = ps.executeQuery();
+        if (rs.next()) visitorCount = rs.getInt("count");
+        rs.close();
         ps.close();
-
-        session.setAttribute("refresh","yes");
-
-    }else{
-
-        // 刷新後把標記清掉
-        session.removeAttribute("refresh");
+    } catch (Exception e) {
+        out.println("資料庫錯誤：" + e.getMessage());
     }
-
-    ps = con.prepareStatement(
-        "SELECT count FROM counter WHERE id = 1"
-    );
-
-    rs = ps.executeQuery();
-
-    if(rs.next()){
-        count = rs.getInt("count");
-    }
-
-}catch(Exception e){
-    out.println("錯誤：" + e.getMessage());
-}finally{
-
-    try{
-        if(rs!=null) rs.close();
-    }catch(Exception e){}
-
-    try{
-        if(ps!=null) ps.close();
-    }catch(Exception e){}
-
-    try{
-        if(con!=null) con.close();
-    }catch(Exception e){}
-}
 %>
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -69,239 +37,130 @@ try{
   <title>STANDARD DAY Clothing Store</title>
   <link rel="stylesheet" href="style.css">
   <style>
-.visitor{
-    width:200px;
-    margin:10px auto;
-    padding:5px;
-    text-align:center;
-    font-size:18px;
-}
-</style>
+    .visitor { width: 200px; margin: 10px auto; padding: 5px; text-align: center; font-size: 18px; }
+    /* 確保愛心樣式正確 */
+    .favorite-icon { cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; transition: transform 0.2s; }
+    .favorite-icon img { width: 20px !important; height: 20px !important; display: block; }
+    .favorite-icon:hover { transform: scale(1.2); }
+  </style>
 </head>
 <body>
-  <%
-String msg = (String) session.getAttribute("msg");
 
-if ("logout".equals(msg)) {
-    session.removeAttribute("msg");
-%>
+  <% if ("logout".equals(session.getAttribute("msg"))) { session.removeAttribute("msg"); %>
+    <script>alert("您已成功登出");</script>
+  <% } %>
 
-<script>
-alert("您已成功登出");
-</script>
-
-<%
-}
-%>
-  <script src="products.js"></script>
-  <script src="script.js"></script>
   <div class="intro" id="intro">
-  <div class="title">
-    <span class="left">STANDARD</span>
-    <span class="right">DAY</span>
+    <div class="title"><span class="left">STANDARD</span><span class="right">DAY</span></div>
   </div>
-</div>
+
   <header>
-    <div class="nav-left">
-      <a href="index.jsp" class="logo">STANDARD DAY</a>
-    </div>
-  
+    <div class="nav-left"><a href="index.jsp" class="logo">STANDARD DAY</a></div>
     <div class="nav-icons">
       <div class="search-wrapper">
         <img src="../images/search.png" alt="Search" id="searchIcon">
         <div class="search-box" id="searchBox">
           <div class="search-input">
-            <img src="../images/search.png" alt="">
             <input type="text" id="searchInput" placeholder="搜尋商品...">
             <div class="search-result" id="searchResult"></div>
           </div>
         </div>
       </div>
-  
-      <div class="menu-wrapper">
-        <img src="../images/clothes.png" alt="Browse" id="menuIcon">
-        <div class="menu-box" id="menuBox">
-          <a href="tops.html" class="menu-item">
-            <img src="../images/tops.png" alt="Tops">
-          </a>
-          <a href="bottoms.html" class="menu-item">
-            <img src="../images/bottoms.png" alt="Bottoms">
-          </a>
-        </div>
-      </div>
-  
-      <a href="about.html" title="關於我們">
-        <img src="../images/info.png" alt="About">
-      </a>
-  
-      <div id="user-area">
-        <a href="member.jsp">
-          <img src="../images/user.png" title="註冊 / 登入">
-        </a>
-      </div>
-
-      <a href="cart.jsp" title="購物車" id="cartLink">
-        <img src="../images/shopping_cart.png" alt="Cart">
-      </a>
+      <a href="about.html" title="關於我們"><img src="../images/info.png" alt="About"></a>
+      <a href="member.jsp"><img src="../images/user.png" title="註冊 / 登入"></a>
+      <a href="cart.jsp" title="購物車" id="cartLink"><img src="../images/shopping_cart.png" alt="Cart"></a>
     </div>
   </header>
 
   <section class="banner">
     <img id="bannerImage" src="../images/banner1.jpg" alt="Banner">
-  
     <div class="banner-text">
       <h1 id="bannerTitle"></h1>
       <p id="bannerDesc"></p>
       <button id="bannerBuyNowBtn">立即選購</button>
     </div>
-  
     <div id="dotsContainer" class="dots"></div>
-  
     <button class="prev">‹</button>
     <button class="next">›</button>
   </section>
 
-  <div class="visitor">
-    您是本站第 <b><%= count %></b>位訪客
-  </div>
+  <div class="visitor">您是本站第 <b><%= visitorCount %></b> 位訪客</div>
+
   <section class="products">
-    <h2>熱門商品</h2>
-    <div class="product-grid">
+    <%
+      String[] sections = {"hot", "tops", "bottoms"};
+      Map<String, String> sectionTitles = new HashMap<>();
+      sectionTitles.put("hot", "熱門商品");
+      sectionTitles.put("tops", "上裝");
+      sectionTitles.put("bottoms", "下裝");
 
-      <div class="product" data-id="1" data-name="夢幻粉色大衣" data-price="1280" data-img="../images/01.jpg">
-        <a href="product.jsp?id=1" class="product-link">
-          <img src="../images/01.jpg" alt="夢幻粉色大衣">
-          <h3 class="product-name">夢幻粉色大衣</h3>
-          <div class="product-price">NT$1,280</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-      
-      <div class="product" data-id="8" data-name="超前衛運動上衣" data-price="590" data-img="../images/08.jpg">
-        <a href="product.jsp?id=8" class="product-link">
-          <img src="../images/08.jpg" alt="超前衛運動上衣">
-          <h3 class="product-name">超前衛運動上衣</h3>
-          <div class="product-price">NT$590</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
+      for(String cat : sections) {
+          ps = con.prepareStatement("SELECT * FROM product WHERE category = ?");
+          ps.setString(1, cat);
+          rs = ps.executeQuery();
+          List<Map<String, Object>> productList = new ArrayList<>();
+          while(rs.next()){
+              Map<String, Object> p = new HashMap<>();
+              p.put("id", rs.getInt("id"));
+              p.put("name", rs.getString("name"));
+              p.put("price", rs.getInt("price"));
+              p.put("image", rs.getString("image"));
+              p.put("stock", rs.getInt("stock"));
+              productList.add(p);
+          }
+          rs.close(); ps.close();
+    %>
+        <h2><%= sectionTitles.get(cat) %></h2>
+        <div class="product-grid">
+        <% if (productList.isEmpty()) { %>
+            <div class="empty-msg" style="padding: 20px; color: #888; font-style: italic; width: 100%; text-align: center;">
+                目前暫無<%= sectionTitles.get(cat) %>，敬請期待最新上架！
+            </div>
+        <% } else { %>
+            <% for(Map<String, Object> p : productList) { %>
+                <div class="product" data-id="<%= p.get("id") %>" data-name="<%= p.get("name") %>" data-price="<%= p.get("price") %>" data-img="<%= p.get("image") %>">
+                    <a href="product.jsp?id=<%= p.get("id") %>">
+                      <img src="<%= p.get("image") %>" alt="<%= p.get("name") %>">
+                      <div class="product-info-header">
+                          <h3><%= p.get("name") %></h3>
+                          <div class="favorite-icon" onclick="event.preventDefault(); toggleFavorite(this, event)">
+                              <img src="../images/heart.png" alt="Favorite">
+                          </div>
+                      </div>
+                      <div class="product-price">NT$<%= p.get("price") %></div>
+                      <div class="stock-info">庫存: <%= p.get("stock") %></div>
+                    </a>
+                    <div class="cart-action">
+                        <input type="number" id="qty_<%= p.get("id") %>" value="1" min="1" max="<%= (int)p.get("stock") %>" style="width:50px;">
+                        <button class="add-cart-btn" <%= (int)p.get("stock") <= 0 ? "disabled" : "" %> onclick="addToCart(<%= p.get("id") %>)">
+                            <%= (int)p.get("stock") > 0 ? "加入購物車" : "補貨中" %>
+                        </button>
+                    </div>
+                </div>
+            <% } %>
+        <% } %>
+        </div>
+      <% } %>
+    </section>
 
-      <div class="product" data-id="9" data-name="象牙白打底上衣" data-price="690" data-img="../images/09.jpg">
-        <a href="product.jsp?id=9" class="product-link">
-          <img src="../images/09.jpg" alt="象牙白打底上衣">
-          <h3 class="product-name">象牙白打底上衣</h3>
-          <div class="product-price">NT$690</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-    </div>
-
-    <h2>上裝</h2>
-    <div class="product-grid">
-
-      <div class="product" data-id="7" data-name="紳士透膚襯衫" data-price="1280" data-img="../images/07.jpg">
-        <a href="product.jsp?id=7" class="product-link">
-          <img src="../images/07.jpg" alt="紳士透膚襯衫">
-          <h3 class="product-name">紳士透膚襯衫</h3>
-          <div class="product-price">NT$1,280</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-      <div class="product" data-id="5" data-name="質感牛仔夾克" data-price="1100" data-img="../images/05.jpg">
-        <a href="product.jsp?id=5" class="product-link">
-          <img src="../images/05.jpg" alt="質感牛仔夾克">
-          <h3 class="product-name">質感牛仔夾克</h3>
-          <div class="product-price">NT$1,100</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-      <div class="product" data-id="6" data-name="質感黑色牛仔夾克" data-price="1280" data-img="../images/06.jpg">
-        <a href="product.jsp?id=6" class="product-link">
-          <img src="../images/06.jpg" alt="質感黑色牛仔夾克">
-          <h3 class="product-name">質感黑色牛仔夾克</h3>
-          <div class="product-price">NT$1,280</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-    </div>
-
-    <h2>下裝</h2>
-    <div class="product-grid">
-      
-      <div class="product" data-id="2" data-name="百搭基礎牛仔褲" data-price="960" data-img="../images/02.jpg">
-        <a href="product.jsp?id=2" class="product-link">
-          <img src="../images/02.jpg" alt="百搭基礎牛仔褲">
-          <h3 class="product-name">百搭基礎牛仔褲</h3>
-          <div class="product-price">NT$960</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-      <div class="product" data-id="3" data-name="時尚週限定條紋長裙" data-price="840" data-img="../images/03.jpg">
-        <a href="product.jsp?id=3" class="product-link">
-          <img src="../images/03.jpg" alt="時尚週限定條紋長裙">
-          <h3 class="product-name">時尚週限定條紋長裙</h3>
-          <div class="product-price">NT$840</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-      <div class="product" data-id="4" data-name="學院格紋顯身短裙" data-price="590" data-img="../images/04.jpg">
-        <a href="product.jsp?id=4" class="product-link">
-          <img src="../images/04.jpg" alt="學院格紋顯身短裙">
-          <h3 class="product-name">學院格紋顯身短裙</h3>
-          <div class="product-price">NT$590</div>
-        </a>
-        <img src="../images/heart.png" class="favorite-icon" alt="收藏">
-        <button class="add-cart-btn">加入購物車</button>
-      </div>
-
-    </div>
-  </section>
-  
   <footer>
     <p>聯絡我們｜service@standardday.com</p>
     <p>© 2025 STANDARD DAY. All rights reserved.</p>
-    <p><a href="privacy.html" style="color:#bbb;">隱私權政策</a></p>
   </footer>
-
-  <button id="backToTop" title="回到頂部">↑</button>
-
-  <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
+  
+  <script src="script.js"></script>
   <script src="cookie-consent.js" defer>
-// 加入購物車
-async function addToCart(productId) {
-    const res = await fetch('addToCart.jsp', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `product_id=${productId}&quantity=1`
-    });
-    const data = await res.json();
-    alert(data.msg);
-}
-
-// 結帳
-async function checkout() {
-    const res = await fetch('checkout.jsp', { method: 'POST' });
-    const data = await res.json();
-    if (data.success) {
-        location.href = `orderSuccess.jsp?order_id=${data.order_id}`;
-    } else {
+    async function addToCart(productId) {
+        const qty = document.getElementById('qty_' + productId).value;
+        const res = await fetch('addToCart.jsp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `product_id=${productId}&quantity=${qty}`
+        });
+        const data = await res.json();
         alert(data.msg);
     }
-}
-</script>
+  </script>
 </body>
 </html>
+<% if(con != null) con.close(); %>
