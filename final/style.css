@@ -1,3 +1,23 @@
+/* 移除所有連結預設底線 */
+a {
+    text-decoration: none;
+    color: inherit; /* 繼承父層顏色，避免出現藍色連結 */
+    transition: opacity 0.2s ease;
+}
+
+/* 懸停時僅做透明度變化，不加底線 */
+a:hover {
+    opacity: 0.7;
+}
+
+/* 簡化標題與文字設定 */
+h2 {
+    font-weight: 300; /* 極簡風常用較細的字體 */
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
 /* ==========================================================================
    1. 基礎設定 (Base)
    ========================================================================== */
@@ -117,21 +137,103 @@ nav a:hover { text-decoration: underline; }
 @keyframes fade { from { opacity: 0.4; } to { opacity: 1; } }
 
 /* ==========================================================================
-   5. 商品列表與按鈕
+   5. 商品列表與按鈕 (已更新為水平滑動版)
    ========================================================================== */
-.products { padding: 40px; max-width: 1400px; margin: 0 auto; background-color: #FFFFFF; }
-.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-.product { position: relative; background-color: #FFFBFE; border: 1px solid #D0CFCF; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.products { 
+    padding: 40px; 
+    max-width: 1400px; 
+    margin: 0 auto; 
+    background-color: #FFFFFF; 
+}
+
+/* 核心修改：從 grid 改為 flex，啟用橫向滑動 */
+.product-grid { 
+    display: flex; 
+    flex-wrap: nowrap;          /* 強制不換行 */
+    overflow-x: auto;           /* 啟用水平捲軸 */
+    gap: 30px; 
+    padding-bottom: 20px;       /* 增加底部空間給捲軸 */
+    -webkit-overflow-scrolling: touch; /* 手機滑動更順暢 */
+}
+
+/* 隱藏捲軸（選用，讓介面更乾淨） */
+.product-grid::-webkit-scrollbar { height: 6px; }
+.product-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+.product { 
+    flex: 0 0 280px;            /* 強制每個商品固定 280px 寬，不會被擠壓 */
+    position: relative; 
+    background-color: #FFFBFE; 
+    border: 1px solid #D0CFCF; 
+    border-radius: 10px; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    cursor: pointer; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
 .product:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.product img { width: 100%; height: 400px; object-fit: cover; display: block; }
-.product-name { font-weight: bold; margin: 15px 15px 5px 15px; font-size: 20px; }
-.product-price { font-size: 25px; font-weight: bold; margin: 0 15px 10px 15px; }
+.product img { width: 100%; height: 350px; object-fit: cover; display: block; }
+.product h3 { font-weight: 400; font-size: 16px; margin: 10px 15px; }
+.product-price { font-weight: 400; font-size: 18px; margin: 0 15px 10px 15px; }
 
-.add-cart-btn { width: calc(100% - 32px); margin: 16px auto; padding: 12px 0; background: #565254; color: #FFFFFF; border: none; border-radius: 999px; font-size: 14px; cursor: pointer; transition: 0.2s; }
-.add-cart-btn:hover { background: #7A7D7D; box-shadow: 0 10px 25px rgba(0,0,0,.2); transform: translateY(-2px); }
+/* 庫存資訊 */
+.stock-info { font-size: 13px; color: #777; margin: 0 15px 10px 15px; }
 
-.favorite-icon { width: 18px !important; height: 18px !important; position: absolute; bottom: 80px; right: 15px; cursor: pointer; transition: 0.2s; }
-.favorite-icon:hover { transform: scale(1.3); }
+/* 購買區塊 */
+.cart-action { display: flex; align-items: center; gap: 8px; padding: 0 15px 15px 15px; }
+.cart-action input { width: 50px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+
+.add-cart-btn { flex-grow: 1; padding: 10px 0; background: #565254; color: #FFFFFF; border: none; border-radius: 999px; font-size: 14px; cursor: pointer; transition: 0.2s; }
+.add-cart-btn:hover { background: #7A7D7D; }
+
+/* 收藏按鈕圖示樣式 (修正大小與對齊) */
+.favorite-icon {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px; /* 縮小邊距 */
+    transition: transform 0.2s;
+    background: none; /* 移除舊的半透明背景 */
+
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* 確保愛心本身可被點擊 */
+}
+
+.favorite-icon * {
+    pointer-events: auto;
+}
+
+/* 強制限制愛心圖片大小 */
+.favorite-icon img {
+    width: 20px !important; /* 強制圖片寬度為 20px */
+    height: 20px !important; /* 強制圖片高度為 20px */
+    display: block;
+    object-fit: contain;
+}
+
+.favorite-icon:hover {
+    transform: scale(1.2);
+}
+
+/* 確保與名稱並排的容器 */
+.product-info-header {
+    display: flex;
+    justify-content: space-between; /* 名稱靠左，愛心靠右 */
+    align-items: center;            /* 垂直置中 */
+    margin: 10px 15px 5px 15px;
+}
+
+.product-info-header h3 {
+    margin: 0; 
+    font-size: 16px;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* 避免名稱過長擠壓愛心 */
+}
 
 /* ==========================================================================
    6. 其他元件 (User Menu, BackToTop, Toast)
