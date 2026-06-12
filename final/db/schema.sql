@@ -154,3 +154,6 @@ INSERT INTO product_comment (product_id, user_id, username, rating, content, cre
 (1, 2, 'demo', 5, '這件粉色大衣超暖又好看！', '2026-06-01 10:00:00'),
 (1, 2, 'demo', 4, '質感不錯，但尺碼偏大一點。',  '2026-06-03 14:30:00'),
 (1, 2, 'demo', 5, '穿出去被朋友狂問哪裡買！',   '2026-06-05 09:15:00');
+
+-- 顯示「熱門商品」
+SELECT * FROM product WHERE category = 'hot' ORDER BY created_at DESC LIMIT 6;
