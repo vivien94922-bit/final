@@ -179,47 +179,56 @@ if (userArea) {
 });
 
   /* ===================== 收藏 ===================== */
-  let fav = JSON.parse(localStorage.getItem("favorites")) || [];
+let fav = JSON.parse(localStorage.getItem("favorites")) || [];
 
-  window.toggleFavorite = function (el) {
+  window.toggleFavorite = function (el, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
     const p = el.closest(".product");
     const id = p.dataset.id;
-
+    const imgEl = el.tagName === 'IMG' ? el : el.querySelector('img');
     const index = fav.findIndex(x => x.id === id);
 
-    if (el.src.includes("heart.png")) {
-      el.src = "../images/love.png";
-      if (index === -1) fav.push({
-        id,
-        name: p.dataset.name,
-        price: p.dataset.price,
-        img: p.dataset.img
-      });
-      toast("已加入收藏");
+    if (index === -1) {
+        // 加入收藏：換成 love.png 並加上紅色濾鏡
+        imgEl.src = "../images/love.png";
+        imgEl.classList.add("red-filter"); 
+        
+        fav.push({
+            id: id,
+            name: p.dataset.name,
+            price: p.dataset.price,
+            img: p.dataset.img
+        });
+        if (typeof toast === 'function') toast("已加入收藏");
     } else {
-      el.src = "../images/heart.png";
-      if (index !== -1) fav.splice(index, 1);
-      toast("已移除收藏");
+        // 移除收藏：換回 heart.png 並移除紅色濾鏡
+        imgEl.src = "../images/heart.png";
+        imgEl.classList.remove("red-filter");
+        
+        fav.splice(index, 1);
+        if (typeof toast === 'function') toast("已移除收藏");
     }
 
     localStorage.setItem("favorites", JSON.stringify(fav));
-  };
+};
 
-  /* ===================== 修正後的綁定 ===================== */
+  // 頁面載入時的初始化檢查
   document.querySelectorAll(".product").forEach(p => {
-      const container = p.querySelector(".favorite-icon");
-      const iconImg = container ? container.querySelector("img") : null;
-      if (!iconImg) return;
+    const iconImg = p.querySelector(".favorite-icon img");
+    if (!iconImg) return;
 
-      const id = p.dataset.id;
-      // 檢查是否已收藏，如果是則變為紅色
-      if (fav.some(x => x.id === id)) {
-          iconImg.src = "../images/love.png";
-      }
-
-      // 將點擊事件直接綁定在 <img> 標籤上
-      iconImg.onclick = (e) => toggleFavorite(iconImg, e);
-  });
+    const id = p.dataset.id;
+    if (fav.some(x => x.id === id)) {
+        iconImg.src = "../images/love.png"; // 確保是 love.png
+        iconImg.classList.add("red-filter"); // 確保加上紅色濾鏡
+    }
+    
+    iconImg.onclick = (e) => toggleFavorite(iconImg, e);
+});
 
 });
 
