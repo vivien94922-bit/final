@@ -268,6 +268,41 @@ if (isLogin) {
 #favorite-list .favorite-icon:hover {
   transform: scale(1.3);
 }
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+  transition: 0.2s ease;
+}
+
+.form-box {
+  width: 400px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  width: 80px;   /* 👉 關鍵：讓欄位統一寬度 */
+  font-weight: bold;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 6px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
   </style>
 </head>
 
@@ -301,24 +336,44 @@ if (isLogin) {
 
     <main class="member-content">
       <h1>會員中心</h1>
-      <section id="register" class="content-section">
-        <h2>會員註冊</h2>
-      
-        <form action="register_process.jsp" method="post">
-          帳號： <input type="text" name="username" autocomplete="username" required>
-          <br><br>
-          
-          密碼： <input type="password" name="password" autocomplete="new-password" required>
-          <br><br>
-          
-          姓名： <input type="text" name="name" autocomplete="name" required>
-          <br><br>
-          
-          Email：<input type="email" name="email" autocomplete="email" required>
-          <br><br>
-          
-          電話：<input type="text" name="phone" autocomplete="tel" required>
-      </form>
+
+<section id="register" class="content-section">
+  <h2>會員註冊</h2>
+
+    <form action="register_process.jsp" method="post" class="form-box">
+
+      <div class="form-row">
+        <label>帳號</label>
+        <input type="text" name="username" required>
+      </div>
+
+      <div class="form-row">
+        <label>密碼</label>
+        <input type="password" name="password" required>
+      </div>
+
+      <div class="form-row">
+        <label>姓名</label>
+        <input type="text" name="name" required>
+      </div>
+
+      <div class="form-row">
+        <label>Email</label>
+        <input type="email" name="email" required>
+      </div>
+
+      <div class="form-row">
+        <label>電話</label>
+        <input type="text" name="phone" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">送出註冊</button>
+        <button type="reset">重填</button>
+      </div>
+
+    </form>
+  </section>
       </section>
       <section id="profile" class="content-section <%= isLogin ? "active" : "" %>">
         
