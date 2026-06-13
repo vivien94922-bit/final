@@ -190,69 +190,71 @@ if (isLogin) {
     transform: rotate(45deg); /* + 變成 × */
   }
   /* ===== 收藏 ===== */
-  /* 收藏列表容器 */
+/* 收藏列表容器：改為並排模式 */
 #favorite-list {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 10px 0;
+  flex-wrap: wrap; /* 允許換行 */
+  gap: 20px;       /* 卡片之間的間距 */
+  padding: 10px;
   max-width: 1000px;
 }
 
-/* 每個商品卡片 */
+/* 每個商品卡片：改為垂直結構以符合變窄的需求 */
 #favorite-list .product {
   display: flex;
-  align-items: left;
+  flex-direction: column; /* 圖片在上方，文字在下方 */
+  width: 200px;           /* 設定卡片寬度，讓它變窄 */
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
   overflow: hidden;
-  padding: 10px;
+  padding: 15px;
   transition: box-shadow 0.2s;
+  position: relative;     /* 為了讓愛心可以放在右上角 */
 }
 
 #favorite-list .product:hover {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* 商品圖片 */
+/* 商品圖片：填滿卡片寬度 */
 #favorite-list .product img {
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 200px;          /* 根據你的美感調整高度 */
   object-fit: cover;
   border-radius: 8px;
-  margin-left: 0;
 }
 
 /* 文字區塊 */
 #favorite-list .product-info {
-  flex: 1;
-  flex-direction: column;
-  justify-content: right;
+  margin-top: 10px;
 }
 
 /* 商品名稱 */
 #favorite-list .product-name {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 5px;
+  white-space: nowrap;    /* 防止名稱過長跑版 */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 價格 */
 #favorite-list .product-price {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  color: #555;
   margin-bottom: 10px;
 }
 
-/* 加入購物車按鈕 */
+/* 按鈕區塊 */
 #favorite-list .add-cart-btn {
-  width: fit-content;
+  width: 100%;            /* 按鈕寬度填滿 */
   background-color: #000;
   color: #fff;
   border: none;
   border-radius: 5px;
-  padding: 6px 12px;
+  padding: 8px;
   cursor: pointer;
 }
 
@@ -268,6 +270,7 @@ if (isLogin) {
 #favorite-list .favorite-icon:hover {
   transform: scale(1.3);
 }
+
 button {
   padding: 10px 18px;
   border: none;
@@ -481,57 +484,64 @@ button {
       if (target) target.classList.add('active');
     }
 
-    /* ==================== 載入收藏清單 ==================== */
-    function loadFavorites() {
-      fetch("favorite_list.jsp")
-        .then(res => res.json())
-        .then(data => {
-          const box = document.getElementById("favorite-list");
-          if (!box) return;
-          box.innerHTML = "";
-          if (!data || data.length === 0) {
-            box.innerHTML = "<p>目前沒有收藏商品</p>";
+    /* ==================== 2. 收藏功能 ==================== */
+    window.loadFavorites = function() {
+        const box = document.getElementById("favorite-list");
+        if (!box) {
+            console.error("找不到 favorite-list 這個容器！");
             return;
-          }
-          data.forEach(item => {
-            box.innerHTML += `
-              <div class="product" data-id="${item.id}">
-                <img src="${item.img}" alt="${item.name}">
-                <div class="product-info">
-                  <h3 class="product-name">${item.name}</h3>
-                  <p class="product-price">NT$ ${item.price}</p>
-                  <button class="add-cart-btn" onclick="addToCart('${item.id}')">加入購物車</button>
-                </div>
-                <img src="images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">
-              </div>`;
-          });
-        })
-        .catch(err => console.error("載入收藏失敗：", err));
-    }
-
-    window.toggleFavorite = function (el) {
-      const p = el.closest(".product");
-      const id = p.dataset.id;
-      fetch("favorite_toggle.jsp", {
-        method: "POST",
-        headers: {"Content-Type":"application/x-www-form-urlencoded"},
-        body: "product_id=" + id
-      })
-      .then(res => res.text())
-      .then(result => {
-        result = result.trim();
-        if (result === "add") {
-          el.src = "../images/love.png";
-        } else if (result === "remove") {
-          if (el.closest("#favorite-list")) {
-            p.remove();
-            const box = document.getElementById("favorite-list");
-            if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
-          } else {
-            el.src = "../images/heart.png";
-          }
         }
-      });
+        
+        fetch("favorite_list.jsp")
+            .then(res => res.json())
+            .then(data => {
+                box.innerHTML = ""; // 確實清空
+                if (!data || data.length === 0) {
+                    box.innerHTML = "<p>目前沒有收藏商品</p>";
+                    return;
+                }
+
+                data.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "product";
+                    div.dataset.id = item.id;
+
+                    // 將內容拆開來寫，避免樣板字串錯誤
+                    div.innerHTML = 
+                        '<a href="/final-main/product.jsp?id=' + item.id + '">' +
+                            '<img src="' + item.img + '" alt="' + item.name + '">' +
+                            '<div class="product-info">' +
+                                '<div class="product-name">' + item.name + '</div>' +
+                                '<div class="product-price">NT$' + item.price + '</div>' +
+                            '</div>' +
+                        '</a>' +
+                        '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
+                        '<img src="/final-main/images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">';
+
+                    document.getElementById("favorite-list").appendChild(div);
+                });
+            })
+            .catch(err => console.error("載入錯誤:", err));
+    };
+
+    window.toggleFavorite = function(el) {
+        const p = el.closest(".product");
+        const id = p.dataset.id;
+        fetch("favorite_toggle.jsp", {
+            method: "POST",
+            headers: {"Content-Type":"application/x-www-form-urlencoded"},
+            body: "product_id=" + id
+        })
+        .then(res => res.text())
+        .then(result => {
+            if (result.trim() === "remove" && el.closest("#favorite-list")) {
+                p.remove();
+                const box = document.getElementById("favorite-list");
+                if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
+            } else {
+                alert("已更新收藏狀態");
+            }
+        });
     };
         
     /* ==================== 初始化與事件監聽 ==================== */
