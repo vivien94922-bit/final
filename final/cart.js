@@ -71,9 +71,14 @@ function bindCartEvents() {
             const cartId = item.dataset.cartId;
             const input = item.querySelector(".quantity");
 
-            let qty = parseInt(input.value) - 1;
-            input.value = qty;
-
+           let qty = parseInt(input.value) - 1;
+           if(qty < 1){
+                 if(confirm("確定刪除此商品？")){
+                    qty = 0;
+                    }else{
+                        return;
+                    }
+                }
             await fetch("updateCartQty.jsp", {
                 method: "POST",
                 headers: {"Content-Type":"application/x-www-form-urlencoded"},
