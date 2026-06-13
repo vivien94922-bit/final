@@ -1,164 +1,125 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="header.jsp" %>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>會員登入 - STANDARD DAY</title>
-  <style>
-    /* ===== 基礎全域設定 ===== */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      display: flex;
-      flex-direction: column; /* 讓 header 頂天，main-content 吃滿剩餘空間 */
-      min-height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登入｜STANDARD DAY</title>
 
-    /* ===== 精簡版 Header 樣式 ===== */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 40px;
-      background-color: #222;
-      position: relative;
-      z-index: 1000;
-    }
+<link rel="stylesheet" href="style.css">
 
-    .logo {
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      text-decoration: none;
-      letter-spacing: 1px;
-    }
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: #f6f6f6;
+}
 
-    /* ===== 主內容區（將登入卡片置中） ===== */
-    .main-content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 0;
-    }
+/* ===== 登入區塊置中 ===== */
+.login-wrapper{
+    height: calc(100vh - 120px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-    /* ===== 登入外層卡片 ===== */
-    .login-container {
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      width: 100%;
-      max-width: 350px;
-      box-sizing: border-box;
-    }
+/* ===== 登入卡片 ===== */
+.login-card{
+    width: 360px;
+    background: #fff;
+    padding: 35px 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    text-align:center;
+    animation: fadeIn 0.6s ease;
+}
 
-    .login-container h2 {
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 25px;
-      font-size: 22px;
-      letter-spacing: 1px;
-    }
+@keyframes fadeIn{
+    from{opacity:0; transform: translateY(20px);}
+    to{opacity:1; transform: translateY(0);}
+}
 
-    /* ===== 表單群組 ===== */
-    .form-group {
-      margin-bottom: 20px;
-    }
+.login-title{
+    font-size: 22px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    color:#222;
+}
 
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      font-size: 14px;
-    }
+/* ===== input ===== */
+.login-input{
+    width:100%;
+    padding: 12px 14px;
+    margin: 8px 0;
+    border:1px solid #ddd;
+    border-radius: 10px;
+    outline:none;
+    transition: 0.3s;
+}
 
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
+.login-input:focus{
+    border-color:#333;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
 
-    .form-group input:focus {
-      border-color: #222;
-      outline: none;
-    }
+/* ===== button ===== */
+.login-btn{
+    width:100%;
+    padding: 12px;
+    margin-top: 15px;
+    border:none;
+    border-radius: 10px;
+    background:#222;
+    color:white;
+    cursor:pointer;
+    font-size: 15px;
+    transition: 0.3s;
+}
 
-    /* ===== 登入按鈕 ===== */
-    .login-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #222;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 10px;
-    }
+.login-btn:hover{
+    background:#444;
+    transform: translateY(-2px);
+}
 
-    .login-btn:hover {
-      background-color: #555;
-    }
+/* ===== 註冊連結 ===== */
+.register-link{
+    margin-top: 15px;
+    font-size: 13px;
+    color:#666;
+    cursor:pointer;
+}
 
-    /* ===== 下方引導註冊連結 ===== */
-    .register-link {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #666;
-      cursor: pointer;
-      text-decoration: underline;
-      transition: color 0.2s;
-    }
-
-    .register-link:hover {
-      color: #000;
-      font-weight: bold;
-    }
-  </style>
+.register-link:hover{
+    color:#000;
+    text-decoration: underline;
+}
+</style>
 </head>
+
 <body>
+<!-- ===== 登入區 ===== -->
+<div class="login-wrapper">
 
-  <header>
-    <div class="nav-left">
-      <a href="index.jsp" class="logo">STANDARD DAY</a>
-    </div>
-  </header>
+  <div class="login-card">
+    <div class="login-title">會員登入</div>
 
-  <div class="main-content">
-    <div class="login-container">
-      <h2>會員登入</h2>
-      
-      <form action="login_process.jsp" method="post">
-        <div class="form-group">
-          <label>帳號</label>
-          <input type="text" name="username" required placeholder="請輸入帳號">
-        </div>
-        
-        <div class="form-group">
-          <label>密碼</label>
-          <input type="password" name="password" required placeholder="請輸入密碼">
-        </div>
-        
-        <button type="submit" class="login-btn">登入</button>
-      </form>
+    <form action="login_process.jsp" method="post">
+      <input class="login-input" type="text" name="username" placeholder="帳號">
+      <input class="login-input" type="password" name="password" placeholder="密碼">
 
-      <div class="register-link" onclick="location.href='member.jsp#register'">
-        還沒註冊？立即註冊
-      </div>
+      <button class="login-btn" type="submit">登入</button>
+    </form>
+
+    <div class="register-link" onclick="location.href='member.jsp#register'">
+      還沒有帳號？立即註冊
     </div>
   </div>
 
-  <script src="script.js" defer></script>
-  <script src="cookie-consent.js" defer></script>
+</div>
+
+<!-- Cookie 同意 -->
+<script src="cookie-consent.js" defer></script>
 
 </body>
 </html>

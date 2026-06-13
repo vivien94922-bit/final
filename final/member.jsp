@@ -49,7 +49,6 @@ if (isLogin) {
   <meta charset="UTF-8">
   <title>會員中心</title>
   <link rel="stylesheet" href="style.css">
-  <script src="products.js"></script>
   <script src="script.js"></script>
   <style>
     header {
@@ -145,93 +144,6 @@ if (isLogin) {
       font-weight: bold;
       text-decoration: none;
     }
-
-    /* ===== Header Icons Layout ===== */
-
-    .nav-icons {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .nav-icons img {
-      width: 22px;
-      height: 22px;
-      cursor: pointer;
-      filter: invert(1);
-    }
-
-    .nav-icons img:hover {
-      opacity: 0.8;
-    }
-
-    .search-wrapper,
-    .menu-wrapper {
-      position: relative;
-    }
-
-    .search-box {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ddd;
-      padding: 10px;
-      display: none;
-      min-width: 160px;
-      z-index: 1000;
-    }
-
-    .menu-box {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ddd;
-      padding: 10px;
-      display: none;
-      min-width: 160px;
-      z-index: 2000;
-    }
-
-    .search-input {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .search-input input {
-      border: 1px solid #ccc;
-      padding: 5px;
-      width: 120px;
-    }
-
-    .menu-box a {
-      display: block;
-      padding: 5px 0;
-      text-decoration: none;
-      color: #333;
-    }
-
-    .menu-box a:hover {
-      color: #000;
-      font-weight: bold;
-    }
-
-    .menu-box .menu-item {
-      display: flex;
-      align-items: center;
-      justify-content: center; /* 圖片置中 */
-      margin: 5px 0;
-    }
-
-    .menu-box .menu-item img {
-      width: 100%;
-      display: block;
-    }
-
      /* ===== FAQ 樣式 ===== */
 
   .faq {
@@ -360,46 +272,9 @@ if (isLogin) {
 </head>
 
 <body>
-  <body data-login="<%= (session.getAttribute("user_id") != null) %>">
-  <!-- ===== Header / Navbar（共用） ===== -->
-  <header>
-    <div class="nav-left">
-      <a href="index.jsp" class="logo">STANDARD DAY</a>
-    </div>
-  
-    <div class="nav-icons">
-      <div class="search-wrapper">
-        <img src="../images/search.png" alt="Search" id="searchIcon">
-        <div class="search-box" id="searchBox">
-          <div class="search-input">
-            <img src="../images/search.png" alt=""> <input type="text" id="searchInput" placeholder="搜尋商品...">
-            <div class="search-result" id="searchResult"></div>
-          </div>
-        </div>
-      </div>
-  
-      <div class="menu-wrapper">
-        <img src="../images/clothes.png" alt="Browse" id="menuIcon"> <div class="menu-box" id="menuBox">
-          <a href="tops.html" class="menu-item">
-            <img src="../images/tops.png" alt="Tops"> </a>
-          <a href="bottoms.html" class="menu-item">
-            <img src="../images/bottoms.png" alt="Bottoms"> </a>
-        </div>
-      </div>
-  
-      <a href="about.html" title="關於我們">
-        <img src="../images/info.png" alt="About"> </a>
-  
-      <a href="member.jsp" title="會員中心" id="memberLink">
-        <img src="../images/user.png" alt="Member"> </a>
-  
-      <a href="cart.html" title="購物車" id="cartLink">
-        <img src="../images/shopping_cart.png" alt="Cart"> </a>
-    </div>
-</header>
-
+  <%@ include file="header.jsp" %>
   <!-- ===== 會員中心 ===== -->
-  <div class="member-container">
+  <div class="member-container">  
 
     <aside class="member-sidebar">
       <ul>
@@ -430,14 +305,20 @@ if (isLogin) {
         <h2>會員註冊</h2>
       
         <form action="register_process.jsp" method="post">
-          帳號：<input type="text" name="username" required><br><br>
-          密碼：<input type="password" name="password" required><br><br>
-          姓名：<input type="text" name="name" required><br><br>
-          Email：<input type="email" name="email" required><br><br>
-          電話：<input type="text" name="phone" required><br><br>
-      
-          <button type="submit" class="save-btn">註冊</button>
-        </form>
+          帳號： <input type="text" name="username" autocomplete="username" required>
+          <br><br>
+          
+          密碼： <input type="password" name="password" autocomplete="new-password" required>
+          <br><br>
+          
+          姓名： <input type="text" name="name" autocomplete="name" required>
+          <br><br>
+          
+          Email：<input type="email" name="email" autocomplete="email" required>
+          <br><br>
+          
+          電話：<input type="text" name="phone" autocomplete="tel" required>
+      </form>
       </section>
       <section id="profile" class="content-section <%= isLogin ? "active" : "" %>">
         
@@ -450,22 +331,28 @@ if (isLogin) {
       </div>
       </section>
 
-      <section id="like" class="content-section">
-        <h2>收藏商品</h2>
-        <div id="favorite-list" class="product-grid">
-          <!-- 收藏商品會動態生成在這裡 -->
-        </div>
-      </section>
+     <section id="like" class="content-section">
+  <h2>收藏商品</h2>
+  <div id="favorite-list" class="product-grid">
+    <!-- JS 會把資料塞進來 -->
+  </div>
+</section>
       <section id="orders" class="content-section">
         <h2>訂單紀錄</h2>
         <p>目前尚無訂單</p>
       </section>
 
       <section id="password" class="content-section">
-        <h2>修改密碼</h2>
-        <input type="password" placeholder="舊密碼"><br><br>
-        <input type="password" placeholder="新密碼"><br><br>
-        <button class="save-btn">送出</button>
+        <form>
+    <h2>修改密碼</h2>
+    <input type="password" id="old-password" name="oldPassword" placeholder="舊密碼" autocomplete="current-password">
+    <br><br>
+    
+    <input type="password" id="new-password" name="newPassword" placeholder="新密碼" autocomplete="new-password">
+    <br><br>
+    
+    <button type="submit" class="save-btn">送出</button>
+</form>
       </section>
       
       <section id="question" class="content-section">
@@ -559,66 +446,91 @@ if (isLogin) {
     }
   
     /* ==================== 收藏功能 ==================== */
-    function loadFavorites() {
-      const favoriteList = document.getElementById('favorite-list');
-      if (!favoriteList) return;
-      favoriteList.innerHTML = '';
-      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+/* ==================== 1. 頁面切換 ==================== */
+function showSection(id) {
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+}
+
+/* ==================== 2. 載入收藏清單 (前後端對接) ==================== */
+function loadFavorites() {
+  fetch("favorite_list.jsp")
+    .then(res => res.json())
+    .then(data => {
+      const box = document.getElementById("favorite-list");
+      if (!box) return;
       
-      if (favorites.length === 0) {
-        favoriteList.innerHTML = `<p style="color:#777; padding:20px 0;">目前沒有收藏商品</p>`;
+      box.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        box.innerHTML = "<p>目前沒有收藏商品</p>";
         return;
       }
-    
-        favorites.forEach(item => {
-        const div = document.createElement('div');
-        div.classList.add('product');
-        div.innerHTML = `
-          <img src="${item.img}" alt="${item.name}">
-          <div class="product-info">
-            <h3 class="product-name">${item.name}</h3>
-            <div class="product-price">NT$${item.price}</div>
-            <button class="add-cart-btn">加入購物車</button>
+
+      data.forEach(item => {
+        // 💡 這裡將愛心圖片路徑改為 "images/love.png" (假設與 member.jsp 在同層目錄)
+        // 如果你的圖片在別處，請自行調整此處與下方 toggleFavorite 的路徑
+        box.innerHTML += `
+          <div class="product" data-id="${item.id}">
+            <img src="${item.img}" alt="${item.name}">
+            <div class="product-info">
+              <h3 class="product-name">${item.name}</h3>
+              <p class="product-price">NT$ ${item.price}</p>
+              <button class="add-cart-btn" onclick="addToCart('${item.id}')">加入購物車</button>
+            </div>
+            <img src="images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">
           </div>
-          <img src="images/love.png" class="favorite-icon" onclick="removeFavorite('${item.id}', this)" alt="收藏">
         `;
-        favoriteList.appendChild(div);
-      
-        // 綁定事件一次，避免重複 alert
-        div.querySelector('.add-cart-btn').addEventListener('click', () => {
-          addToCartFromMember(div.querySelector('.add-cart-btn'), item.id, item.name, item.price, item.img);
-        });
       });
+    })
+    .catch(err => {
+      console.error("載入收藏失敗：", err);
+    });
+}
+/* ===================== 雙向收藏切換 ===================== */
+window.toggleFavorite = function (el) {
+  const p = el.closest(".product");
+  const id = p.dataset.id;
+
+  fetch("favorite_toggle.jsp", {
+    method: "POST",
+    headers: {"Content-Type":"application/x-www-form-urlencoded"},
+    body: "product_id=" + id
+  })
+  .then(res => res.text())
+  .then(result => {
+    result = result.trim();
+
+    if (result === "add") {
+      el.src = "../images/love.png";
+      if(typeof showToast === "function") showToast("已加入收藏 ❤️");
     } 
-    
-    
-    function removeFavorite(id, icon) {
-      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      favorites = favorites.filter(item => item.id !== id);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      icon.closest('.product').remove();
-    }
-    
-    function addToCartFromMember(btn, id, name, price, img) {
-      // 這裡確保即使 script.js 沒載入，至少會跳通知
-      if (typeof addToCart === 'function') {
-        addToCart(btn);
+    else if (result === "remove") {
+      // 💡 超棒優化：如果使用者是在「會員中心的收藏清單」裡點擊取消
+      // 我們可以直接把整個商品卡片從畫面上淡出/移除，體驗極佳！
+      if (el.closest("#favorite-list")) {
+        p.remove(); 
+        // 如果刪到沒商品了，顯示提示
+        const box = document.getElementById("favorite-list");
+        if (box.children.length === 0) {
+          box.innerHTML = "<p>目前沒有收藏商品</p>";
+        }
       } else {
-        alert(`已將 ${name} 加入購物車 (購物車功能由 script.js 提供)`);
+        // 如果是在一般商品頁，就只是把愛心變空心
+        el.src = "../images/heart.png";
       }
+      
+      if(typeof showToast === "function") showToast("已取消收藏");
+    } 
+    else {
+      console.log("收藏錯誤：", result);
     }
-    function checkLoginThen(sectionId) {
-
-    const isLogin = document.body.dataset.login === "true";
-
-    if (!isLogin) {
-        alert("請先登入會員");
-        window.location.href = "login.jsp";
-        return;
-    }
-
-    showSection(sectionId);
-    }
+  });
+};
+    
     /* ==================== 核心修正：導航欄控制 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -699,5 +611,3 @@ if (isLogin) {
 
 </body>
 </html>
-
-

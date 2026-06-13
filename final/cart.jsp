@@ -7,49 +7,10 @@
     <title>購物車</title>
     <link rel="stylesheet" href="cart.css">
     <link rel="stylesheet" href="style.css">
-    <script src="products.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
-
-    <header>
-      <div class="nav-left">
-        <a href="index.jsp" class="logo">STANDARD DAY</a>
-      </div>
-      <div class="nav-icons">
-        <div class="search-wrapper">
-          <img src="../images/search.png" alt="Search" id="searchIcon">
-          <div class="search-box" id="searchBox">
-            <div class="search-input">
-                <img src="../images/search.png" alt="">
-                <input type="text" id="searchInput" placeholder="搜尋商品...">
-                <div class="search-result" id="searchResult"></div>
-            </div>
-          </div>
-        </div>
-        <div class="menu-wrapper">
-          <img src="../images/clothes.png" alt="Browse" id="menuIcon">
-           <div class="menu-box" id="menuBox">
-                <a href="tops.html" class="menu-item">
-                  <img src="../images/tops.png" alt="Tops">
-                </a>
-                <a href="bottoms.html" class="menu-item">
-                  <img src="../images/bottoms.png" alt="Bottoms">
-                </a>
-          </div>
-        </div>
-        <a href="about.html" title="關於我們">
-          <img src="../images/info.png" alt="About">
-        </a>
-        <a href="member.jsp" title="會員中心">
-          <img src="../images/user.png" alt="Member">
-        </a>
-        <a href="cart.jsp" title="購物車">
-          <img src="../images/shopping_cart.png" alt="Cart">
-        </a>
-      </div>
-    </header>
-
+    <%@ include file="header.jsp" %>
     <nav class="breadcrumb">
         <a href="index.jsp">首頁</a> &gt; <span>購物車</span>
     </nav>
@@ -80,13 +41,13 @@
                 return;
             }
 
-            const items = await res.json();
             const container = document.getElementById('cart-container');
-            container.innerHTML = '';
+            const items = await res.json();
 
-            if (items.length === 0) {
-                container.innerHTML = '<p style="text-align:center;padding:40px;">購物車是空的</p>';
-                updateTotal([]);
+            console.log("RAW RESPONSE:", items);
+
+            if (!Array.isArray(items)) {
+                container.innerHTML = "<p>購物車是空的或尚未登入</p>";
                 return;
             }
 
@@ -102,7 +63,8 @@
                         <p>單價：NT$${item.price.toLocaleString()}</p>
                         <div class="quantity-controls">
                             <button class="decrease">-</button>
-                            <input type="number" class="quantity" value="${item.quantity}" min="1">
+                            <input type="number" name="quantity" class="quantity" value min="1">
+                            <input type="number" id="quantity-${item.cartId}" name="quantity_${item.cartId}" class="quantity" value min="1">
                             <button class="increase">+</button>
                             <button class="remove-btn">刪除</button>
                         </div>

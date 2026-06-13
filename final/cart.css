@@ -1,23 +1,84 @@
-/* ==================== 購物車主容器 ==================== */
-.cart-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; 
 }
-
-.page-title {
-    font-size: 22px;
-    margin-bottom: 25px;
-    font-weight: bold;
+.cart-item {
     display: flex;
     align-items: center;
+    background-color: #ffffff; 
+    padding: 50px;
+    margin-bottom: 30px;
+    border-radius: 4px; 
+    border: 1px solid #e0e0e0;
+}
+.cart-item img {
+    width: 300px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+.item-info {
+    flex: 1;
 }
 
-/* ==================== 麵包屑導航 ==================== */
+.item-info p {
+    margin: 8px 0;   
+    color: #333; 
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.quantity-controls button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #333333; 
+    color: #ffffff; 
+    
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.quantity-controls input {
+    width: 50px;
+    text-align: center;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    height: 28px;
+}
+
+.remove-btn {
+    background-color: #333333; 
+    
+    color: white;
+    border: none;
+    padding: 8px 12px;       
+    min-width: 60px;      
+    height: 32px;           
+    display: flex;          
+    align-items: center;   
+    justify-content: center; 
+    cursor: pointer;
+    border-radius: 2px;
+    white-space: nowrap;   
+}
+
+.total {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #000;
+}
+
 .breadcrumb {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-size: 14px;
-    color: #888;
 }
 .breadcrumb a {
     color: #a3785b;
@@ -27,146 +88,11 @@
 .breadcrumb a:hover {
     text-decoration: underline;
 }
-
-/* ==================== 折扣提示框 ==================== */
 .discount-hint {
-    margin: 15px 0;
-    padding: 12px 15px;
-    background: #fdf6ec; /* 柔和的警示橘底色 */
+    margin: 10px 0;
+    padding: 10px;
+    background: #f5f5f5;
     font-size: 14px;
-    color: #e6a23c;
-    border-left: 4px solid #e6a23c;
-    border-radius: 4px;
-}
-
-/* ==================== 購物車商品單體 (.cart-item) ==================== */
-.cart-item {
-    display: flex;
-    align-items: center;
-    background-color: #ffffff; 
-    padding: 20px; /* 💡 修正：從 50px 改為 20px 更平衡舒適 */
-    margin-bottom: 20px;
-    border-radius: 6px; 
-    border: 1px solid #e8e8e8;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-}
-
-.cart-item img {
-    width: 90px; /* 💡 修正：微調為精緻縮圖尺寸 */
-    height: 120px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-right: 20px;
-}
-
-.item-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.item-info p {
-    margin: 0;   
-    color: #333; 
-    font-size: 15px;
-}
-
-.item-name {
-    font-weight: 500;
-}
-
-.item-spec {
-    font-size: 13px;
-    color: #888;
-}
-
-.item-price {
-    font-weight: bold;
-    color: #555;
-}
-
-/* ==================== 數量加減控制器 ==================== */
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.quantity-controls button {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #ccc;
-    background-color: #fff; 
-    color: #333; 
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.quantity-controls button:hover {
-    background-color: #222;
-    color: #fff;
-    border-color: #222;
-}
-
-.quantity-controls input {
-    width: 45px;
-    text-align: center;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    height: 26px;
-    font-size: 14px;
-    outline: none;
-}
-
-/* ==================== 刪除按鈕 ==================== */
-.remove-btn {
-    background-color: transparent; 
-    color: #999;
-    border: none;
-    padding: 0 10px;        
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    margin-left: auto; /* 💡 讓刪除按鈕自動推到最右邊，排版極乾淨 */
-}
-
-.remove-btn:hover {
-    color: #ff4d4f; /* 滑過變警告紅 */
-}
-
-/* ==================== 總計金額與結帳按鈕 ==================== */
-.total {
-    text-align: right;
-    font-size: 22px;
-    font-weight: bold;
-    margin: 30px 0 20px 0;
-    color: #222;
-}
-
-.checkout-container {
-    text-align: right;
-}
-
-.checkout-btn {
-    background: #222;
-    color: #fff;
-    border: none;
-    padding: 12px 40px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.checkout-btn:hover {
-    background: #444;
-}
+    color: #333;
+    border-left: 4px solid #000;
+  }

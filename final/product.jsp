@@ -2,6 +2,7 @@
 <%@ page import="java.sql.*"%>
 <%@ page isErrorPage="true" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="header.jsp" %>
 <%
     // ==========================================
     // 1. 後端後台邏輯區 (變數宣告與資料庫查詢)
@@ -43,7 +44,7 @@
         }
         offset = (currentPage - 1) * pageSize;
 
-        // 建立連線 —— 【呼叫 dbutil.jsp 裡的方法】
+        // 建立連線 —— 【這裡已修正：直接呼叫 dbutil.jsp 裡的方法】
         conn = getConnection(); 
         if (conn == null) {
             throw new SQLException("資料庫連線建立失敗，請檢查 dbutil.jsp 的設定。");
@@ -100,7 +101,7 @@
 %>
 
 <%-- ========================================== --%>
-<%-- 2. 前端畫面呈現區                             --%>
+<%-- 2. 前端畫面呈現區 (純 HTML / CSS / JS)     --%>
 <%-- ========================================== --%>
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -108,25 +109,230 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%=name%> - STANDARD DAY</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ================= 基礎設定 ================= */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #000;
+  background-color: #fff;
+}
+/* ================= 商品主區 ================= */
+.product-container {
+  display: flex;
+  gap: 60px;
+  padding: 60px 20px;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
 
-<link rel="stylesheet" href="product.css">
-<script src="cookie-consent.js" defer></script>
-<script src="product.js" defer></script>
+.product-images {
+  width: 440px;
+  height: 570px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.product-images img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info {
+  max-width: 440px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.product-info h1 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.product-desc {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* ================= 價格 ================= */
+.price {
+  border-left: 4px solid #565254;
+  padding-left: 10px;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #565254;
+}
+
+/* ================= 表單 ================= */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  height: 44px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* ================= 加入購物車按鈕 ================= */
+.add-cart {
+  width: 100%;
+  margin: 10px 0 20px;
+  padding: 14px 0;
+  background: #565254;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.add-cart:hover {
+  background: #7A7D7D;
+  transform: translateY(-2px);
+}
+
+/* ================= Tabs ================= */
+.tabs-section {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.tabs {
+  display: flex;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.tab {
+  flex: 1;
+  padding: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+}
+
+.tab.active {
+  border-bottom: 3px solid #000;
+  font-weight: bold;
+  color: #000;
+}
+
+.tab-content {
+  padding: 40px 20px;
+}
+
+.content {
+  display: none;
+  text-align: center;
+}
+
+.content.active {
+  display: block;
+}
+
+/* ================= 尺寸表 ================= */
+.size-table {
+  width: 100%;
+  max-width: 600px;
+  border-collapse: collapse;
+  margin: 20px auto;
+  font-size: 14px;
+}
+
+.size-table th,
+.size-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.size-table th {
+  background: #f5f5f5;
+}
+
+/* ================= 評論區 ================= */
+#feedback-form {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+#feedback-form input,
+#feedback-form select,
+#feedback-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#feedback-form button {
+  padding: 12px 30px;
+  background: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.feedback-list {
+  max-width: 600px;
+  margin: 40px auto;
+}
+
+.feedback-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+
+/* ================= 動畫 ================= */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
 </head>
+
 <body>
-
-<header>
-    <div class="nav-left">
-        <a href="index.jsp" class="logo">STANDARD DAY</a>
-    </div>
-    <div class="nav-icons">
-        <a href="cart.jsp">
-            <img src="images/shopping_cart.png" alt="購物車">
-        </a>
-    </div>
-</header>
-
-<main class="product-container">
+    <main class="product-container">
     <div class="product-images fade-up">
       <img src="<%=nameImage%>" alt="<%=name%>">
     </div>
@@ -135,7 +341,7 @@
         <h1><%=name%></h1>
 
         <div class="product-desc">
-          <%=description != null ? description : "暫無商品描述"%>
+          <%=description%>
         </div>
 
         <div class="price">
@@ -167,6 +373,7 @@
 </main>
 
 <section class="tabs-section">
+
 <div class="tabs">
     <button class="tab active" data-target="tab-desc">商品描述</button>
     <button class="tab" data-target="tab-shipping">送貨及付款方式</button>
@@ -174,6 +381,7 @@
 </div>
 
 <div class="tab-content">
+
     <div id="tab-desc" class="content active">
         <h3>材質</h3>
         <p>Polyester 80% / Wool 20%</p>
@@ -187,6 +395,7 @@
     </div>
 
     <div id="tab-reviews" class="content">
+
         <%
         Integer userIdObj = (Integer) session.getAttribute("user_id");
         String sessionName = (String) session.getAttribute("username");
@@ -222,6 +431,7 @@
         <div class="feedback-list">
         <%
         try {
+            // 查詢當前頁面的評論列表
             String sqlCommentList = "SELECT * FROM product_comment WHERE product_id=? ORDER BY create_time DESC LIMIT ?, ?";
             ps3 = conn.prepareStatement(sqlCommentList);
             ps3.setInt(1, id);
@@ -284,9 +494,56 @@
         }
         %>
         </div>
+
     </div>
 </div>
 </section>
+
+<script>
+// Tab 切換控制
+const tabs = document.querySelectorAll('.tab');
+const contents = document.querySelectorAll('.content');
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+    });
+});
+
+// 非同步加入購物車
+async function addToCart(productId) {
+    const qty = document.getElementById('qtyInput').value;
+
+    const res = await fetch('addToCart.jsp', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `product_id=${productId}&quantity=${qty}`
+    });
+
+    if (res.status === 401) {
+        alert('請先登入');
+        location.href = 'login.jsp';
+        return;
+    }
+
+    const data = await res.json();
+
+    if (data.success) {
+        if (confirm(data.msg + '\n\n前往購物車？')) {
+            location.href = 'cart.jsp';
+        }
+    } else {
+        alert(data.msg);
+    }
+}
+</script>
+
 </body>
 </html>
 

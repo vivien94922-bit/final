@@ -1,43 +1,39 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ===================== 搜尋 ===================== */
-  const searchIcon = document.getElementById("searchIcon");
-  const searchBox = document.getElementById("searchBox");
+const searchIcon = document.getElementById("searchIcon");
+const searchBox = document.getElementById("searchBox");
+const searchInput = document.getElementById("searchInput");
+const searchResult = document.getElementById("searchResult");
 
-  if (searchIcon && searchBox) {
-    searchIcon.addEventListener("click", () => {
-      searchBox.classList.toggle("active");
-    });
+searchIcon.addEventListener("click", () => {
+  searchBox.classList.toggle("active");
+});
+
+let timer;
+
+searchInput.addEventListener("input", () => {
+
+  const keyword = searchInput.value.trim();
+
+  clearTimeout(timer);
+
+  if(keyword.length === 0){
+    searchResult.innerHTML = "";
+    return;
   }
 
-  const searchInput = document.getElementById("searchInput");
-  const searchResult = document.getElementById("searchResult");
+  timer = setTimeout(() => {
 
-  if (searchInput && searchResult && typeof products !== "undefined") {
-    searchInput.addEventListener("input", () => {
-      const keyword = searchInput.value.trim().toLowerCase();
-      searchResult.innerHTML = "";
-
-      if (!keyword) return;
-
-      const results = products.filter(p =>
-        p.name.toLowerCase().includes(keyword)
-      );
-
-      if (results.length === 0) {
-        searchResult.innerHTML = "<div>找不到商品</div>";
-        return;
-      }
-
-      results.forEach(p => {
-        const a = document.createElement("a");
-        a.href = `product.jsp?id=${p.id}`;
-        a.textContent = p.name;
-        searchResult.appendChild(a);
+    fetch("search.jsp?keyword=" + encodeURIComponent(keyword))
+      .then(res => res.text())
+      .then(data => {
+        searchResult.innerHTML = data;
       });
-    });
-  }
 
+  }, 200);
+
+});
   /* ===================== menu ===================== */
   const menuIcon = document.getElementById("menuIcon");
   const menuBox = document.getElementById("menuBox");
@@ -179,56 +175,44 @@ if (userArea) {
 });
 
   /* ===================== 收藏 ===================== */
-let fav = JSON.parse(localStorage.getItem("favorites")) || [];
+  let fav = JSON.parse(localStorage.getItem("favorites")) || [];
 
-  window.toggleFavorite = function (el, event) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-
+  window.toggleFavorite = function (el) {
     const p = el.closest(".product");
     const id = p.dataset.id;
-    const imgEl = el.tagName === 'IMG' ? el : el.querySelector('img');
+
     const index = fav.findIndex(x => x.id === id);
 
-    if (index === -1) {
-        // 加入收藏：換成 love.png 並加上紅色濾鏡
-        imgEl.src = "../images/love.png";
-        imgEl.classList.add("red-filter"); 
-        
-        fav.push({
-            id: id,
-            name: p.dataset.name,
-            price: p.dataset.price,
-            img: p.dataset.img
-        });
-        if (typeof toast === 'function') toast("已加入收藏");
+    if (el.src.includes("heart.png")) {
+      el.src = "../images/love.png";
+      if (index === -1) fav.push({
+        id,
+        name: p.dataset.name,
+        price: p.dataset.price,
+        img: p.dataset.img
+      });
+      toast("已加入收藏");
     } else {
-        // 移除收藏：換回 heart.png 並移除紅色濾鏡
-        imgEl.src = "../images/heart.png";
-        imgEl.classList.remove("red-filter");
-        
-        fav.splice(index, 1);
-        if (typeof toast === 'function') toast("已移除收藏");
+      el.src = "../images/heart.png";
+      if (index !== -1) fav.splice(index, 1);
+      toast("已移除收藏");
     }
 
     localStorage.setItem("favorites", JSON.stringify(fav));
-};
+  };
 
-  // 頁面載入時的初始化檢查
   document.querySelectorAll(".product").forEach(p => {
-    const iconImg = p.querySelector(".favorite-icon img");
-    if (!iconImg) return;
+    const icon = p.querySelector(".favorite-icon");
+    if (!icon) return;
 
     const id = p.dataset.id;
+
     if (fav.some(x => x.id === id)) {
-        iconImg.src = "../images/love.png"; // 確保是 love.png
-        iconImg.classList.add("red-filter"); // 確保加上紅色濾鏡
+      icon.src = "../images/love.png";
     }
-    
-    iconImg.onclick = (e) => toggleFavorite(iconImg, e);
-});
+
+    icon.onclick = () => toggleFavorite(icon);
+  });
 
 });
 

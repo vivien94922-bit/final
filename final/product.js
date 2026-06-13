@@ -53,45 +53,34 @@ function requireLogin(redirectTo) {
 }
   
   // ===== 加入購物車 =====
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".add-cart");
-    if (!btn) return;
+  async function addToCart(productId) {
+  const qty = document.getElementById('qtyInput').value;
 
-    if (!requireLogin(window.location.href)) return;
-    const productEl = btn.closest(".product-container");
-    if (!productEl) return;
-
-    const { id, name, price, img } = productEl.dataset;
-
-    if (id === undefined || name === undefined || price === undefined || img === undefined) {
-      alert("商品資料不完整");
-      return;
-    }
-
-    const size = document.getElementById("sizeSelect").value;
-    const qtyInput = productEl.querySelector('input[type="number"]');
-    const quantity = parseInt(qtyInput.value) || 1;
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || {};
-    const key = `${id}_${size}`;
-
-    if (cart[key]) {
-      cart[key].quantity += quantity;
-    } else {
-      cart[key] = {
-        id: Number(id),
-        name,
-        price: Number(price),
-        img,
-        size,
-        quantity
-      };
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(` ${name}（${size}）已加入購物車`);
+  const res = await fetch('addToCart.jsp', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `product_id=${productId}&quantity=${qty}`
   });
 
+  // 沒登入
+  if (res.status === 401) {
+    alert("請先登入");
+    location.href = "login.jsp";
+    return;
+  }
+
+  const data = await res.json();
+
+  if (data.success) {
+    if (confirm(data.msg + "\n\n要去購物車嗎？")) {
+      location.href = "cart.jsp";
+    }
+  } else {
+    alert(data.msg);
+  }
+}
   // ===== Tab 切換 =====
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {

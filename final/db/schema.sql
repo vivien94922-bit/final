@@ -130,7 +130,7 @@ INSERT INTO members (username, password, salt, name, email, phone, role) VALUES
  '1122334455667788',
  '示範會員', 'demo@standardday.com', '0911111111', 'user');
 
--- 商品（對應原本 index.jsp / tops.html / bottoms.html 的 15 件商品）
+-- 商品（對應原本 index.jsp / tops.jsp / bottoms.jsp 的 15 件商品）
 -- 圖片路徑採全站統一的相對路徑 ../images/（與各頁面一致）
 INSERT INTO product (id, name, price, image, description, category, stock) VALUES
 (1,  '夢幻粉色大衣',           1280, '../images/01.jpg', '柔軟保暖的粉色長版大衣，剪裁俐落，秋冬穿搭首選。', 'tops',    20),
@@ -154,6 +154,3 @@ INSERT INTO product_comment (product_id, user_id, username, rating, content, cre
 (1, 2, 'demo', 5, '這件粉色大衣超暖又好看！', '2026-06-01 10:00:00'),
 (1, 2, 'demo', 4, '質感不錯，但尺碼偏大一點。',  '2026-06-03 14:30:00'),
 (1, 2, 'demo', 5, '穿出去被朋友狂問哪裡買！',   '2026-06-05 09:15:00');
-
--- 顯示「熱門商品」
-SELECT * FROM product WHERE category = 'hot' ORDER BY created_at DESC LIMIT 6;
