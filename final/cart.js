@@ -65,12 +65,20 @@ function bindCartEvents() {
 
             input.value = parseInt(input.value) + 1;
 
-            const res = await fetch(...);
+            const res = await fetch("updateCartQty.jsp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `cart_id=${cartId}&quantity=${input.value}`
+            });
+            
             if(!res.ok){
                 alert("更新失敗");
                 return;
             }
-            await renderCart(); // ⭐關鍵
+            
+            await renderCart();
         };
     });
 
