@@ -70,7 +70,6 @@ function bindCartEvents() {
                 alert("更新失敗");
                 return;
             }
-
             await renderCart(); // ⭐關鍵
         };
     });
