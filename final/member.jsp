@@ -308,14 +308,10 @@ button {
 
 <body>
   <%@ include file="header.jsp" %>
-  <!-- ===== 會員中心 ===== -->
   <div class="member-container">  
 
     <aside class="member-sidebar">
       <ul>
-    
-        <li onclick="showSection('register')">會員註冊</li>
-    
         <% if(isLogin){ %>
           <li onclick="showSection('profile')">會員資料</li>
           <li onclick="showSection('orders')">訂單紀錄</li>
@@ -323,78 +319,66 @@ button {
           <li onclick="showSection('question')">常見問題</li>
           <li onclick="location.href='logout.jsp'">登出</li>
         <% } else { %>
-          <li onclick="checkLoginThen('profile')">會員資料</li>
-          <li onclick="checkLoginThen('orders')">訂單紀錄</li>
-          <li onclick="checkLoginThen('like')">收藏商品</li>
-          <li onclick="checkLoginThen('question')">常見問題</li>
+          <li onclick="location.href='login.jsp'">會員登入和註冊</li>
+          <li onclick="alert('請先登入會員！')">會員資料</li>
+          <li onclick="alert('請先登入會員！')">訂單紀錄</li>
+          <li onclick="alert('請先登入會員！')">收藏商品</li>
+          <li onclick="showSection('question')">常見問題</li>
         <% } %>
-    
       </ul>
     </aside>
 
     <main class="member-content">
       <h1>會員中心</h1>
 
-<section id="register" class="content-section">
-  <h2>會員註冊</h2>
-
-    <form action="register_process.jsp" method="post" class="form-box">
-
-      <div class="form-row">
-        <label>帳號</label>
-        <input type="text" name="username" required>
-      </div>
-
-      <div class="form-row">
-        <label>密碼</label>
-        <input type="password" name="password" required>
-      </div>
-
-      <div class="form-row">
-        <label>姓名</label>
-        <input type="text" name="name" required>
-      </div>
-
-      <div class="form-row">
-        <label>Email</label>
-        <input type="email" name="email" required>
-      </div>
-
-      <div class="form-row">
-        <label>電話</label>
-        <input type="text" name="phone" required>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit">送出註冊</button>
-        <button type="reset">重填</button>
-      </div>
-
-    </form>
-  </section>
-      </section>
       <section id="profile" class="content-section <%= isLogin ? "active" : "" %>">
+        <h2>會員資料</h2>
         
-      <h2>會員資料</h2>
+        <div id="profileViewBox" class="profile-box">
+          <p><b>姓名：</b> <%= (name == null || name.equals("")) ? "（未取得資料）" : name %></p>
+          <p><b>Email：</b> <%= (email == null || email.equals("")) ? "（未取得資料）" : email %></p>
+          <p><b>電話：</b> <%= (phone == null || phone.equals("")) ? "（未取得資料）" : phone %></p>
+          
+          <div class="form-actions" style="margin-top: 20px;">
+            <button type="button" class="save-btn" onclick="switchToEditMode()">修改資料</button>
+          </div>
+        </div>
 
-      <div class="profile-box">
-        <p><b>姓名：</b> <%= name %></p>
-        <p><b>Email：</b> <%= email %></p>
-        <p><b>電話：</b> <%= phone %></p>
-      </div>
+        <form action="update_profile.jsp" method="post" class="form-box" id="profileEditForm" style="display: none;">
+          <div class="form-row">
+            <label>姓名</label>
+            <input type="text" name="name" value="<%= (name == null) ? "" : name %>" required>
+          </div>
+          
+          <div class="form-row">
+            <label>Email</label>
+            <input type="email" name="email" value="<%= (email == null) ? "" : email %>" required>
+          </div>
+          
+          <div class="form-row">
+            <label>電話</label>
+            <input type="text" name="phone" value="<%= (phone == null) ? "" : phone %>" required>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="save-btn" style="background-color: #28a745;">送出修改</button>
+            <button type="button" class="save-btn" style="background-color: #dc3545;" onclick="switchToViewMode()">取消</button>
+          </div>
+        </form>
       </section>
 
-     <section id="like" class="content-section">
-  <h2>收藏商品</h2>
-  <div id="favorite-list" class="product-grid">
-    <!-- JS 會把資料塞進來 -->
-  </div>
-</section>
+      <section id="like" class="content-section">
+        <h2>收藏商品</h2>
+        <div id="favorite-list" class="product-grid">
+          </div>
+      </section>
+
       <section id="orders" class="content-section">
         <h2>訂單紀錄</h2>
         <p>目前尚無訂單</p>
       </section>
-      <section id="question" class="content-section">
+      
+      <section id="question" class="content-section <%= !isLogin ? "active" : "" %>">
         <h2 class="faq-title">常見問題</h2>
       
         <div class="faq-item">
@@ -468,185 +452,106 @@ button {
             <p>週一至週五 10:00-12:00/13:00-18:00</p>
           </div>
         </div>
-      
       </section>
-
 
     </main>
   </div>
 
   <script>
+    // 點擊「修改資料」：隱藏文字，顯示輸入框
+    function switchToEditMode() {
+      document.getElementById('profileViewBox').style.display = 'none';  // 隱藏純文字
+      document.getElementById('profileEditForm').style.display = 'block'; // 顯示表單
+    }
+
+    // 點擊「取消」：隱藏輸入框，顯示文字
+    function switchToViewMode() {
+      document.getElementById('profileEditForm').style.display = 'none';  // 隱藏表單
+      document.getElementById('profileViewBox').style.display = 'block'; // 顯示純文字
+      
+      // 可選：如果使用者有改動欄位但點了取消，重整頁面可以將輸入框內容重設回原本的資料
+      // location.reload(); 
+    }
     /* ==================== 頁面切換 ==================== */
     function showSection(id) {
       document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
       });
-      document.getElementById(id).classList.add('active');
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
     }
-  
-    /* ==================== 收藏功能 ==================== */
-/* ==================== 1. 頁面切換 ==================== */
-function showSection(id) {
-  document.querySelectorAll('.content-section').forEach(section => {
-    section.classList.remove('active');
-  });
-  const target = document.getElementById(id);
-  if (target) target.classList.add('active');
-}
 
-/* ==================== 2. 載入收藏清單 (前後端對接) ==================== */
-function loadFavorites() {
-  fetch("favorite_list.jsp")
-    .then(res => res.json())
-    .then(data => {
-      const box = document.getElementById("favorite-list");
-      if (!box) return;
-      
-      box.innerHTML = "";
+    /* ==================== 載入收藏清單 ==================== */
+    function loadFavorites() {
+      fetch("favorite_list.jsp")
+        .then(res => res.json())
+        .then(data => {
+          const box = document.getElementById("favorite-list");
+          if (!box) return;
+          box.innerHTML = "";
+          if (!data || data.length === 0) {
+            box.innerHTML = "<p>目前沒有收藏商品</p>";
+            return;
+          }
+          data.forEach(item => {
+            box.innerHTML += `
+              <div class="product" data-id="${item.id}">
+                <img src="${item.img}" alt="${item.name}">
+                <div class="product-info">
+                  <h3 class="product-name">${item.name}</h3>
+                  <p class="product-price">NT$ ${item.price}</p>
+                  <button class="add-cart-btn" onclick="addToCart('${item.id}')">加入購物車</button>
+                </div>
+                <img src="images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">
+              </div>`;
+          });
+        })
+        .catch(err => console.error("載入收藏失敗：", err));
+    }
 
-      if (!data || data.length === 0) {
-        box.innerHTML = "<p>目前沒有收藏商品</p>";
-        return;
-      }
-
-      data.forEach(item => {
-        // 💡 這裡將愛心圖片路徑改為 "images/love.png" (假設與 member.jsp 在同層目錄)
-        // 如果你的圖片在別處，請自行調整此處與下方 toggleFavorite 的路徑
-        box.innerHTML += `
-          <div class="product" data-id="${item.id}">
-            <img src="${item.img}" alt="${item.name}">
-            <div class="product-info">
-              <h3 class="product-name">${item.name}</h3>
-              <p class="product-price">NT$ ${item.price}</p>
-              <button class="add-cart-btn" onclick="addToCart('${item.id}')">加入購物車</button>
-            </div>
-            <img src="images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">
-          </div>
-        `;
-      });
-    })
-    .catch(err => {
-      console.error("載入收藏失敗：", err);
-    });
-}
-/* ===================== 雙向收藏切換 ===================== */
-window.toggleFavorite = function (el) {
-  const p = el.closest(".product");
-  const id = p.dataset.id;
-
-  fetch("favorite_toggle.jsp", {
-    method: "POST",
-    headers: {"Content-Type":"application/x-www-form-urlencoded"},
-    body: "product_id=" + id
-  })
-  .then(res => res.text())
-  .then(result => {
-    result = result.trim();
-
-    if (result === "add") {
-      el.src = "../images/love.png";
-      if(typeof showToast === "function") showToast("已加入收藏 ❤️");
-    } 
-    else if (result === "remove") {
-      // 💡 超棒優化：如果使用者是在「會員中心的收藏清單」裡點擊取消
-      // 我們可以直接把整個商品卡片從畫面上淡出/移除，體驗極佳！
-      if (el.closest("#favorite-list")) {
-        p.remove(); 
-        // 如果刪到沒商品了，顯示提示
-        const box = document.getElementById("favorite-list");
-        if (box.children.length === 0) {
-          box.innerHTML = "<p>目前沒有收藏商品</p>";
+    window.toggleFavorite = function (el) {
+      const p = el.closest(".product");
+      const id = p.dataset.id;
+      fetch("favorite_toggle.jsp", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: "product_id=" + id
+      })
+      .then(res => res.text())
+      .then(result => {
+        result = result.trim();
+        if (result === "add") {
+          el.src = "../images/love.png";
+        } else if (result === "remove") {
+          if (el.closest("#favorite-list")) {
+            p.remove();
+            const box = document.getElementById("favorite-list");
+            if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
+          } else {
+            el.src = "../images/heart.png";
+          }
         }
-      } else {
-        // 如果是在一般商品頁，就只是把愛心變空心
-        el.src = "../images/heart.png";
-      }
-      
-      if(typeof showToast === "function") showToast("已取消收藏");
-    } 
-    else {
-      console.log("收藏錯誤：", result);
-    }
-  });
-};
-    
-    /* ==================== 核心修正：導航欄控制 ==================== */
+      });
+    };
+        
+    /* ==================== 初始化與事件監聽 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
+      loadFavorites();
 
-  loadFavorites();
+      // FAQ 切換
+      document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.closest('.faq-item').classList.toggle('active');
+        });
+      });
 
-  // FAQ
-  document.querySelectorAll('.faq-question').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
-      item.classList.toggle('active');
-    });
-  });
-
-  // menu
-  const menuIcon = document.getElementById("menuIcon");
-  const menuWrapper = document.querySelector('.menu-wrapper');
-
-  if (menuIcon && menuWrapper) {
-    menuIcon.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menuWrapper.classList.toggle("active");
-    });
-  }
-
-  document.addEventListener("click", () => {
-    if (menuWrapper) menuWrapper.classList.remove("active");
-  });
-
-  // profile form
-  const profileForm = document.getElementById("profileForm");
-  if (profileForm) {
-    profileForm.addEventListener("submit", e => {
-      e.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-
-      if (!name || !email || !phone) {
-        alert("請填寫完整會員資料");
-        return;
+      // 檢查網址 Hash
+      const hash = window.location.hash;
+      if (hash) {
+        const sectionId = hash.replace("#", "");
+        showSection(sectionId);
       }
-
-      localStorage.setItem("user", name);
-
-      alert("登入成功！");
-
-      const redirect = localStorage.getItem("redirectAfterLogin") || "index.jsp";
-      localStorage.removeItem("redirectAfterLogin");
-      window.location.href = redirect;
     });
-  }
-
-  // ⭐⭐⭐ 這個才是正確 hash 處理（重點）
-  const hash = window.location.hash;
-  if (hash) {
-    const sectionId = hash.replace("#", "");
-    showSection(sectionId);
-  }
-  function logout() {
-  // 清掉登入相關資料
-  localStorage.removeItem("user");
-  localStorage.removeItem("isLogin");
-  localStorage.removeItem("userProfile");
-  localStorage.removeItem("cart"); // 可選
-  localStorage.removeItem("favorites"); // 可選
-
-  alert("已成功登出");
-
-  // 導回首頁
-  window.location.href = "index.jsp";
-}
-});
   </script>
-
-  <!-- Cookie 同意提示（組員D：個資法/Cookie） -->
-  <script src="cookie-consent.js" defer></script>
-
 </body>
 </html>
