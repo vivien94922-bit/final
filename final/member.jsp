@@ -319,14 +319,12 @@ button {
         <% if(isLogin){ %>
           <li onclick="showSection('profile')">會員資料</li>
           <li onclick="showSection('orders')">訂單紀錄</li>
-          <li onclick="showSection('password')">修改密碼</li>
           <li onclick="showSection('like')">收藏商品</li>
           <li onclick="showSection('question')">常見問題</li>
           <li onclick="location.href='logout.jsp'">登出</li>
         <% } else { %>
           <li onclick="checkLoginThen('profile')">會員資料</li>
           <li onclick="checkLoginThen('orders')">訂單紀錄</li>
-          <li onclick="checkLoginThen('password')">修改密碼</li>
           <li onclick="checkLoginThen('like')">收藏商品</li>
           <li onclick="checkLoginThen('question')">常見問題</li>
         <% } %>
@@ -396,20 +394,6 @@ button {
         <h2>訂單紀錄</h2>
         <p>目前尚無訂單</p>
       </section>
-
-      <section id="password" class="content-section">
-        <form>
-    <h2>修改密碼</h2>
-    <input type="password" id="old-password" name="oldPassword" placeholder="舊密碼" autocomplete="current-password">
-    <br><br>
-    
-    <input type="password" id="new-password" name="newPassword" placeholder="新密碼" autocomplete="new-password">
-    <br><br>
-    
-    <button type="submit" class="save-btn">送出</button>
-</form>
-      </section>
-      
       <section id="question" class="content-section">
         <h2 class="faq-title">常見問題</h2>
       
