@@ -1,39 +1,39 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ===================== 搜尋 ===================== */
-const searchIcon = document.getElementById("searchIcon");
-const searchBox = document.getElementById("searchBox");
-const searchInput = document.getElementById("searchInput");
-const searchResult = document.getElementById("searchResult");
-
-searchIcon.addEventListener("click", () => {
-  searchBox.classList.toggle("active");
-});
-
-let timer;
-
-searchInput.addEventListener("input", () => {
-
-  const keyword = searchInput.value.trim();
-
-  clearTimeout(timer);
-
-  if(keyword.length === 0){
-    searchResult.innerHTML = "";
-    return;
-  }
-
-  timer = setTimeout(() => {
-
-    fetch("search.jsp?keyword=" + encodeURIComponent(keyword))
-      .then(res => res.text())
-      .then(data => {
-        searchResult.innerHTML = data;
-      });
-
-  }, 200);
-
-});
+  const searchIcon = document.getElementById("searchIcon");
+  const searchBox = document.getElementById("searchBox");
+  const searchInput = document.getElementById("searchInput");
+  const searchResult = document.getElementById("searchResult");
+  
+  searchIcon.addEventListener("click", () => {
+    searchBox.classList.toggle("active");
+  });
+  
+  let timer;
+  
+  searchInput.addEventListener("input", () => {
+  
+    const keyword = searchInput.value.trim();
+  
+    clearTimeout(timer);
+  
+    if(keyword.length === 0){
+      searchResult.innerHTML = "";
+      return;
+    }
+  
+    timer = setTimeout(() => {
+  
+      fetch("search.jsp?keyword=" + encodeURIComponent(keyword))
+        .then(res => res.text())
+        .then(data => {
+          searchResult.innerHTML = data;
+        });
+  
+    }, 200);
+  
+  });
   /* ===================== menu ===================== */
   const menuIcon = document.getElementById("menuIcon");
   const menuBox = document.getElementById("menuBox");
@@ -109,26 +109,26 @@ searchInput.addEventListener("input", () => {
   }
 
   /* ===================== header login UI ===================== */
-const userArea = document.getElementById("user-area");
-
-if (userArea) {
-  fetch("check_login.jsp")
-    .then(r => r.text())
-    .then(s => {
-      if (s.trim() === "OK") {
-        userArea.innerHTML = `
-          <a href="member.jsp">會員中心</a>
-          <a href="logout.jsp">登出</a>
-        `;
-      } else {
-        userArea.innerHTML = `
-          <a href="login.jsp">
-            <img src="../images/user.png">
-          </a>
-        `;
-      }
-    });
-}
+  const userArea = document.getElementById("user-area");
+  
+  if (userArea) {
+    fetch("check_login.jsp")
+      .then(r => r.text())
+      .then(s => {
+        if (s.trim() === "OK") {
+          userArea.innerHTML = `
+            <a href="member.jsp">會員中心</a>
+            <a href="logout.jsp">登出</a>
+          `;
+        } else {
+          userArea.innerHTML = `
+            <a href="login.jsp">
+              <img src="../images/user.png">
+            </a>
+          `;
+        }
+      });
+  }
   /* ===================== 回到頂部 ===================== */
   const topBtn = document.getElementById("backToTop");
 
@@ -172,48 +172,53 @@ if (userArea) {
     const data = await addRes.json();
 
     alert(data.msg || "已加入購物車");
-});
-
-  /* ===================== 收藏 ===================== */
-  let fav = JSON.parse(localStorage.getItem("favorites")) || [];
-
-  window.toggleFavorite = function (el) {
-    const p = el.closest(".product");
-    const id = p.dataset.id;
-
-    const index = fav.findIndex(x => x.id === id);
-
-    if (el.src.includes("heart.png")) {
-      el.src = "../images/love.png";
-      if (index === -1) fav.push({
-        id,
-        name: p.dataset.name,
-        price: p.dataset.price,
-        img: p.dataset.img
-      });
-      toast("已加入收藏");
-    } else {
-      el.src = "../images/heart.png";
-      if (index !== -1) fav.splice(index, 1);
-      toast("已移除收藏");
-    }
-
-    localStorage.setItem("favorites", JSON.stringify(fav));
-  };
-
-  document.querySelectorAll(".product").forEach(p => {
-    const icon = p.querySelector(".favorite-icon");
-    if (!icon) return;
-
-    const id = p.dataset.id;
-
-    if (fav.some(x => x.id === id)) {
-      icon.src = "../images/love.png";
-    }
-
-    icon.onclick = () => toggleFavorite(icon);
   });
 
+  /* ===================== 資料庫版收藏功能 ===================== */
+  window.toggleFavorite = function (el) {
+      const p = el.closest(".product");
+      const id = p.dataset.id; // 務必確保你的 HTML 有 data-id
+      
+      // 判斷當前是「加入收藏」還是「取消收藏」
+      const isAdding = el.src.includes("heart.png");
+  
+      fetch("favorite_toggle.jsp", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "product_id=" + id
+      })
+      .then(res => res.text())
+      .then(result => {
+          if (result.trim() === "add") {
+              el.src = "images/love.png"; // 變實心
+              toast("已加入收藏");
+          } else if (result.trim() === "remove") {
+              el.src = "images/heart.png"; // 變空心
+              toast("已移除收藏");
+          }
+      })
+      .catch(err => console.error("收藏失敗:", err));
+  };
+  
+  // 頁面載入時，從資料庫同步所有愛心的狀態
+  function syncFavoriteIcons() {
+      fetch("favorite_list.jsp")
+          .then(res => res.json())
+          .then(data => {
+              const favoriteIds = data.map(item => String(item.id)); 
+              document.querySelectorAll(".product").forEach(p => {
+                  const icon = p.querySelector(".favorite-icon");
+                  if (!icon) return;
+                  const id = p.dataset.id;
+                  // 若此商品 ID 在資料庫清單中，設為實心
+                  icon.src = favoriteIds.includes(id) ? "images/love.png" : "images/heart.png";
+              });
+          });
+  }
+  
+  // 頁面載入完成後執行同步
+  document.addEventListener("DOMContentLoaded", syncFavoriteIcons);
+  
 });
 
 /* ===================== intro ===================== */
