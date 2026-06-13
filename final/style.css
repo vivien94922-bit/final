@@ -1,6 +1,10 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background-image: url("images/bg.png");
+  background-size: cover;        /* 填滿畫面 */
+  background-position: center;   /* 置中 */
+  background-repeat: no-repeat;  /* 不重複 */
 }
 
 .intro {
