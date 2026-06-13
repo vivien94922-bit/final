@@ -45,6 +45,16 @@ async function renderCart() {
     bindCartEvents();
     updateTotalFromDB(cart);
 }
+function updateTotalFromDB(cart){
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+    });
+    document.getElementById("cart-total")
+            .textContent =
+            "NT$" + total.toLocaleString();
+}
+
 function bindCartEvents() {
 
     document.querySelectorAll(".increase").forEach(btn => {
