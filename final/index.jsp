@@ -130,7 +130,7 @@ ResultSet rs2 = ps2.executeQuery();
 while(rs2.next()){
 %>
 
-<div class="product">
+<div class="product" data-id="<%= rs2.getInt("id") %>">
     <a href="product.jsp?id=<%= rs2.getInt("id") %>" class="product-link">
         <img src="<%= rs2.getString("image") %>">
         <div class="product-info">
@@ -166,7 +166,7 @@ ResultSet rsTop = psTop.executeQuery();
 while(rsTop.next()){
 %>
 
-<div class="product">
+<div class="product" data-id="<%= rsTop.getInt("id") %>">
     <a href="product.jsp?id=<%= rsTop.getInt("id") %>" class="product-link">
         <img src="<%= rsTop.getString("image") %>">
         <div class="product-info">
@@ -202,7 +202,7 @@ ResultSet rsBottom = psBottom.executeQuery();
 while(rsBottom.next()){
 %>
 
-<div class="product">
+<div class="product" data-id="<%= rsBottom.getInt("id") %>">
     <a href="product.jsp?id=<%= rsBottom.getInt("id") %>" class="product-link">
         <img src="<%= rsBottom.getString("image") %>">
         <div class="product-info">
@@ -233,6 +233,7 @@ con2.close();
 <footer>
   <p>聯絡我們｜service@standardday.com</p>
   <p>© 2025 STANDARD DAY. All rights reserved.</p>
+  <p><a href="privacy.html" style="color:#bbb;">隱私權政策</a></p>
 </footer>
 
 <button id="backToTop">↑</button>
