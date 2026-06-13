@@ -189,7 +189,7 @@
   </section>
 
   <section class="about-section team-section">
-    <h2>團隊介紹</h2>
+     <h2>團隊介紹</h2>
 
     <div class="team-grid">
 
@@ -197,12 +197,12 @@
         <img src="../images/member1.jpg" alt="翁逸岑">
         <div class="student-id">11344231</div>
         <h3>翁逸岑</h3>
-        <h4>前端整合與商品展示</h4>
-        <p>修改檔名、換關於我們照片</p>
+        <h4>前端整合與商品展示 (組員A)</h4>
+        <p>我負責全站首頁與商品展示的 UI 設計、動態商品陳列以及即時搜尋介面，並主導 RWD 響應式排版優化。透過編寫動態前端網頁，將設計概念實作為流暢的使用者操作畫面，在美觀、便利性與 RWD 跨裝置體驗上做了很大的優化與努力。</p>
         <div class="work-progress">
-          <div class="progress-label">工作分配 10%</div>
+          <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
-            <div class="progress-fill" data-percent="10"></div>
+            <div class="progress-fill" data-percent="25"></div>
           </div>
         </div>
       </div>
@@ -211,12 +211,12 @@
         <img src="../images/member2.jpg" alt="蕭小雯">
         <div class="student-id">11344222</div>
         <h3>蕭小雯</h3>
-        <h4>後端核心 / 交易邏輯 </h4>
+        <h4>後端核心 / 交易邏輯 (組員B)</h4>
         <p>主要負責整個電商網站最核心的「交易邏輯」，包含加入購物車 API、結帳流程處理、管理者訂單瀏覽功能，以及購買完成後自動扣減資料庫庫存的 SQL 事務處理。在確保商業系統核心的資料一致性上花費了許多心力 debug。</p>
         <div class="work-progress">
-          <div class="progress-label">工作分配 30%</div>
+          <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
-            <div class="progress-fill" data-percent="30"></div>
+            <div class="progress-fill" data-percent="25"></div>
           </div>
         </div>
       </div>
@@ -225,12 +225,12 @@
         <img src="../images/member3.jpg" alt="簡嘉葳">
         <div class="student-id">11344218</div>
         <h3>簡嘉葳</h3>
-        <h4>會員系統與互動功能 </h4>
+        <h4>會員系統與互動功能 (組員C)</h4>
         <p>負責編寫網站的使用者互動功能，包含 Login / Logout 的 Session 與 Cookie 狀態控管、支援中文且依最新日期排序的留言板功能，以及訪客計數器的實作。在串聯不同頁面的使用者登入狀態時，挑戰了許多 JavaScript 與後端狀態機制的整合。</p>
         <div class="work-progress">
-          <div class="progress-label">工作分配 30%</div>
+          <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
-            <div class="progress-fill" data-percent="30"></div>
+            <div class="progress-fill" data-percent="25"></div>
           </div>
         </div>
       </div>
@@ -242,9 +242,9 @@
         <h4>資料庫與全站安全 (組員D)</h4>
         <p>負責底層資料庫的規劃（ERD與資料表設計）、全站 API 資料結構的統一，並主導資安防護。包含利用 Prepared Statement 防止資料隱碼注入（SQL Injection）、密碼的 Hash 加密處理，以及符合個資法規的 Cookie 同意提示提示機制，確保網站安全穩固。</p>
         <div class="work-progress">
-          <div class="progress-label">工作分配 30%</div>
+          <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
-            <div class="progress-fill" data-percent="30"></div>
+            <div class="progress-fill" data-percent="25"></div>
           </div>
         </div>
       </div>
