@@ -27,14 +27,13 @@ ResultSet rs = ps.executeQuery();
 
   <%
   while(rs.next()){
+      int id = rs.getInt("id");
+      String name = rs.getString("name");
+      int price = rs.getInt("price");
+      String image = rs.getString("image");
   %>
 
-    <div class="product"
-         data-id="<%= rs.getInt("id") %>"
-         data-name="<%= rs.getString("name") %>"
-         data-price="<%= rs.getInt("price") %>"
-         data-img="<%= rs.getString("image") %>">
-
+    <div class="product" data-id="<%= id %>">
       <a href="product.jsp?id=<%= rs.getInt("id") %>" class="product-link">
 
         <img src="<%= rs.getString("image") %>">
@@ -46,7 +45,7 @@ ResultSet rs = ps.executeQuery();
 
       </a>
 
-      <img src="images/heart.png" class="favorite-icon">
+      <img src="images/heart.png" class="favorite-icon" onclick="toggleFavorite(this)">
       <button class="add-cart-btn">加入購物車</button>
 
     </div>
