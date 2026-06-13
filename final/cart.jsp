@@ -20,7 +20,7 @@
 
     <div id="discountHint" class="discount-hint"></div>
     <div class="total">
-        總計：NT$<span id="totalAmount">0</span>
+        總計：<span id="cart-total">NT$0</span>
     </div>
     <div class="checkout-container">
         <button id="checkoutBtn" class="checkout-btn">前往結帳</button>
