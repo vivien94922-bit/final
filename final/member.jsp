@@ -485,64 +485,78 @@ button {
     }
 
     /* ==================== 2. 收藏功能 ==================== */
-    window.loadFavorites = function() {
-        const box = document.getElementById("favorite-list");
-        if (!box) {
-            console.error("找不到 favorite-list 這個容器！");
-            return;
+    window.toggleFavorite = function (el) {
+    const p = el.closest(".product");
+    const id = p.dataset.id;
+    
+    // 檢查當前是否在收藏列表頁面 (假設你的容器 ID 是 favorite-list)
+    const isFavoritePage = document.getElementById("favorite-list") !== null;
+
+    fetch("favorite_toggle.jsp", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "product_id=" + id
+    })
+    .then(res => {
+        // 1. 檢查 HTTP 狀態碼
+        if (res.status === 401) {
+            alert("請先登入");
+            window.location.href = "login.jsp";
+            throw new Error("Not logged in"); // 停止後續執行
         }
+        return res.text();
+    })
+    .then(result => {
+        const status = result.trim();
         
+        if (status === "add") {
+            el.src = "images/love.png"; // 變實心
+            toast("已加入收藏");
+        } else if (status === "remove") {
+            // 如果在收藏列表頁，直接把卡片移除
+            if (isFavoritePage) {
+                p.remove(); 
+                // 若列表空了，顯示提示訊息
+                const list = document.getElementById("favorite-list");
+                if (list && list.querySelectorAll(".product").length === 0) {
+                    list.innerHTML = "<p>目前沒有收藏商品</p>";
+                }
+            } else {
+                // 如果在一般商品列表，只換回空心
+                el.src = "images/heart.png";
+            }
+            toast("已移除收藏");
+        }
+    })
+    .catch(err => console.error("收藏失敗:", err));
+};
+  
+    // 頁面載入時自動執行：同步收藏狀態
+    document.addEventListener("DOMContentLoaded", () => {
         fetch("favorite_list.jsp")
             .then(res => res.json())
             .then(data => {
-                box.innerHTML = ""; // 確實清空
-                if (!data || data.length === 0) {
-                    box.innerHTML = "<p>目前沒有收藏商品</p>";
-                    return;
-                }
+                // 將後端回傳的 ID 整理成陣列 (假設回傳結構是 [{id: 1}, {id: 2}])
+                const favoriteIds = data.map(item => item.id);
 
-                data.forEach(item => {
-                    const div = document.createElement("div");
-                    div.className = "product";
-                    div.dataset.id = item.id;
+                // 檢查頁面上每一個產品卡片
+                document.querySelectorAll(".product").forEach(product => {
+                    const id = parseInt(product.dataset.id);
+                    const icon = product.querySelector(".favorite-icon");
 
-                    // 將內容拆開來寫，避免樣板字串錯誤
-                    div.innerHTML = 
-                        '<a href="/final-main/final/product.jsp?id=' + item.id + '">' +
-                            '<img src="' + item.img + '" alt="' + item.name + '">' +
-                            '<div class="product-info">' +
-                                '<div class="product-name">' + item.name + '</div>' +
-                                '<div class="product-price">NT$' + item.price + '</div>' +
-                            '</div>' +
-                        '</a>' +
-                        '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
-                        '<img src="/final-main/images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">';
-
-                    document.getElementById("favorite-list").appendChild(div);
+                    if (icon) {
+                        // 如果該 ID 在清單內，顯示實心；否則顯示空心
+                        if (favoriteIds.includes(id)) {
+                            icon.src = "images/love.png";
+                        } else {
+                            icon.src = "images/heart.png";
+                        }
+                    }
                 });
-            })
-            .catch(err => console.error("載入錯誤:", err));
-    };
+            });
+    });
 
-    window.toggleFavorite = function(el) {
-        const p = el.closest(".product");
-        const id = p.dataset.id;
-        fetch("favorite_toggle.jsp", {
-            method: "POST",
-            headers: {"Content-Type":"application/x-www-form-urlencoded"},
-            body: "product_id=" + id
-        })
-        .then(res => res.text())
-        .then(result => {
-            if (result.trim() === "remove" && el.closest("#favorite-list")) {
-                p.remove();
-                const box = document.getElementById("favorite-list");
-                if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
-            } else {
-                alert("已更新收藏狀態");
-            }
-        });
-    };
+});
         
     /* ==================== 初始化與事件監聽 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
