@@ -508,7 +508,7 @@ button {
 
                     // 將內容拆開來寫，避免樣板字串錯誤
                     div.innerHTML = 
-                        '<a href="/final-main/product.jsp?id=' + item.id + '">' +
+                        '<a href="/final-main/final/product.jsp?id=' + item.id + '">' +
                             '<img src="' + item.img + '" alt="' + item.name + '">' +
                             '<div class="product-info">' +
                                 '<div class="product-name">' + item.name + '</div>' +
