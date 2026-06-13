@@ -238,6 +238,32 @@ con2.close();
 
 <button id="backToTop">↑</button>
 <script src="cookie-consent.js" defer></script>
+<script>
+    // 頁面載入時自動執行：同步收藏狀態
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("favorite_list.jsp")
+            .then(res => res.json())
+            .then(data => {
+                // 將後端回傳的 ID 整理成陣列 (假設回傳結構是 [{id: 1}, {id: 2}])
+                const favoriteIds = data.map(item => item.id);
+
+                // 檢查頁面上每一個產品卡片
+                document.querySelectorAll(".product").forEach(product => {
+                    const id = parseInt(product.dataset.id);
+                    const icon = product.querySelector(".favorite-icon");
+
+                    if (icon) {
+                        // 如果該 ID 在清單內，顯示實心；否則顯示空心
+                        if (favoriteIds.includes(id)) {
+                            icon.src = "images/love.png";
+                        } else {
+                            icon.src = "images/heart.png";
+                        }
+                    }
+                });
+            });
+    });
+</script>
 
 </body>
 </html>
