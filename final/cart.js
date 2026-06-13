@@ -121,3 +121,7 @@ function bindCartEvents() {
         };
     });
 }
+document.addEventListener(
+    "DOMContentLoaded",
+    renderCart
+);
