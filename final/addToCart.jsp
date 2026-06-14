@@ -13,6 +13,7 @@ if(userId == null){
 
 int productId = Integer.parseInt(request.getParameter("product_id"));
 int qty = Integer.parseInt(request.getParameter("quantity"));
+String size =request.getParameter("size");
 
 Connection conn = getConnection();
 
