@@ -568,11 +568,13 @@ tabs.forEach(tab => {
 async function addToCart(productId) {
     // 獲取輸入框的值
     const qty = document.getElementById('qtyInput').value;
+    const size = document.getElementById('sizeSelect').value;
 
     // 將參數正確帶入 URLSearchParams 或字串中
     const formData = new URLSearchParams();
     formData.append('product_id', productId);
     formData.append('quantity', qty);
+    formData.append('size', size);
 
     const res = await fetch('addToCart.jsp', {
         method: 'POST',
