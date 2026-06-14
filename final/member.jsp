@@ -578,14 +578,14 @@ window.loadFavorites = function() {
                 
                 // 採用字串拼接以保持你的習慣，但結構更清晰
                 div.innerHTML = 
-                    '<a href="/final-main/final/product.jsp?id=' + item.id + '" class="product-link">' +
+                    '<a href="product.jsp?id=' + item.id + '" class="product-link">' +
                         '<img src="' + item.img + '" alt="' + item.name + '" onerror="this.src=\'/final-main/images/default.jpg\'">' +
                         '<div class="product-info">' +
                             '<div class="product-name">' + item.name + '</div>' +
                             '<div class="product-price">NT$' + item.price + '</div>' +
                         '</div>' +
                     '</a>' +
-                    '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
+                    '<button class="add-cart-btn">加入購物車</button>' +
                     '<img src="images/love.png" class="favorite-icon">';
                 
                 fragment.appendChild(div);
