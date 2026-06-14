@@ -1,0 +1,557 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*"%>
+<%@ include file="dbutil.jsp" %>
+<%
+Integer userId = (Integer) session.getAttribute("user_id");
+boolean isLogin = (userId != null);
+
+String name = "";
+String email = "";
+String phone = "";
+%>
+<%
+if (isLogin) {
+
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        // 統一連線（組員D：DBUtil）
+        conn = getConnection();
+
+        String sql = "SELECT name, email, phone FROM members WHERE id=?";
+        ps = conn.prepareStatement(sql);
+        if (isLogin) {
+          ps.setInt(1, userId);
+        }
+
+        rs = ps.executeQuery();
+
+        if (rs.next()) {
+            name = rs.getString("name");
+            email = rs.getString("email");
+            phone = rs.getString("phone");
+        }
+
+    } catch (Exception e) {
+        out.println("錯誤：" + e.getMessage());
+    } finally {
+        if (rs != null) try { rs.close(); } catch (Exception e) {}
+        if (ps != null) try { ps.close(); } catch (Exception e) {}
+        if (conn != null) try { conn.close(); } catch (Exception e) {}
+    }
+}
+%>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background-color: #222;
+      position: relative;
+      z-index: 1000;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .member-container {
+      display: flex;
+      min-height: 200vh;
+    }
+
+    .member-sidebar {
+      width: 200px;
+      background-color: #333;
+      color: white;
+    }
+
+    .member-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .member-sidebar li {
+      padding: 15px 15px 15px 30px;
+      cursor: pointer;
+    }
+
+    .member-sidebar li:hover {
+      background-color: #555;
+    }
+
+    .member-content {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .content-section {
+     opacity: 0;
+     max-height: 0;
+     overflow: hidden;
+     pointer-events: none;
+     transition: opacity 0.3s ease;
+    }
+
+    .content-section.active {
+     opacity: 1;
+     max-height: 2000px;
+     pointer-events: auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 300px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .save-btn {
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .save-btn:hover {
+      background-color: #555;
+    }
+
+    .logo {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+     /* ===== FAQ 樣式 ===== */
+
+  .faq {
+    max-width: 450px;
+    margin-top: 20px;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid #ddd;
+    width:450px
+  }
+
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .faq-question .icon {
+    transition: transform 0.3s ease;
+    font-size: 20px;
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 15px;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    max-height: 200px;
+    padding: 10px 15px 20px;
+  }
+
+  .faq-item.active .icon {
+    transform: rotate(45deg); /* + 變成 × */
+  }
+  /* ===== 收藏 ===== */
+  /* 收藏列表容器 */
+#favorite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px 0;
+  max-width: 1000px;
+}
+
+/* 每個商品卡片 */
+#favorite-list .product {
+  display: flex;
+  align-items: left;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 10px;
+  transition: box-shadow 0.2s;
+}
+
+#favorite-list .product:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* 商品圖片 */
+#favorite-list .product img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-left: 0;
+}
+
+/* 文字區塊 */
+#favorite-list .product-info {
+  flex: 1;
+  flex-direction: column;
+  justify-content: right;
+}
+
+/* 商品名稱 */
+#favorite-list .product-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+/* 價格 */
+#favorite-list .product-price {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* 加入購物車按鈕 */
+#favorite-list .add-cart-btn {
+  width: fit-content;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* 收藏愛心 */
+#favorite-list .favorite-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 15px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#favorite-list .favorite-icon:hover {
+  transform: scale(1.3);
+}
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+  transition: 0.2s ease;
+}
+
+.form-box {
+  width: 400px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  width: 80px;   /* 👉 關鍵：讓欄位統一寬度 */
+  font-weight: bold;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 6px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+  </style>
+</head>
+
+<body>
+  <%@ include file="header.jsp" %>
+  <div class="member-container">  
+
+    <aside class="member-sidebar">
+      <ul>
+        <% if(isLogin){ %>
+          <li onclick="showSection('profile')">會員資料</li>
+          <li onclick="showSection('orders')">訂單紀錄</li>
+          <li onclick="showSection('like')">收藏商品</li>
+          <li onclick="showSection('question')">常見問題</li>
+          <li onclick="location.href='logout.jsp'">登出</li>
+        <% } else { %>
+          <li onclick="location.href='login.jsp'">會員登入和註冊</li>
+          <li onclick="alert('請先登入會員！')">會員資料</li>
+          <li onclick="alert('請先登入會員！')">訂單紀錄</li>
+          <li onclick="alert('請先登入會員！')">收藏商品</li>
+          <li onclick="showSection('question')">常見問題</li>
+        <% } %>
+      </ul>
+    </aside>
+
+    <main class="member-content">
+      <h1>會員中心</h1>
+
+      <section id="profile" class="content-section <%= isLogin ? "active" : "" %>">
+        <h2>會員資料</h2>
+        
+        <div id="profileViewBox" class="profile-box">
+          <p><b>姓名：</b> <%= (name == null || name.equals("")) ? "（未取得資料）" : name %></p>
+          <p><b>Email：</b> <%= (email == null || email.equals("")) ? "（未取得資料）" : email %></p>
+          <p><b>電話：</b> <%= (phone == null || phone.equals("")) ? "（未取得資料）" : phone %></p>
+          
+          <div class="form-actions" style="margin-top: 20px;">
+            <button type="button" class="save-btn" onclick="switchToEditMode()">修改資料</button>
+          </div>
+        </div>
+
+        <form action="update_profile.jsp" method="post" class="form-box" id="profileEditForm" style="display: none;">
+          <div class="form-row">
+            <label>姓名</label>
+            <input type="text" name="name" value="<%= (name == null) ? "" : name %>" required>
+          </div>
+          
+          <div class="form-row">
+            <label>Email</label>
+            <input type="email" name="email" value="<%= (email == null) ? "" : email %>" required>
+          </div>
+          
+          <div class="form-row">
+            <label>電話</label>
+            <input type="text" name="phone" value="<%= (phone == null) ? "" : phone %>" required>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="save-btn" style="background-color: #28a745;">送出修改</button>
+            <button type="button" class="save-btn" style="background-color: #dc3545;" onclick="switchToViewMode()">取消</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="like" class="content-section">
+        <h2>收藏商品</h2>
+        <div id="favorite-list" class="product-grid">
+          </div>
+      </section>
+
+      <section id="orders" class="content-section">
+        <h2>訂單紀錄</h2>
+        <p>目前尚無訂單</p>
+      </section>
+      
+      <section id="question" class="content-section <%= !isLogin ? "active" : "" %>">
+        <h2 class="faq-title">常見問題</h2>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            如何修改會員資料？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            你可以在會員中心的「會員資料」頁面修改。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            忘記密碼怎麼辦？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            請點擊登入頁的「忘記密碼」進行重設。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            有提供海外配送服務嗎？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            目前無法提供海外配送服務，請見諒。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            可以以非會員身分購買嗎？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            所有訂單皆需以電子信箱註冊並登入後方可結帳。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            如何取消訂單？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            若需訂單取消，請儘早於出貨前聯絡客服。若商品已進倉或已發貨，可能需依「退貨流程」處理，且可能產生運費。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            訂單送出後我可以修改我的運送地址嗎？
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            若訂單已付費且欲修改地址，請立即以訂單編號聯絡我們。一旦倉庫已處理訂單，將無法編輯地址或修改訂單。
+          </div>
+        </div>
+      
+        <div class="faq-item">
+          <button type="button" class="faq-question">
+            聯絡我們
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>客服電話：03-1234-4321</p>
+            <p>客服信箱：standardday@gmail.com</p>
+            <p>週一至週五 10:00-12:00/13:00-18:00</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // 點擊「修改資料」：隱藏文字，顯示輸入框
+    function switchToEditMode() {
+      document.getElementById('profileViewBox').style.display = 'none';  // 隱藏純文字
+      document.getElementById('profileEditForm').style.display = 'block'; // 顯示表單
+    }
+
+    // 點擊「取消」：隱藏輸入框，顯示文字
+    function switchToViewMode() {
+      document.getElementById('profileEditForm').style.display = 'none';  // 隱藏表單
+      document.getElementById('profileViewBox').style.display = 'block'; // 顯示純文字
+      
+      // 可選：如果使用者有改動欄位但點了取消，重整頁面可以將輸入框內容重設回原本的資料
+      // location.reload(); 
+    }
+    /* ==================== 頁面切換 ==================== */
+    function showSection(id) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+    }
+
+    /* ==================== 載入收藏清單 ==================== */
+    function loadFavorites() {
+      fetch("favorite_list.jsp")
+        .then(res => res.json())
+        .then(data => {
+          const box = document.getElementById("favorite-list");
+          if (!box) return;
+          box.innerHTML = "";
+          if (!data || data.length === 0) {
+            box.innerHTML = "<p>目前沒有收藏商品</p>";
+            return;
+          }
+          data.forEach(item => {
+            box.innerHTML += `
+              <div class="product" data-id="${item.id}">
+                <img src="${item.img}" alt="${item.name}">
+                <div class="product-info">
+                  <h3 class="product-name">${item.name}</h3>
+                  <p class="product-price">NT$ ${item.price}</p>
+                  <button class="add-cart-btn" onclick="addToCart('${item.id}')">加入購物車</button>
+                </div>
+                <img src="images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">
+              </div>`;
+          });
+        })
+        .catch(err => console.error("載入收藏失敗：", err));
+    }
+
+    window.toggleFavorite = function (el) {
+      const p = el.closest(".product");
+      const id = p.dataset.id;
+      fetch("favorite_toggle.jsp", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: "product_id=" + id
+      })
+      .then(res => res.text())
+      .then(result => {
+        result = result.trim();
+        if (result === "add") {
+          el.src = "../images/love.png";
+        } else if (result === "remove") {
+          if (el.closest("#favorite-list")) {
+            p.remove();
+            const box = document.getElementById("favorite-list");
+            if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
+          } else {
+            el.src = "../images/heart.png";
+          }
+        }
+      });
+    };
+        
+    /* ==================== 初始化與事件監聽 ==================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFavorites();
+
+      // FAQ 切換
+      document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.closest('.faq-item').classList.toggle('active');
+        });
+      });
+
+      // 檢查網址 Hash
+      const hash = window.location.hash;
+      if (hash) {
+        const sectionId = hash.replace("#", "");
+        showSection(sectionId);
+      }
+    });
+  </script>
+</body>
+</html>
