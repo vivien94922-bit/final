@@ -71,8 +71,8 @@ CREATE TABLE product_comment (
   rating      INT,
   content     TEXT,
   create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_comment_product FOREIGN KEY (product_id) REFERENCES product(id),
-  CONSTRAINT fk_comment_member  FOREIGN KEY (user_id)    REFERENCES members(id)
+  CONSTRAINT fk_comment_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
+  CONSTRAINT fk_comment_member  FOREIGN KEY (user_id)    REFERENCES members(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -------------------------------------------------------------
@@ -83,11 +83,11 @@ CREATE TABLE cart (
   user_id    INT NOT NULL,
   product_id INT NOT NULL,
   quantity   INT NOT NULL DEFAULT 1,
-  CONSTRAINT fk_cart_member  FOREIGN KEY (user_id)    REFERENCES members(id),
-  CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(id)
+  size       VARCHAR(10) NOT NULL DEFAULT 'M',
+  UNIQUE KEY unique_cart_item (user_id, product_id, size),
+  CONSTRAINT fk_cart_member  FOREIGN KEY (user_id)    REFERENCES members(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-ALTER TABLE cart ADD UNIQUE KEY unique_cart_item (user_id, product_id); -- 確保購物車不會出現重複的 (user_id, product_id) 組合
 
 -- -------------------------------------------------------------
 -- 訪客計數器（單列）
@@ -111,7 +111,7 @@ CREATE TABLE orders (
   total      INT,
   status     VARCHAR(20) NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_order_member FOREIGN KEY (member_id) REFERENCES members(id)
+  CONSTRAINT fk_order_member FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE order_items (
@@ -122,8 +122,8 @@ CREATE TABLE order_items (
   price      INT,
   size       VARCHAR(10),
   quantity   INT,
-  CONSTRAINT fk_item_order   FOREIGN KEY (order_id)   REFERENCES orders(id),
-  CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES product(id)
+  CONSTRAINT fk_item_order   FOREIGN KEY (order_id)   REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =============================================================

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="webutil.jsp" %>
 
 <%
 String keyword = request.getParameter("keyword");
@@ -19,7 +20,7 @@ if (keyword != null && !keyword.trim().equals("")) {
 %>
         <div class="search-item">
           <a href="product.jsp?id=<%= rs.getInt("id") %>">
-            <%= rs.getString("name") %>
+            <%=escapeHtml(rs.getString("name"))%>
           </a>
         </div>
 <%

@@ -20,7 +20,7 @@ async function renderCart() {
         }
 
         // 🌟 核心修正：進迴圈前，先把容器清空，徹底終結重複疊加！
-        container.innerHTML = ""; 
+        container.replaceChildren();
 
         // 判斷購物車是否有商品
         if (Array.isArray(cart) && cart.length > 0) {
@@ -29,28 +29,41 @@ async function renderCart() {
                 // 防呆：如果後台不小心傳回數量為 0 或負數的資料，前端直接跳過不渲染
                 if (item.quantity <= 0) return;
 
-                // 動態建立商品外殼 div
                 const div = document.createElement("div");
                 div.className = "cart-item";
-                
-                // 把後台資料綁在 dataset 中，方便加減按鈕抓取
                 div.dataset.price = item.price;
-                div.dataset.cartId = item.cart_id; // 請確保後台欄位叫 cart_id
-
-                // 塞入商品的內層結構
-                div.innerHTML = `
-                    <img src="${item.image || 'images/default.jpg'}" width="150" style="height: auto; margin-right: 20px;">
-                    <div class="item-info">
-                        <h3>${item.name}</h3>
-                        <p>單價：NT$${item.price}</p>
-                        <div class="quantity-controls" style="display: flex; gap: 5px; align-items: center;">
-                            <button class="decrease">-</button>
-                            <input type="number" class="quantity" value="${item.quantity}" min="1" style="width: 40px; text-align: center;" readonly>
-                            <button class="increase">+</button>
-                            <button class="remove-btn" style="background: #333; color: #fff; margin-left: 10px; padding: 2px 8px; border: none; cursor: pointer;">刪除</button>
-                        </div>
-                    </div>
-                `;
+                div.dataset.cartId = item.cart_id;
+                const image = document.createElement("img");
+                image.src = item.image || "images/clothes.png";
+                image.alt = item.name || "";
+                image.width = 150;
+                image.style.cssText = "height:auto;margin-right:20px";
+                const info = document.createElement("div");
+                info.className = "item-info";
+                const title = document.createElement("h3");
+                title.textContent = item.name || "";
+                const price = document.createElement("p");
+                price.textContent = "單價：NT$" + Number(item.price || 0).toLocaleString();
+                const size = document.createElement("p");
+                size.textContent = "尺寸：" + (item.size || "M");
+                const controls = document.createElement("div");
+                controls.className = "quantity-controls";
+                controls.style.cssText = "display:flex;gap:5px;align-items:center";
+                const decrease = document.createElement("button");
+                decrease.type = "button"; decrease.className = "decrease"; decrease.textContent = "-";
+                const quantity = document.createElement("input");
+                quantity.type = "number"; quantity.className = "quantity";
+                quantity.value = item.quantity; quantity.min = "1"; quantity.readOnly = true;
+                quantity.style.cssText = "width:40px;text-align:center";
+                const increase = document.createElement("button");
+                increase.type = "button"; increase.className = "increase"; increase.textContent = "+";
+                increase.disabled = Number(item.quantity) >= Number(item.stock);
+                const remove = document.createElement("button");
+                remove.type = "button"; remove.className = "remove-btn"; remove.textContent = "刪除";
+                remove.style.cssText = "display:flex;justify-content:center;align-items:center;background-color:#333;color:#fff;margin-left:10px;padding:8px 16px;border:none;cursor:pointer;font-size:18px";
+                controls.append(decrease, quantity, increase, remove);
+                info.append(title, price, size, controls);
+                div.append(image, info);
                 
                 // 把這個做好的商品塞進大容器
                 container.appendChild(div);
@@ -62,7 +75,10 @@ async function renderCart() {
 
         } else {
             // 購物車沒東西時的顯示
-            container.innerHTML = "<p style='text-align:center; padding: 40px; color: #666;'>購物車空空如也...</p>";
+            const empty = document.createElement("p");
+            empty.textContent = "購物車空空如也...";
+            empty.style.cssText = "text-align:center;padding:40px;color:#666";
+            container.appendChild(empty);
             updateTotalFromDB([]); // 金額歸零
         }
 
@@ -165,11 +181,13 @@ async function sendUpdate(cartId, qty) {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `cart_id=${cartId}&quantity=${qty}`
+            body: new URLSearchParams({ cart_id: cartId, quantity: qty }).toString()
         });
 
-        if (!res.ok) {
-            alert("操作失敗");
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            alert(data.message || "操作失敗");
+            await renderCart();
             return;
         }
         

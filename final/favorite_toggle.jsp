@@ -2,33 +2,47 @@
 <%@ include file="dbutil.jsp" %>
 <%
     Integer userId = (Integer) session.getAttribute("user_id");
-    String productId = request.getParameter("product_id");
+    if (userId == null) {
+        response.setStatus(401);
+        return;
+    }
+    if (!"POST".equalsIgnoreCase(request.getMethod())) {
+        response.setStatus(405);
+        return;
+    }
 
-    if (userId == null) { response.setStatus(401); return; }
-
-    Connection con = getConnection();
+    int productId;
     try {
-        // 檢查該用戶是否已收藏該商品
-        String checkSql = "SELECT id FROM favorite WHERE user_id = ? AND product_id = ?";
-        PreparedStatement psCheck = con.prepareStatement(checkSql);
-        psCheck.setInt(1, userId);
-        psCheck.setString(2, productId);
-        ResultSet rs = psCheck.executeQuery();
+        productId = Integer.parseInt(request.getParameter("product_id"));
+        if (productId <= 0) throw new NumberFormatException();
+    } catch (Exception e) {
+        response.setStatus(400);
+        return;
+    }
 
-        if (rs.next()) {
-            // 已存在 -> 刪除
-            PreparedStatement psDel = con.prepareStatement("DELETE FROM favorite WHERE user_id = ? AND product_id = ?");
-            psDel.setInt(1, userId);
-            psDel.setString(2, productId);
-            psDel.executeUpdate();
-            out.print("remove");
-        } else {
-            // 不存在 -> 新增
-            PreparedStatement psIns = con.prepareStatement("INSERT INTO favorite (user_id, product_id) VALUES (?, ?)");
-            psIns.setInt(1, userId);
-            psIns.setString(2, productId);
-            psIns.executeUpdate();
-            out.print("add");
+    try (Connection con = getConnection();
+         PreparedStatement psCheck = con.prepareStatement(
+             "SELECT id FROM favorites WHERE member_id = ? AND product_id = ?")) {
+        psCheck.setInt(1, userId);
+        psCheck.setInt(2, productId);
+        try (ResultSet rs = psCheck.executeQuery()) {
+            if (rs.next()) {
+                try (PreparedStatement psDel = con.prepareStatement(
+                        "DELETE FROM favorites WHERE member_id = ? AND product_id = ?")) {
+                    psDel.setInt(1, userId);
+                    psDel.setInt(2, productId);
+                    psDel.executeUpdate();
+                }
+                out.print("remove");
+            } else {
+                try (PreparedStatement psIns = con.prepareStatement(
+                        "INSERT INTO favorites (member_id, product_id) VALUES (?, ?)")) {
+                    psIns.setInt(1, userId);
+                    psIns.setInt(2, productId);
+                    psIns.executeUpdate();
+                }
+                out.print("add");
+            }
         }
-    } finally { if (con != null) con.close(); }
+    }
 %>

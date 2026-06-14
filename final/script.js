@@ -166,12 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `product_id=${id}&quantity=1`
+        body: `product_id=${encodeURIComponent(id)}&quantity=1&size=M`
     });
 
     const data = await addRes.json();
 
-    alert(data.msg || "已加入購物車");
+    alert(data.msg || (addRes.ok ? "已加入購物車" : "操作失敗"));
   });
 
   /* ===================== 收藏功能 ===================== */

@@ -1,68 +1,90 @@
-<%@ page contentType="application/json; charset=UTF-8" %>
+<%@ page contentType="application/json; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
-
 <%
-    Integer userId = (Integer) session.getAttribute("user_id");
+if (!"POST".equalsIgnoreCase(request.getMethod())) {
+    response.setStatus(405);
+    response.setHeader("Allow", "POST");
+    out.print("{\"success\":false,\"msg\":\"不支援的請求方式\"}");
+    return;
+}
+Integer userId = (Integer) session.getAttribute("user_id");
+if (userId == null) {
+    response.setStatus(401);
+    out.print("{\"success\":false,\"msg\":\"請先登入\"}");
+    return;
+}
 
-    if(userId == null){
-        response.setStatus(401);
-        out.print("{\"success\":false,\"msg\":\"請先登入\"}");
-        return;
-    }
+int productId;
+int quantity;
+try {
+    productId = Integer.parseInt(request.getParameter("product_id"));
+    quantity = Integer.parseInt(request.getParameter("quantity"));
+} catch (Exception e) {
+    response.setStatus(400);
+    out.print("{\"success\":false,\"msg\":\"商品或數量資料不正確\"}");
+    return;
+}
+String size = request.getParameter("size");
+size = size == null ? "M" : size.trim().toUpperCase();
+if (quantity <= 0 || (!"S".equals(size) && !"M".equals(size) && !"L".equals(size))) {
+    response.setStatus(400);
+    out.print("{\"success\":false,\"msg\":\"請選擇正確尺寸與數量\"}");
+    return;
+}
 
-    // 接收參數並增加錯誤防禦
-    String pIdStr = request.getParameter("product_id");
-    String qtyStr = request.getParameter("quantity");
-    
-    if (pIdStr == null || qtyStr == null) {
-        out.print("{\"success\":false,\"msg\":\"參數錯誤\"}");
-        return;
-    }
+Connection conn = null;
+try {
+    conn = getConnection();
+    conn.setAutoCommit(false);
 
-    int productId = Integer.parseInt(pIdStr);
-    int addQty = Integer.parseInt(qtyStr);
-
-    Connection conn = null;
-    PreparedStatement psCheck = null;
-    PreparedStatement psAction = null;
-    ResultSet rs = null;
-
-    try {
-        conn = getConnection();
-        
-        // 1. 檢查該用戶購物車內是否已存在此商品
-        String checkSql = "SELECT cart_id, quantity FROM cart WHERE user_id = ? AND product_id = ?";
-        psCheck = conn.prepareStatement(checkSql);
-        psCheck.setInt(1, userId);
-        psCheck.setInt(2, productId);
-        rs = psCheck.executeQuery();
-
-        if (rs.next()) {
-            // 2. 如果存在，執行更新 (累計數量)
-            int cartId = rs.getInt("cart_id");
-            int existingQty = rs.getInt("quantity");
-            psAction = conn.prepareStatement("UPDATE cart SET quantity = ? WHERE cart_id = ?");
-            psAction.setInt(1, existingQty + addQty);
-            psAction.setInt(2, cartId);
-        } else {
-            // 3. 如果不存在，執行新增
-            psAction = conn.prepareStatement("INSERT INTO cart(user_id, product_id, quantity) VALUES(?,?,?)");
-            psAction.setInt(1, userId);
-            psAction.setInt(2, productId);
-            psAction.setInt(3, addQty);
+    int stock;
+    try (PreparedStatement ps = conn.prepareStatement(
+            "SELECT stock FROM product WHERE id=? FOR UPDATE")) {
+        ps.setInt(1, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (!rs.next()) throw new IllegalArgumentException("找不到商品");
+            stock = rs.getInt("stock");
         }
-
-        psAction.executeUpdate();
-        out.print("{\"success\":true,\"msg\":\"已加入購物車\"}");
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        out.print("{\"success\":false,\"msg\":\"伺服器錯誤\"}");
-    } finally {
-        if (rs != null) rs.close();
-        if (psCheck != null) psCheck.close();
-        if (psAction != null) psAction.close();
-        if (conn != null) conn.close();
     }
+
+    int currentTotal = 0;
+    try (PreparedStatement ps = conn.prepareStatement(
+            "SELECT COALESCE(SUM(quantity),0) FROM cart WHERE user_id=? AND product_id=?")) {
+        ps.setInt(1, userId);
+        ps.setInt(2, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) currentTotal = rs.getInt(1);
+        }
+    }
+    if (currentTotal + quantity > stock) {
+        throw new IllegalStateException("庫存不足，目前最多可再加入 " + Math.max(0, stock - currentTotal) + " 件");
+    }
+
+    try (PreparedStatement ps = conn.prepareStatement(
+            "INSERT INTO cart(user_id,product_id,quantity,size) VALUES(?,?,?,?) " +
+            "ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity)")) {
+        ps.setInt(1, userId);
+        ps.setInt(2, productId);
+        ps.setInt(3, quantity);
+        ps.setString(4, size);
+        ps.executeUpdate();
+    }
+    conn.commit();
+    out.print("{\"success\":true,\"msg\":\"成功加入購物車\"}");
+} catch (IllegalArgumentException e) {
+    if (conn != null) try { conn.rollback(); } catch (SQLException ignored) {}
+    response.setStatus(404);
+    out.print("{\"success\":false,\"msg\":\"找不到商品\"}");
+} catch (IllegalStateException e) {
+    if (conn != null) try { conn.rollback(); } catch (SQLException ignored) {}
+    response.setStatus(409);
+    out.print("{\"success\":false,\"msg\":\"" + e.getMessage() + "\"}");
+} catch (Exception e) {
+    if (conn != null) try { conn.rollback(); } catch (SQLException ignored) {}
+    response.setStatus(500);
+    out.print("{\"success\":false,\"msg\":\"處理失敗: " + e.getMessage() + "\"}");
+} finally {
+    if (conn != null) try { conn.close(); } catch (SQLException ignored) {}
+}
 %>

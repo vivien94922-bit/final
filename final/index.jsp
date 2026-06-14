@@ -3,6 +3,7 @@
 
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="webutil.jsp" %>
 <%@ include file="header.jsp" %>
 <%
 Connection con = null;
@@ -18,7 +19,7 @@ try{
     con = getConnection();
 
     // 不是刷新才增加
-    if(session.getAttribute("refresh") == null){
+    if(session.getAttribute("visitor_counted") == null){
 
         ps = con.prepareStatement(
             "UPDATE counter SET count = count + 1 WHERE id = 1"
@@ -26,11 +27,7 @@ try{
         ps.executeUpdate();
         ps.close();
 
-        session.setAttribute("refresh","yes");
-
-    }else{
-
-        session.removeAttribute("refresh");
+        session.setAttribute("visitor_counted", Boolean.TRUE);
     }
 
     ps = con.prepareStatement(
@@ -132,16 +129,16 @@ ResultSet rs2 = ps2.executeQuery();
 while(rs2.next()){
 %>
 
-<div class="product" 
-     data-id="<%= rs2.getInt("id") %>" 
-     data-name="<%= rs2.getString("name") %>" 
-     data-price="<%= rs2.getInt("price") %>" 
-     data-img="<%= rs2.getString("image") %>">
+<div class="product"
+     data-id="<%= rs2.getInt("id") %>"
+     data-name="<%=escapeHtml(rs2.getString("name"))%>"
+     data-price="<%= rs2.getInt("price") %>"
+     data-img="<%=escapeHtml(rs2.getString("image"))%>">
     
     <a href="product.jsp?id=<%= rs2.getInt("id") %>" class="product-link">
-        <img src="<%= rs2.getString("image") %>">
+        <img src="<%=escapeHtml(rs2.getString("image"))%>" alt="<%=escapeHtml(rs2.getString("name"))%>">
         <div class="product-info">
-            <div class="product-name"><%= rs2.getString("name") %></div>
+            <div class="product-name"><%=escapeHtml(rs2.getString("name"))%></div>
             <div class="product-price">NT$<%= rs2.getInt("price") %></div>
         </div>
     </a>
@@ -173,9 +170,9 @@ while(rsTop.next()){
 
 <div class="product" data-id="<%= rsTop.getInt("id") %>">
     <a href="product.jsp?id=<%= rsTop.getInt("id") %>" class="product-link">
-        <img src="<%= rsTop.getString("image") %>">
+        <img src="<%=escapeHtml(rsTop.getString("image"))%>" alt="<%=escapeHtml(rsTop.getString("name"))%>">
         <div class="product-info">
-            <div class="product-name"><%= rsTop.getString("name") %></div>
+            <div class="product-name"><%=escapeHtml(rsTop.getString("name"))%></div>
             <div class="product-price">NT$<%= rsTop.getInt("price") %></div>
         </div>
     </a>
@@ -209,9 +206,9 @@ while(rsBottom.next()){
 
 <div class="product" data-id="<%= rsBottom.getInt("id") %>">
     <a href="product.jsp?id=<%= rsBottom.getInt("id") %>" class="product-link">
-        <img src="<%= rsBottom.getString("image") %>">
+        <img src="<%=escapeHtml(rsBottom.getString("image"))%>" alt="<%=escapeHtml(rsBottom.getString("name"))%>">
         <div class="product-info">
-            <div class="product-name"><%= rsBottom.getString("name") %></div>
+            <div class="product-name"><%=escapeHtml(rsBottom.getString("name"))%></div>
             <div class="product-price">NT$<%= rsBottom.getInt("price") %></div>
         </div>
     </a>

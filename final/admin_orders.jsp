@@ -76,8 +76,8 @@ private String adminOrderEscapeHtml(String value) {
   <aside class="admin-sidebar">
     <h2>管理員後台</h2>
     <ul>
-      <li id="tab-orders" class="active-tab" onclick="switchTab('orders')">訂單管理</li>
-      <li id="tab-products" onclick="switchTab('products')">商品管理</li>
+      <li id="tab-orders" class="active-tab">訂單管理</li>
+      <li onclick="location.href='admin_products.jsp'">商品管理</li>
       <li onclick="location.href='logout.jsp'">登出系統</li>
     </ul>
   </aside>
@@ -167,88 +167,6 @@ private String adminOrderEscapeHtml(String value) {
       </div>
     </section>
 
-    <section id="section-products" class="content-section">
-      <h2>商品管理後台</h2>
-      
-      <div class="box">
-        <h3>上架新商品</h3>
-        <form action="product_process.jsp" method="post">
-          <input type="hidden" name="action" value="insert">
-          <div class="form-row">
-            <label>商品名稱</label>
-            <input type="text" name="name" required placeholder="例如：極簡工裝帽">
-          </div>
-          <div class="form-row">
-            <label>商品價格</label>
-            <input type="number" name="price" required placeholder="例如：450">
-          </div>
-          <div class="form-row">
-            <label>圖片路徑</label>
-            <input type="text" name="img" required placeholder="例如：images/hat.png">
-          </div>
-          <button type="submit" class="btn-add">確認上架商品</button>
-        </form>
-      </div>
-
-      <div class="box">
-        <h3>現有商品列表</h3>
-        <table>
-          <thead>
-            <tr>
-              <th width="10%">圖片</th>
-              <th width="10%">ID</th>
-              <th width="40%">商品名稱</th>
-              <th width="15%">價格</th>
-              <th width="25%">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <%
-              PreparedStatement psProds = con.prepareStatement("SELECT id, name, price, image FROM product ORDER BY id DESC");
-              ResultSet rsProds = psProds.executeQuery();
-              while(rsProds.next()) {
-                  String id = rsProds.getString("id");
-                  String name = rsProds.getString("name");
-                  int price = rsProds.getInt("price");
-                  String img = rsProds.getString("image");
-            %>
-            <tr>
-              <td><img src="<%= (img!=null && !img.isEmpty())? img : "images/no-image.png" %>" class="prod-img"></td>
-              <td><%= id %></td>
-              <td>
-                <span class="view-mode-<%= id %>"><%= name %></span>
-                <form action="product_process.jsp" method="post" id="form-<%= id %>" style="display:none; margin:0;">
-                  <input type="hidden" name="action" value="update">
-                  <input type="hidden" name="p_id" value="<%= id %>">
-                  <input type="text" name="name" value="<%= name %>" style="width:90%; padding:4px;" required>
-              </td>
-              <td>
-                <span class="view-mode-<%= id %>">NT$ <%= price %></span>
-                  <input type="number" name="price" value="<%= price %>" style="width:70px; padding:4px; margin-top:4px;" required>
-                  <input type="text" name="img" value="<%= img %>" style="width:90%; padding:4px; margin-top:4px;" placeholder="圖片路徑" required>
-                </form>
-              </td>
-              <td>
-                <div class="view-mode-<%= id %>">
-                  <button type="button" class="btn-edit" onclick="enterEditMode('<%= id %>')">修改</button>
-                  <button type="button" class="btn-del" onclick="confirmDelete('<%= id %>')">刪除</button>
-                </div>
-                <div class="edit-mode-<%= id %>" style="display:none;">
-                  <button type="button" class="btn-save" onclick="submitEdit('<%= id %>')">儲存</button>
-                  <button type="button" class="btn-cancel" onclick="cancelEditMode('<%= id %>')">取消</button>
-                </div>
-              </td>
-            </tr>
-            <% 
-              } 
-              rsProds.close();
-              psProds.close();
-            %>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
   </main>
 
   <%
@@ -260,42 +178,6 @@ private String adminOrderEscapeHtml(String value) {
     }
   %>
 
-  <script>
-    // 頁籤切換
-    function switchTab(tabName) {
-      document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
-      document.querySelectorAll('.admin-sidebar li').forEach(li => li.classList.remove('active-tab'));
-      
-      document.getElementById('section-' + tabName).classList.add('active');
-      document.getElementById('tab-' + tabName).classList.add('active-tab');
-    }
-
-    // 商品就地修改控制
-    function enterEditMode(id) {
-      document.querySelectorAll('.view-mode-' + id).forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.edit-mode-' + id).forEach(el => el.style.display = 'inline-block');
-      document.getElementById('form-' + id).style.display = 'block';
-    }
-
-    // 取消修改
-    function cancelEditMode(id) {
-      document.querySelectorAll('.view-mode-' + id).forEach(el => el.style.display = 'inline');
-      document.querySelectorAll('.edit-mode-' + id).forEach(el => el.style.display = 'none');
-      document.getElementById('form-' + id).style.display = 'none';
-    }
-
-    // 觸發該列的 Form 提交
-    function submitEdit(id) {
-      document.getElementById('form-' + id).submit();
-    }
-
-    // 刪除按鈕觸發
-    function confirmDelete(pId) {
-      if (confirm("🚨 您確定要徹底刪除這件商品嗎？\n此動作將無法還原！")) {
-        location.href = "product_process.jsp?action=delete&p_id=" + pId;
-      }
-    }
-  </script>
   <script src="cookie-consent.js" defer></script>
 </body>
 </html>

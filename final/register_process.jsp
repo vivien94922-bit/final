@@ -10,6 +10,11 @@ String password = request.getParameter("password");
 String name = request.getParameter("name");
 String email = request.getParameter("email");
 String phone = request.getParameter("phone");
+String agreePrivacy = request.getParameter("agree_privacy");
+if (!"yes".equals(agreePrivacy)) {
+    out.println("<script>alert('請先閱讀並同意隱私權政策'); history.back();</script>");
+    return;
+}
 
 Connection conn = null;
 PreparedStatement ps = null;

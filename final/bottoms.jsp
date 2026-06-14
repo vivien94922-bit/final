@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="webutil.jsp" %>
 
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -42,17 +43,17 @@ try {
 
     <div class="product"
          data-id="<%= rs.getInt("id") %>"
-         data-name="<%= rs.getString("name") %>"
+         data-name="<%=escapeHtml(rs.getString("name"))%>"
          data-price="<%= rs.getInt("price") %>"
-         data-img="<%= rs.getString("image") %>">
+         data-img="<%=escapeHtml(rs.getString("image"))%>">
 
       <!-- ✅ 改 JSP，不要 html -->
       <a href="product.jsp?id=<%= rs.getInt("id") %>" class="product-link">
 
-        <img src="<%= rs.getString("image") %>" alt="<%= rs.getString("name") %>">
+        <img src="<%=escapeHtml(rs.getString("image"))%>" alt="<%=escapeHtml(rs.getString("name"))%>">
 
         <div class="product-info">
-          <div class="product-name"><%= rs.getString("name") %></div>
+          <div class="product-name"><%=escapeHtml(rs.getString("name"))%></div>
           <div class="product-price">NT$<%= rs.getInt("price") %></div>
         </div>
 

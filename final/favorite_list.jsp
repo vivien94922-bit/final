@@ -7,11 +7,10 @@
     Connection con = null;
     try {
         con = getConnection();
-        // 使用正確的表名 'favorite' 與欄位 'user_id'
         String sql = "SELECT p.id, p.name, p.price, p.image " +
              "FROM product p " +
-             "JOIN favorite f ON p.id = f.product_id " +
-             "WHERE f.user_id = ? " +
+             "JOIN favorites f ON p.id = f.product_id " +
+             "WHERE f.member_id = ? " +
              "GROUP BY p.id " +
              "ORDER BY MAX(f.created_at) DESC";
  
