@@ -198,7 +198,7 @@
         <div class="student-id">11344231</div>
         <h3>翁逸岑</h3>
         <h4>前端整合與商品展示 (組員A)</h4>
-        <p>我負責全站首頁與商品展示的 UI 設計、動態商品陳列以及即時搜尋介面，並主導 RWD 響應式排版優化。透過編寫動態前端網頁，將設計概念實作為流暢的使用者操作畫面，在美觀、便利性與 RWD 跨裝置體驗上做了很大的優化與努力。</p>
+        <p>負責商品展示功能開發，透過資料庫動態讀取商品資訊並顯示庫存數量，實作購物時庫存自動扣減機制，參與購物車加入商品功能及資料庫整合作業，並與全體組員共同完成首頁組員介紹頁面及心得撰寫。</p>
         <div class="work-progress">
           <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
@@ -226,7 +226,7 @@
         <div class="student-id">11344218</div>
         <h3>簡嘉葳</h3>
         <h4>會員系統與互動功能 (組員C)</h4>
-        <p>負責編寫網站的使用者互動功能，包含 Login / Logout 的 Session 與 Cookie 狀態控管、支援中文且依最新日期排序的留言板功能，以及訪客計數器的實作。在串聯不同頁面的使用者登入狀態時，挑戰了許多 JavaScript 與後端狀態機制的整合。</p>
+        <p>負責留言板功能（支援中文顯示、依日期排序及最新留言置頂）、會員登入控制、商品搜尋、訪客計數器、產品管理（新增、上架、修改、刪除商品）、管理者訂單瀏覽、會員優惠設計，以及網站整合測試工作；同時參與購物車結帳功能開發、CSS版面設計與背景圖製作，並與全體組員共同完成首頁組員介紹及心得撰寫。</p>
         <div class="work-progress">
           <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
@@ -240,7 +240,7 @@
         <div class="student-id">11150214</div>
         <h3>神林俊希</h3>
         <h4>資料庫與全站安全 (組員D)</h4>
-        <p>負責底層資料庫的規劃（ERD與資料表設計）、全站 API 資料結構的統一，並主導資安防護。包含利用 Prepared Statement 防止資料隱碼注入（SQL Injection）、密碼的 Hash 加密處理，以及符合個資法規的 Cookie 同意提示提示機制，確保網站安全穩固。</p>
+        <p>負責網站安全與法規相關功能，包括 SQL Injection 防護、個資法與 Cookie 告知等法律規範實作，以及管理者系統優化工作，並與全體組員共同完成首頁組員介紹及心得撰寫。</p>
         <div class="work-progress">
           <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
