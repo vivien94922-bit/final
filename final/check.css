@@ -5,7 +5,9 @@ body {
     padding: 40px 20px;
 }
 
-.checkout-container { max-width: 1000px; margin: 0 auto; }
+.checkout-container { max-width: 1000px; 
+    margin: 40px auto; /* 上下留 40px，左右自動置中 */
+    padding: 0 20px;   /* 防止手機版貼邊 */ }
 .main-title {
     text-align: center;
     font-size: 2.8rem;
@@ -34,7 +36,10 @@ body {
 }
 
 /* 網格系統 */
-.checkout-grid { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+.checkout-grid { display: grid; 
+    grid-template-columns: 1fr 350px; /* 左邊佔空間，右邊固定 350px */
+    gap: 30px; 
+    align-items: start; /* 防止左邊的高度被右邊強制拉伸 */}
 
 /* 玻璃質感卡片 */
 .section, .summary-card {

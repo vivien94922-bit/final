@@ -98,6 +98,12 @@
         }
 
         long calculatedTotal = 0L;
+        for (Object[] line : cartLines) {
+            calculatedTotal += (long) ((Integer) line[2]).intValue() * ((Integer) line[4]).intValue();
+        }
+        if (calculatedTotal < 2000) {
+            calculatedTotal += 100; // 加上運費
+        }
         for (Map.Entry<Integer, Object[]> entry : productTotals.entrySet()) {
             Object[] line = entry.getValue();
             String productName = (String) line[0];
