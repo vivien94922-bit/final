@@ -213,7 +213,8 @@
         <h3>蕭小雯</h3>
         <h4>後端核心 / 交易邏輯 (組員B)</h4>
         <p>主要負責整個電商網站最核心的「交易邏輯」，包含加入購物車 API、結帳流程處理、管理者訂單瀏覽功能，以及購買完成後自動扣減資料庫庫存的 SQL 事務處理。在確保商業系統核心的資料一致性上花費了許多心力 debug。</p>
-        <div class="work-progress">
+        <p> </p>
+          <div class="work-progress">
           <div class="progress-label">工作分配 25%</div>
           <div class="progress-bar">
             <div class="progress-fill" data-percent="25"></div>
