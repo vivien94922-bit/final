@@ -568,78 +568,81 @@ a:active {
 }
 
 @media screen and (max-width: 768px) {
-
+  /* 1. 確保卡片填滿高度 */
   .product {
-    position: relative; /* 這是關鍵，讓內部元素可以相對於卡片絕對定位 */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%; 
   }
 
-  /* 1. 商品列表維持三欄 */
+  /* 2. 合併後的 info 設定 (重點在 flex-grow: 1) */
+  .product-info {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* 這是讓按鈕推到底部的關鍵 */
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* 3. 按鈕設定 (移除冗餘，確保 margin-top: auto 生效) */
+  .add-cart-btn {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    padding: 6px 0;
+    font-size: 10px;
+    margin-top: auto;   /* 推到底部 */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 8px; /* 與卡片底部的間距 */
+  }
+
+  /* 其餘樣式保持不變 */
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
 
-  /* 2. 圖片維持修長比例 */
   .product img {
-    height: 160px;
+    height: 220px;
     object-fit: cover;
   }
 
-  /* 3. 調整文字區塊：確保名稱在上方，價格在下方 */
-  .product-info {
-    padding: 10px 8px;
-    display: flex;
-    flex-direction: column; /* 垂直排列 */
-    align-items: flex-start; /* 文字靠左對齊 */
-    gap: 4px; /* 名稱與價格間的距離 */
-  }
-
-  /* 名稱樣式 */
+  /* 限制名稱長度 */
   .product-name {
     font-size: 15px;
     font-weight: 500;
-    line-height: 1.2;
+    line-height: 1.3;
+    
+    /* 關鍵限制：強制兩行，超過顯示省略號 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* 預留空間給愛心，避免文字寫太長壓到愛心 */
+    margin-right: 30px; 
   }
 
-  /* 價格樣式 */
   .product-price {
     font-size: 14px;
     font-weight: 600;
     color: #666;
   }
 
-  /* 按鈕樣式 */
-  .add-cart-btn {
-    width: 90%;
-    padding: 6px 0;
-    font-size: 10px;
-    margin: 8px auto;
-  }
-
-  /* 愛心圖示：加大並增加觸控區域，精確位於按鈕上方 */
   .favorite-icon {
     width: 22px !important;
     height: 22px !important;
-    padding: 8px;              /* 增加觸控範圍 */
-    
-    /* 這裡使用定位，讓愛心固定在按鈕上方 */
+    padding: 8px;
     position: absolute;
-    bottom: 50px;              /* 根據你的按鈕高度與 padding 進行微調 */
+    bottom: 50px;
     right: 5px;
-    
     cursor: pointer;
     box-sizing: content-box;
     transition: transform 0.2s;
-    z-index: 2;                /* 確保在圖片或文字上方 */
-  }
-
-  /* 確保按鈕不會遮擋到愛心 */
-  .add-cart-btn {
-    position: relative;        /* 確保按鈕在正常文檔流中 */
-    z-index: 1;
-    width: 90%;
-    padding: 6px 0;
-    font-size: 10px;
-    margin: 8px auto;
+    z-index: 2;
   }
 }
