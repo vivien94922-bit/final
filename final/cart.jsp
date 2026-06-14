@@ -10,7 +10,10 @@
     <script src="script.js"></script>
     
     <style>
-        /* ===== 購物車按鈕與區塊美化 ===== */
+        /* 購物車頁面基礎排版 */
+        .breadcrumb { max-width: 1000px; margin: 20px auto; color: #888; font-size: 14px; }
+        .breadcrumb a { color: #000; text-decoration: none; }
+        
         .total {
             max-width: 1000px;
             margin: 30px auto 15px auto;
@@ -42,21 +45,17 @@
             font-size: 15px;
             font-weight: 500;
             letter-spacing: 2px;
-            border-radius: 4px; /* 內斂的微圓角 */
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.4s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .checkout-btn:hover {
+        .checkout-btn:hover:not(:disabled) {
             background: #fff;
             color: #000;
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-
-        .checkout-btn:active {
-            transform: translateY(-1px);
         }
 
         .checkout-btn:disabled {
@@ -68,7 +67,6 @@
             box-shadow: none;
         }
 
-        /* 滿額提示美化 */
         .discount-hint {
             max-width: 1000px;
             margin: 20px auto;
@@ -84,6 +82,10 @@
 </head>
 <body>
     <%@ include file="header.jsp" %>
+    
+    <nav class="breadcrumb">
+        <a href="index.jsp">首頁</a> &gt; <span>購物車</span>
+    </nav>
 
     <div id="cart-container"></div>
 
@@ -94,16 +96,26 @@
     </div>
     
     <div class="checkout-container">
-        <button id="checkoutBtn" class="checkout-btn" onclick="handleCheckout()">前往結帳</button>
+        <button id="checkoutBtn" class="checkout-btn" onclick="handleCheckout()" disabled>前往結帳</button>
     </div>
 
     <script>
         function handleCheckout() {
+            const totalText = document.getElementById('cart-total').innerText; 
+            const pureTotalNumber = parseInt(totalText.replace(/[^0-9]/g, ''));
+
+            // 防呆：防止金額為 0 也能結帳
+            if (!pureTotalNumber || pureTotalNumber <= 0) {
+                alert("購物車是空的，請先選購商品！");
+                return;
+            }
+
             const btn = document.getElementById('checkoutBtn');
             btn.disabled = true;
             btn.innerText = '處理中...';
+            
             setTimeout(() => {
-                location.href = 'checkout.jsp';
+                location.href = 'checkout.jsp?amount=' + pureTotalNumber;
             }, 400);
         }
     </script>
