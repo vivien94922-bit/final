@@ -596,14 +596,14 @@ a:active {
 
   /* 名稱樣式 */
   .product-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
     line-height: 1.2;
   }
 
   /* 價格樣式 */
   .product-price {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: #666;
   }
