@@ -390,20 +390,22 @@ body {
             NT$ <%=price%>
         </div>
 
-        <div class="form-group">
-            <label>尺寸選擇</label>
-            <select name="size" id="sizeSelect">
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-            </select>
+        <div class="form-row">
+            <div class="form-group">
+                <label>尺寸選擇</label>
+                <select name="size" id="sizeSelect">
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label>數量</label>
+                <input type="number" id="qtyInput" value="1" min="1" max="<%=stock%>">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>數量</label>
-            <input type="number" id="qtyInput" value="1" min="1" max="<%=stock%>">
-        </div>
-        
         <% if (stock > 0) { %>
             <span style="color:green; font-weight:bold; display:block; margin-bottom:10px;">庫存：<%=stock%></span>
             <button type="button" class="add-cart" onclick="addToCart(<%=id%>)">加入購物車</button>
@@ -541,6 +543,12 @@ body {
 </div>
 </section>
 
+<footer>
+    <p>聯絡我們｜service@standardday.com</p>
+    <p>© 2025 STANDARD DAY. All rights reserved.</p>
+    <p><a href="privacy.html" style="color:#bbb;">隱私權政策</a></p>
+</footer>
+
 <script>
 // Tab 切換控制
 const tabs = document.querySelectorAll('.tab');
@@ -585,6 +593,7 @@ async function addToCart(productId) {
     }
 }
 </script>
+
 <script src="cookie-consent.js" defer></script>
 
 </body>
