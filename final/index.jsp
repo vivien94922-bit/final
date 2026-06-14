@@ -146,7 +146,7 @@ while(rs2.next()){
         </div>
     </a>
 
-    <img src="/final/final/images/heart.png" class="favorite-icon" alt="收藏" onclick="toggleFavorite(this)">
+    <img src="/final/final/images/heart.png" class="favorite-icon" alt="收藏" onclick="toggleFavorite(event, this)">
 
     <button class="add-cart-btn">加入購物車</button>
 </div>
@@ -182,7 +182,7 @@ while(rsTop.next()){
 
     <img src="../images/heart.png"
          class="favorite-icon"
-         onclick="toggleFavorite(this)">
+         onclick="toggleFavorite(event, this)">
 
     <button class="add-cart-btn">加入購物車</button>
 </div>
@@ -218,7 +218,7 @@ while(rsBottom.next()){
 
     <img src="../images/heart.png"
          class="favorite-icon"
-         onclick="toggleFavorite(this)">
+         onclick="toggleFavorite(event, this)">
 
     <button class="add-cart-btn">加入購物車</button>
 </div>
