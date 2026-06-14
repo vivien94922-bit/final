@@ -579,7 +579,7 @@ window.loadFavorites = function() {
                 // 採用字串拼接以保持你的習慣，但結構更清晰
                 div.innerHTML = 
                     '<a href="product.jsp?id=' + item.id + '" class="product-link">' +
-                        '<img src="' + item.img + '" alt="' + item.name + '" onerror="this.src=\'/final-main/images/default.jpg\'">' +
+                        '<img src="' + item.img + '" alt="' + item.name + '">' +
                         '<div class="product-info">' +
                             '<div class="product-name">' + item.name + '</div>' +
                             '<div class="product-price">NT$' + item.price + '</div>' +
