@@ -87,6 +87,9 @@ CREATE TABLE cart (
   CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 確保購物車不會出現重複的 (user_id, product_id) 組合
+ALTER TABLE cart ADD UNIQUE KEY unique_cart_item (user_id, product_id);
+
 -- -------------------------------------------------------------
 -- 訪客計數器（單列）
 -- -------------------------------------------------------------
