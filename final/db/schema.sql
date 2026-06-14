@@ -61,7 +61,7 @@ CREATE TABLE product (
 
 -- -------------------------------------------------------------
 -- 商品留言 / 評價（留言板：中文 + 依日期排序，最新在最上）
---   user_id 允許為 NULL（目前 add.jsp 未寫入；保留供登入會員綁定）
+--   user_id 允許為 NULL（會員刪除後仍保留留言內容）
 -- -------------------------------------------------------------
 CREATE TABLE product_comment (
   id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -185,8 +185,3 @@ CREATE TABLE favorites (
   CONSTRAINT fk_fav_member  FOREIGN KEY (member_id)  REFERENCES members(id) ON DELETE CASCADE,
   CONSTRAINT fk_fav_product  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO favorites (member_id, product_id) VALUES (2, 1); -- 新增收藏範例
-DELETE FROM favorites WHERE member_id = 2 AND product_id = 1; -- 刪除收藏範例
-
-SELECT * FROM favorites WHERE member_id = 2; -- 檢視現有收藏 同步網站
