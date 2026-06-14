@@ -566,14 +566,20 @@ tabs.forEach(tab => {
 
 // 非同步加入購物車
 async function addToCart(productId) {
+    // 獲取輸入框的值
     const qty = document.getElementById('qtyInput').value;
+
+    // 將參數正確帶入 URLSearchParams 或字串中
+    const formData = new URLSearchParams();
+    formData.append('product_id', productId);
+    formData.append('quantity', qty);
 
     const res = await fetch('addToCart.jsp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `product_id=${productId}&quantity=${qty}`
+        body: formData.toString() // 這會產生 "product_id=1&quantity=1"
     });
 
     if (res.status === 401) {
@@ -582,14 +588,20 @@ async function addToCart(productId) {
         return;
     }
 
-    const data = await res.json();
-
-    if (data.success) {
-        if (confirm(data.msg + '\n\n前往購物車？')) {
-            location.href = 'cart.jsp';
+    // 建議增加錯誤處理，防止伺服器掛掉時報 JSON 解析錯誤
+    const text = await res.text();
+    try {
+        const data = JSON.parse(text);
+        if (data.success) {
+            if (confirm(data.msg + '\n\n前往購物車？')) {
+                location.href = 'cart.jsp';
+            }
+        } else {
+            alert(data.msg);
         }
-    } else {
-        alert(data.msg);
+    } catch (e) {
+        console.error("解析失敗，伺服器可能發生錯誤:", text);
+        alert("系統發生錯誤，請稍後再試");
     }
 }
 </script>
