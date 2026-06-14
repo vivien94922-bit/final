@@ -174,12 +174,20 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(data.msg || "已加入購物車");
   });
 
-  /* ===================== 資料庫版收藏功能 ===================== */
+  /* ===================== 優化後的收藏功能 ===================== */
+  // 1. 定義一個通用的更新函式，讓所有相同 ID 的按鈕都能同步
+  window.updateAllHearts = function(productId, isFavorite) {
+      const newSrc = isFavorite ? "images/love.png" : "images/heart.png";
+      // 找出頁面上所有對應此 ID 的愛心圖示並更新
+      document.querySelectorAll(`.product[data-id="${productId}"] .favorite-icon`)
+          .forEach(icon => {
+              icon.src = newSrc;
+          });
+  };
+
   window.toggleFavorite = function (el) {
       const p = el.closest(".product");
       const id = p.dataset.id;
-      
-      // 檢查當前是否在收藏列表頁面 (假設你的容器 ID 是 favorite-list)
       const isFavoritePage = document.getElementById("favorite-list") !== null;
 
       fetch("favorite_toggle.jsp", {
@@ -188,64 +196,42 @@ document.addEventListener("DOMContentLoaded", () => {
           body: "product_id=" + id
       })
       .then(res => {
-          // 1. 檢查 HTTP 狀態碼
           if (res.status === 401) {
               alert("請先登入");
               window.location.href = "login.jsp";
-              throw new Error("Not logged in"); // 停止後續執行
+              throw new Error("Not logged in");
           }
           return res.text();
       })
       .then(result => {
           const status = result.trim();
-          
-          if (status === "add") {
-              el.src = "images/love.png"; // 變實心
-              toast("已加入收藏");
-          } else if (status === "remove") {
-              // 如果在收藏列表頁，直接把卡片移除
-              if (isFavoritePage) {
-                  p.remove(); 
-                  // 若列表空了，顯示提示訊息
+          const isNowFavorite = (status === "add");
+
+          if (status === "add" || status === "remove") {
+              // 【關鍵修改】：不再只改 el，而是全域更新所有對應 ID 的愛心
+              window.updateAllHearts(id, isNowFavorite);
+
+              // 處理收藏頁面特有的移除邏輯
+              if (isFavoritePage && status === "remove") {
+                  p.remove();
                   const list = document.getElementById("favorite-list");
                   if (list && list.querySelectorAll(".product").length === 0) {
                       list.innerHTML = "<p>目前沒有收藏商品</p>";
                   }
-              } else {
-                  // 如果在一般商品列表，只換回空心
-                  el.src = "images/heart.png";
               }
-              toast("已移除收藏");
+              toast(isNowFavorite ? "已加入收藏" : "已移除收藏");
           }
       })
       .catch(err => console.error("收藏失敗:", err));
   };
-  
-    // 頁面載入時自動執行：同步收藏狀態
-  document.addEventListener("DOMContentLoaded", () => {
-      fetch("favorite_list.jsp")
-          .then(res => res.json())
-          .then(data => {
-              // 將後端回傳的 ID 整理成陣列 (假設回傳結構是 [{id: 1}, {id: 2}])
-              const favoriteIds = data.map(item => item.id);
-
-              // 檢查頁面上每一個產品卡片
-              document.querySelectorAll(".product").forEach(product => {
-                  const id = parseInt(product.dataset.id);
-                  const icon = product.querySelector(".favorite-icon");
-                  if (icon) {
-                      // 如果該 ID 在清單內，顯示實心；否則顯示空心
-                      if (favoriteIds.includes(id)) {
-                          icon.src = "images/love.png";
-                      } else {
-                          icon.src = "images/heart.png";
-                      }
-                  }
-              });
-          });
-  });
 
 });
+
+// 在點擊愛心並確認後端更新成功後，發送事件：
+const updateEvent = new CustomEvent('wishlist-updated', { 
+    detail: { productId: 123, isWishlisted: true } 
+});
+window.dispatchEvent(updateEvent);
 
 /* ===================== intro ===================== */
 window.addEventListener("load", () => {
