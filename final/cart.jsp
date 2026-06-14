@@ -89,6 +89,9 @@
 
     <div id="cart-container"></div>
 
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
     <div id="discountHint" class="discount-hint"></div>
     
     <div class="total">

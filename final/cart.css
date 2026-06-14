@@ -96,3 +96,35 @@ body {
     color: #333;
     border-left: 4px solid #000;
   }
+  /* 購物車金額區域的基礎樣式 */
+#cart-total {
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+/* 動畫定義：讓金額稍微縮放並變色 */
+@keyframes highlightPulse {
+    0% { transform: scale(1); color: inherit; }
+    50% { transform: scale(1.1); color: #e74c3c; } /* 變大並變為警示紅 */
+    100% { transform: scale(1); color: inherit; }
+}
+
+/* 觸發類別 */
+.price-pulse {
+    animation: highlightPulse 0.5s ease-in-out;
+}
+.progress-container {
+    max-width: 1000px;
+    margin: 20px auto 0;
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #000; /* 進度條顏色 */
+    width: 0%;      /* 初始長度 */
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}

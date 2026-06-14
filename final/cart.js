@@ -93,35 +93,45 @@ async function renderCart() {
 function updateTotalFromDB(cart) {
     let total = 0;
     cart.forEach(item => {
-        if (item.quantity > 0) {
-            total += item.price * item.quantity;
-        }
+        if (item.quantity > 0) total += item.price * item.quantity;
     });
 
-    // 渲染總金額
+    // 1. 更新總金額顯示 (保留你原本的金額動畫)
     const totalEl = document.getElementById("cart-total");
     if (totalEl) {
+        if (total >= 1500 && total < 2000) {
+            totalEl.classList.add("price-pulse");
+            setTimeout(() => totalEl.classList.remove("price-pulse"), 500);
+        }
         totalEl.textContent = "NT$" + total.toLocaleString();
     }
 
-    // 控制 discountHint 滿額提示與結帳按鈕
+    // 2. 更新進度條長度
+    const progressBar = document.getElementById("progressBar");
+    const progressContainer = document.getElementById("progressContainer");
+    let percent = (total / 2000) * 100;
+    if (percent > 100) percent = 100; // 超過滿額則填滿
+    if (progressBar) progressBar.style.width = percent + "%";
+
+    // 3. 更新文字提示與結帳按鈕
     const hintEl = document.getElementById("discountHint");
     const checkoutBtn = document.getElementById("checkoutBtn");
 
-    if (hintEl) {
-        if (total === 0) {
-            hintEl.style.display = "none";
-            if (checkoutBtn) checkoutBtn.disabled = true; // 購物車沒東西時不能結帳
-        } else if (total < 2000) {
-            let diff = 2000 - total;
-            hintEl.style.display = "block";
-            hintEl.innerHTML = `💡 還差 <b>NT$${diff.toLocaleString()}</b> 即可享有免運費優惠！(現正滿 NT$2,000 免運)`;
-            if (checkoutBtn) checkoutBtn.disabled = false;
+    if (total === 0) {
+        progressContainer.style.display = "none";
+        hintEl.style.display = "none";
+        if (checkoutBtn) checkoutBtn.disabled = true;
+    } else {
+        progressContainer.style.display = "block";
+        hintEl.style.display = "block";
+        if (total < 1500) {
+            let diff = 1500 - total;
+            hintEl.innerHTML = `💡 還差 <b>NT$${diff.toLocaleString()}</b> 即可享有免運費優惠！`;
         } else {
-            hintEl.style.display = "block";
-            hintEl.innerHTML = `🎉 太棒了！已達成滿額免運費資格！`;
-            if (checkoutBtn) checkoutBtn.disabled = false;
+            hintEl.innerHTML = `恭喜！已達成滿額免運費資格！`;
+            progressBar.style.backgroundColor = "#27ae60"; // 達標變綠色
         }
+        if (checkoutBtn) checkoutBtn.disabled = false;
     }
 }
 
