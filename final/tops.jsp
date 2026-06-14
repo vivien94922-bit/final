@@ -46,7 +46,7 @@ ResultSet rs = ps.executeQuery();
 
       </a>
 
-      <img src="images/heart.png" class="favorite-icon" onclick="toggleFavorite(this)">
+      <img src="images/heart.png" class="favorite-icon" onclick="toggleFavorite(event, this)">
       <button class="add-cart-btn">加入購物車</button>
 
     </div>

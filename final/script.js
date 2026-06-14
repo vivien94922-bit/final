@@ -174,70 +174,47 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(data.msg || (addRes.ok ? "已加入購物車" : "操作失敗"));
   });
 
-  /* ===================== 優化後的收藏功能 ===================== */
-  // 1. 定義一個通用的更新函式，讓所有相同 ID 的按鈕都能同步
+  /* ===================== 收藏功能 ===================== */
   window.updateAllHearts = function(productId, isFavorite) {
-      const newSrc = isFavorite ? "images/love.png" : "images/heart.png";
-      // 找出頁面上所有對應此 ID 的愛心圖示並更新
-      document.querySelectorAll(`.product[data-id="${productId}"] .favorite-icon`)
-          .forEach(icon => {
-              icon.src = newSrc;
-          });
+    const newSrc = isFavorite ? "images/love.png" : "images/heart.png";
+    document.querySelectorAll(`.product[data-id="${productId}"] .favorite-icon`)
+      .forEach(icon => { icon.src = newSrc; });
   };
 
-  window.toggleFavorite = function (el) {
-      const p = el.closest(".product");
-      const id = p.dataset.id;
-      const isFavoritePage = document.getElementById("favorite-list") !== null;
-
-      fetch("favorite_toggle.jsp", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "product_id=" + id
-      })
-      .then(res => {
-          if (res.status === 401) {
-              alert("請先登入");
-              window.location.href = "login.jsp";
-              throw new Error("Not logged in");
-          }
-          return res.text();
-      })
-      .then(result => {
-          const status = result.trim();
-          const isNowFavorite = (status === "add");
-
-          if (status === "add" || status === "remove") {
-              // 【關鍵修改】：不再只改 el，而是全域更新所有對應 ID 的愛心
-              window.updateAllHearts(id, isNowFavorite);
-
-              // 處理收藏頁面特有的移除邏輯
-              if (isFavoritePage && status === "remove") {
-                  p.remove();
-                  const list = document.getElementById("favorite-list");
-                  if (list && list.querySelectorAll(".product").length === 0) {
-                      list.innerHTML = "<p>目前沒有收藏商品</p>";
-                  }
-              }
-              toast(isNowFavorite ? "已加入收藏" : "已移除收藏");
-          }
-      })
-      .catch(err => console.error("收藏失敗:", err));
-  };
-
-});
-
-// 在點擊愛心並確認後端更新成功後，發送事件：
-const updateEvent = new CustomEvent('wishlist-updated', { 
-    detail: { productId: 123, isWishlisted: true } 
-});
-window.dispatchEvent(updateEvent);
-
-// 這樣寫，點擊任何 class="favorite-icon" 的元素都會自動觸發 toggleFavorite
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('favorite-icon')) {
-        window.toggleFavorite(e.target);
+  window.toggleFavorite = async function (event, el) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
     }
+    const p = el.closest(".product");
+    const id = p.dataset.id;
+    const isFavoritePage = document.getElementById("favorite-list") !== null;
+
+    try {
+      const res = await fetch("favorite_toggle.jsp", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "product_id=" + id
+      });
+
+      if (res.status === 401) {
+        alert("請先登入");
+        window.location.href = "login.jsp";
+        return;
+      }
+
+      const status = (await res.text()).trim();
+      if (status === "add" || status === "remove") {
+        window.updateAllHearts(id, status === "add");
+        if (isFavoritePage && status === "remove") {
+          p.remove();
+        }
+        toast(status === "add" ? "已加入收藏" : "已移除收藏");
+      }
+    } catch (err) {
+      console.error("收藏失敗:", err);
+    }
+  };
 });
 
 /* ===================== intro ===================== */
