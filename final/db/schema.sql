@@ -87,8 +87,7 @@ CREATE TABLE cart (
   CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 確保購物車不會出現重複的 (user_id, product_id) 組合
-ALTER TABLE cart ADD UNIQUE KEY unique_cart_item (user_id, product_id);
+ALTER TABLE cart ADD UNIQUE KEY unique_cart_item (user_id, product_id); -- 確保購物車不會出現重複的 (user_id, product_id) 組合
 
 -- -------------------------------------------------------------
 -- 訪客計數器（單列）
@@ -187,7 +186,7 @@ CREATE TABLE favorites (
   CONSTRAINT fk_fav_product  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO favorites (member_id, product_id) VALUES (2, 1);
-DELETE FROM favorites WHERE member_id = 2 AND product_id = 1;
+INSERT INTO favorites (member_id, product_id) VALUES (2, 1); -- 新增收藏範例
+DELETE FROM favorites WHERE member_id = 2 AND product_id = 1; -- 刪除收藏範例
 
-SELECT * FROM favorites WHERE member_id = 2;
+SELECT * FROM favorites WHERE member_id = 2; -- 檢視現有收藏 同步網站
