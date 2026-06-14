@@ -118,6 +118,19 @@ body {
   color: #000;
   background-color: #fff;
 }
+
+/* ===== Footer 樣式 ===== */
+  footer {
+  flex-shrink: 0;
+  background-color: #222;
+  color: #bbb;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #333;
+  position: sticky;
+  top: 100vh; /* 讓 Footer 停留在視窗最下方 */
+}
+
 /* ================= 商品主區 ================= */
 .product-container {
   display: flex;
@@ -327,6 +340,35 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@media screen and (max-width: 768px) {
+  .product-container {
+    flex-direction: column;
+    padding: 20px 15px;
+    gap: 20px;
+  }
+
+  .product-images { width: 100%; height: 350px; }
+  
+  .form-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  .add-cart { width: 100% !important; margin-top: 10px; }
 }
 </style>
 </head>
