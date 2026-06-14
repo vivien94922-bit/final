@@ -233,6 +233,13 @@ const updateEvent = new CustomEvent('wishlist-updated', {
 });
 window.dispatchEvent(updateEvent);
 
+// 這樣寫，點擊任何 class="favorite-icon" 的元素都會自動觸發 toggleFavorite
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('favorite-icon')) {
+        window.toggleFavorite(e.target);
+    }
+});
+
 /* ===================== intro ===================== */
 window.addEventListener("load", () => {
   const intro = document.getElementById("intro");
