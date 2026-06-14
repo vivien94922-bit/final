@@ -598,6 +598,7 @@ button {
             heart.src = "images/love.png";
             heart.alt = "取消收藏";
             heart.className = "favorite-icon";
+            heart.addEventListener("click", event => toggleFavorite(event, heart));
             const addButton = document.createElement("button");
             addButton.type = "button";
             addButton.className = "add-cart-btn";

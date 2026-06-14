@@ -62,7 +62,7 @@ try {
       <img src="images/heart.png"
            class="favorite-icon"
            alt="收藏"
-           onclick="toggleFavorite(this)">
+           onclick="toggleFavorite(event, this)">
 
       <button class="add-cart-btn">加入購物車</button>
 
