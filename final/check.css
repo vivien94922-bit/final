@@ -1,203 +1,71 @@
-/* ===== 1. 覆蓋 style.css 的 body 背景，還原乾淨視覺 ===== */
 body {
-    font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
-    background-image: none !important; /* ❌ 強制拔除首頁的 bg.png 背景圖 */
-    background-color: #fafafa !important; /* 🌟 改用乾淨、高質感的微灰底 */
-    color: #111;
-    margin: 0;
-    padding: 0;
-    display: block !important; /* 恢復正常區塊流動，防堵 header 左右並排 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: url('your-background-image.jpg') no-repeat center center fixed; /* 替換成你的背景圖 */
+    background-size: cover;
+    padding: 40px 20px;
 }
 
-/* ===== 2. 結帳主區塊容器（負責把表單置中） ===== */
-.checkout-main-wrapper {
-    display: flex !important;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 70px); /* 扣除 header 高度，填滿畫面 */
-    padding: 60px 20px;
-    box-sizing: border-box;
-    background-color: #fafafa; /* 確保主體維持純淨底色 */
-}
-
-.checkout-container {
-    width: 100%;
-    max-width: 520px; /* 收緊寬度，填寫更流暢 */
-    background: #fff;
-    padding: 40px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03); /* 輕微的現代感高質感陰影 */
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-/* ===== 3. 標題與段落（配合品牌 STANDARD DAY 改為時尚極簡黑） ===== */
+.checkout-container { max-width: 1000px; margin: 0 auto; }
 .main-title {
-    font-size: 26px;
-    font-weight: 600;
-    color: #000;
-    letter-spacing: 2px;
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 40px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee; /* 改為下底線，視覺比左邊綠線平衡 */
+    font-size: 2.8rem;
+    font-weight: 800; /* 加粗 */
+    color: #333;      /* 調整為深灰色，比純黑柔和但對比度高 */
+    margin-bottom: 30px;
+    
+    /* 加入一點文字陰影，即使背景有點花，字也能浮出來 */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    
+    /* 加上下底線裝飾，增加標題份量感 */
+    position: relative;
+    padding-bottom: 10px;
 }
 
-.section-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: #000;
-    letter-spacing: 1px;
-    margin: 35px 0 15px 0;
-    border-left: 3px solid #000; /* 捨棄綠色，改用質感的純黑線條 */
-    padding-left: 10px;
+.main-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: black; 
+    border-radius: 2px;
 }
 
-/* ===== 4. 表單輸入框優化 ===== */
-.form-group {
-    margin-bottom: 15px;
+/* 網格系統 */
+.checkout-grid { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+
+/* 玻璃質感卡片 */
+.section, .summary-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(15px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
-.input-wrapper {
-    display: flex;
-    align-items: center;
-    border: 1px solid #e5e5e5;
-    border-radius: 4px;
-    padding: 12px 15px;
-    transition: border-color 0.3s;
-}
-
-.input-wrapper:focus-within {
-    border-color: #000; /* 點選輸入框時外框變黑，非常有質感 */
-}
-
-.label-text {
-    width: 70px;
-    color: #777;
-    font-size: 13px;
-    letter-spacing: 1px;
-}
-
+/* 輸入框優化 */
+.form-group { margin-bottom: 15px; }
+.label-text { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
 input[type="text"], input[type="tel"] {
-    border: none;
-    outline: none;
-    flex: 1;
-    font-size: 14px;
-    color: #111;
-    background: transparent;
+    width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
 }
 
-input::placeholder {
-    color: #ccc;
-}
+/* 總結區塊 */
+.summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; color: #333; }
+.total { font-size: 1.25rem; font-weight: bold; color: #ff4757; }
+.divider { height: 1px; background: #eee; margin: 15px 0; }
 
-/* ===== 5. 付款選項優化 ===== */
-.payment-options {
-    margin-top: 15px;
-}
-
-.payment-item {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 4px;
-    padding: 16px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.payment-item:hover {
-    border-color: #000;
-    background: #fafafa;
-}
-
-.payment-item input[type="radio"] {
-    margin-right: 12px;
-    accent-color: #000; /* 讓單選圓點變成品牌黑色 */
-}
-
-.payment-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-}
-
-/* LINE Pay 保持原本亮眼的官方綠 */
-.line-pay-text {
-    color: #00c300; 
-    font-weight: 600;
-}
-
-/* ===== 6. 金額加總區塊 ===== */
-.summary {
-    margin-top: 40px;
-    background: #fcfcfc;
-    padding: 20px;
-    border-radius: 4px;
-    border: 1px solid #f0f0f0;
-}
-
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #666;
-}
-
-.divider {
-    height: 1px;
-    background-color: #eee;
-    margin: 15px 0;
-}
-
-.summary-line.total {
-    font-weight: 600;
-    font-size: 18px;
-    color: #000;
-    margin-bottom: 0;
-}
-
-/* ===== 7. 送出按鈕黑白反轉特效 ===== */
+/* 按鈕風格 */
 .submit-btn {
-    width: 100%;             
-    background-color: #000; 
-    color: #fff;        
-    border: 1px solid #000;
-    padding: 16px;         
-    font-size: 15px;      
-    font-weight: 500;     
-    letter-spacing: 2px; 
-    border-radius: 4px;     
-    cursor: pointer;
-    margin-top: 35px;        
-    transition: all 0.3s ease; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: 100%; padding: 15px; background: #ff4757; color: white; border: none;
+    border-radius: 10px; font-size: 1.1rem; cursor: pointer; transition: 0.3s;
 }
+.submit-btn:hover { background: #ff6b81; transform: translateY(-2px); }
 
-.submit-btn:hover {
-    background-color: #fff; 
-    color: #000;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
-}
-
-.submit-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.submit-btn:disabled {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.hidden {
-    display: none;
+/* 手機版適應 */
+@media (max-width: 768px) {
+    .checkout-grid { grid-template-columns: 1fr; }
 }
