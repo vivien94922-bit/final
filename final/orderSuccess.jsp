@@ -43,6 +43,5 @@
         if (orderId) document.getElementById('orderIdText').textContent = '訂單編號：' + orderId;
         if (total)   document.getElementById('totalText').textContent   = '實付金額：NT$' + parseInt(total).toLocaleString();
     </script>
-    <script src="cookie-consent.js" defer></script>
 </body>
 </html>

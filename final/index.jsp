@@ -130,7 +130,12 @@ ResultSet rs2 = ps2.executeQuery();
 while(rs2.next()){
 %>
 
-<div class="product" data-id="<%= rs2.getInt("id") %>">
+<div class="product" 
+     data-id="<%= rs2.getInt("id") %>" 
+     data-name="<%= rs2.getString("name") %>" 
+     data-price="<%= rs2.getInt("price") %>" 
+     data-img="<%= rs2.getString("image") %>">
+    
     <a href="product.jsp?id=<%= rs2.getInt("id") %>" class="product-link">
         <img src="<%= rs2.getString("image") %>">
         <div class="product-info">
@@ -139,9 +144,7 @@ while(rs2.next()){
         </div>
     </a>
 
-    <img src="../images/heart.png"
-         class="favorite-icon"
-         onclick="toggleFavorite(this)">
+    <img src="/final/final/images/heart.png" class="favorite-icon" alt="收藏" onclick="toggleFavorite(this)">
 
     <button class="add-cart-btn">加入購物車</button>
 </div>
@@ -264,5 +267,6 @@ con2.close();
             });
     });
 </script>
+
 </body>
 </html>

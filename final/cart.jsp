@@ -106,9 +106,11 @@
             const btn = document.getElementById('checkoutBtn');
             btn.disabled = true;
             btn.innerText = '處理中...';
+            const totalText = document.getElementById('cart-total').innerText; 
+            const pureTotalNumber = totalText.replace(/[^0-9]/g, ''); // 濾掉 "NT$" 變成純數字字串
             // 延遲一下下再跳轉，做出高階電商的轉場感
             setTimeout(() => {
-                location.href = 'checkout.jsp';
+                location.href = 'checkout.jsp?amount=' + pureTotalNumber;
             }, 400);
         }
     </script>

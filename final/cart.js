@@ -47,7 +47,7 @@ async function renderCart() {
                             <button class="decrease">-</button>
                             <input type="number" class="quantity" value="${item.quantity}" min="1" style="width: 40px; text-align: center;" readonly>
                             <button class="increase">+</button>
-                            <button class="remove-btn" style="display: flex; justify-content: center; align-items: center; background-color: #333; color: #fff; margin-left: 10px; padding: 8px 16px; border: none; cursor: pointer; font-size: 18px; ">刪除</button>
+                            <button class="remove-btn" style="background: #333; color: #fff; margin-left: 10px; padding: 2px 8px; border: none; cursor: pointer;">刪除</button>
                         </div>
                     </div>
                 `;

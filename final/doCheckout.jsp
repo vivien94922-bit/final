@@ -1,198 +1,81 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="java.util.LinkedHashMap" %>
-<%@ page import="java.util.Map" %>
 <%@ include file="dbutil.jsp" %>
-<%!
-    private String jsonEscape(String value) {
-        if (value == null) return "";
-        return value.replace("\\", "\\\\")
-                    .replace("\"", "\\\"")
-                    .replace("\r", "\\r")
-                    .replace("\n", "\\n");
-    }
-%>
 <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    // 1. 強制設定回應格式為標準的 JSON 格式
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
 
-    if (!"POST".equalsIgnoreCase(request.getMethod())) {
-        response.setStatus(405);
-        response.setHeader("Allow", "POST");
-        out.print("{\"success\":false,\"msg\":\"不支援的請求方式\"}");
-        return;
-    }
-
+    // 2. 獲取 Session 中的 user_id (與 getCartItems.jsp 完全對齊)
     Integer userId = (Integer) session.getAttribute("user_id");
     if (userId == null) {
         response.setStatus(401);
-        out.print("{\"success\":false,\"msg\":\"請先登入\"}");
+        out.print("{\"success\": false, \"msg\": \"請先登入\"}");
+        out.flush();
         return;
     }
 
-    String recipientName = request.getParameter("recipient_name");
+    // 3. 接收前端透過 fetch 傳過來的收件人資料與結帳總金額
+    String name = request.getParameter("recipient_name");
     String phone = request.getParameter("recipient_phone");
     String address = request.getParameter("recipient_address");
     String payment = request.getParameter("payment");
-
-    recipientName = recipientName == null ? "" : recipientName.trim();
-    phone = phone == null ? "" : phone.trim();
-    address = address == null ? "" : address.trim();
-    payment = payment == null ? "" : payment.trim();
-
-    boolean validPayment = "credit".equals(payment)
-        || "linepay".equals(payment)
-        || "cod".equals(payment);
-
-    if (recipientName.isEmpty() || phone.isEmpty() || address.isEmpty() || !validPayment
-            || recipientName.length() > 50 || phone.length() > 20 || address.length() > 255) {
-        response.setStatus(400);
-        out.print("{\"success\":false,\"msg\":\"請確認收件人資料與付款方式\"}");
-        return;
+    
+    String totalParam = request.getParameter("total_amount");
+    int totalAmount = 0;
+    if (totalParam != null && !totalParam.trim().isEmpty()) {
+        try {
+            totalAmount = Integer.parseInt(totalParam);
+        } catch (NumberFormatException e) {
+            totalAmount = 0;
+        }
     }
 
-    Connection conn = null;
-    try {
-        conn = getConnection();
-        conn.setAutoCommit(false);
-
-        /*
-         * Lock cart and product rows until checkout finishes. The map also
-         * combines duplicate cart rows before validating stock.
-         */
-        Map<Integer, Object[]> cartLines = new LinkedHashMap<Integer, Object[]>();
-        String cartSql =
-            "SELECT c.product_id, c.quantity, p.name, p.price, p.stock " +
-            "FROM cart c JOIN product p ON c.product_id = p.id " +
-            "WHERE c.user_id = ? ORDER BY p.id FOR UPDATE";
-
-        try (PreparedStatement psCart = conn.prepareStatement(cartSql)) {
-            psCart.setInt(1, userId);
-            try (ResultSet rs = psCart.executeQuery()) {
-                while (rs.next()) {
-                    int productId = rs.getInt("product_id");
-                    int quantity = rs.getInt("quantity");
-                    if (quantity <= 0) {
-                        throw new IllegalStateException("購物車內含有無效數量，請重新整理購物車");
-                    }
-
-                    Object[] line = cartLines.get(productId);
-                    if (line == null) {
-                        line = new Object[] {
-                            rs.getString("name"),
-                            Integer.valueOf(rs.getInt("price")),
-                            Integer.valueOf(rs.getInt("stock")),
-                            Integer.valueOf(quantity)
-                        };
-                        cartLines.put(productId, line);
-                    } else {
-                        line[3] = Integer.valueOf(((Integer) line[3]).intValue() + quantity);
-                    }
+    // 使用 dbutil.jsp 的 getConnection() 建立連線
+    try (Connection conn = getConnection()) {
+        
+        // 動作 A：將收件人資料與金額寫入訂單資料表
+        String orderSql = "INSERT INTO orders (name, phone, address, total, payment, member_id) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement pstmtOrder = conn.prepareStatement(orderSql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmtOrder.setString(1, name);         
+            pstmtOrder.setString(2, phone);        
+            pstmtOrder.setString(3, address);      
+            pstmtOrder.setInt(4, totalAmount);     
+            pstmtOrder.setString(5, payment);      
+            pstmtOrder.setInt(6, userId); // 🌟 這裡也對齊 user_id 寫進訂單
+            
+            pstmtOrder.executeUpdate();
+            
+            // 撈取剛剛寫入成功的真正訂單編號
+            int realOrderId = 0;
+            try (ResultSet rs = pstmtOrder.getGeneratedKeys()) {
+                if (rs.next()) {
+                    realOrderId = rs.getInt(1);
                 }
             }
-        }
 
-        if (cartLines.isEmpty()) {
-            throw new IllegalStateException("購物車目前沒有商品");
-        }
-
-        long calculatedTotal = 0L;
-        for (Map.Entry<Integer, Object[]> entry : cartLines.entrySet()) {
-            Object[] line = entry.getValue();
-            String productName = (String) line[0];
-            int price = ((Integer) line[1]).intValue();
-            int stock = ((Integer) line[2]).intValue();
-            int quantity = ((Integer) line[3]).intValue();
-
-            if (quantity > stock) {
-                throw new IllegalStateException("商品「" + productName + "」庫存不足，請調整購買數量");
+            /* =================================================================
+               🌟 終極修正：精準清空該登入用戶在 `cart` 資料表裡的購物車商品！
+               ================================================================= */
+            String clearCartSql = "DELETE FROM cart WHERE user_id = ?"; 
+            try (PreparedStatement pstmtClearCart = conn.prepareStatement(clearCartSql)) {
+                pstmtClearCart.setInt(1, userId); 
+                pstmtClearCart.executeUpdate();
             }
-            calculatedTotal += (long) price * quantity;
+            /* ================================================================= */
+            
+            // 回傳成功的 JSON
+            String jsonSuccess = "{\"success\": true, \"order_id\": " + realOrderId + ", \"msg\": \"\u8a02\u55ae\u5efa\u7acb\u6210\u529f\u4e14\u8cfc\u7269\u8eca\u5df2\u6e05\u7a7a\"}";
+            out.print(jsonSuccess);
+            out.flush();
         }
 
-        if (calculatedTotal <= 0L || calculatedTotal > Integer.MAX_VALUE) {
-            throw new IllegalStateException("訂單金額不正確，請重新整理購物車");
-        }
-
-        int orderId;
-        String orderSql =
-            "INSERT INTO orders (name, phone, address, total, payment, member_id) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement psOrder =
-                conn.prepareStatement(orderSql, Statement.RETURN_GENERATED_KEYS)) {
-            psOrder.setString(1, recipientName);
-            psOrder.setString(2, phone);
-            psOrder.setString(3, address);
-            psOrder.setInt(4, (int) calculatedTotal);
-            psOrder.setString(5, payment);
-            psOrder.setInt(6, userId);
-            psOrder.executeUpdate();
-
-            try (ResultSet keys = psOrder.getGeneratedKeys()) {
-                if (!keys.next()) {
-                    throw new SQLException("Order ID was not generated");
-                }
-                orderId = keys.getInt(1);
-            }
-        }
-
-        String itemSql =
-            "INSERT INTO order_items (order_id, product_id, name, price, quantity) " +
-            "VALUES (?, ?, ?, ?, ?)";
-        String stockSql =
-            "UPDATE product SET stock = stock - ? WHERE id = ? AND stock >= ?";
-
-        try (PreparedStatement psItem = conn.prepareStatement(itemSql);
-             PreparedStatement psStock = conn.prepareStatement(stockSql)) {
-            for (Map.Entry<Integer, Object[]> entry : cartLines.entrySet()) {
-                int productId = entry.getKey().intValue();
-                Object[] line = entry.getValue();
-                String productName = (String) line[0];
-                int price = ((Integer) line[1]).intValue();
-                int quantity = ((Integer) line[3]).intValue();
-
-                psItem.setInt(1, orderId);
-                psItem.setInt(2, productId);
-                psItem.setString(3, productName);
-                psItem.setInt(4, price);
-                psItem.setInt(5, quantity);
-                psItem.addBatch();
-
-                psStock.setInt(1, quantity);
-                psStock.setInt(2, productId);
-                psStock.setInt(3, quantity);
-                if (psStock.executeUpdate() != 1) {
-                    throw new IllegalStateException("商品「" + productName + "」庫存不足，請調整購買數量");
-                }
-            }
-            psItem.executeBatch();
-        }
-
-        try (PreparedStatement psClear =
-                conn.prepareStatement("DELETE FROM cart WHERE user_id = ?")) {
-            psClear.setInt(1, userId);
-            psClear.executeUpdate();
-        }
-
-        conn.commit();
-        out.print("{\"success\":true,\"order_id\":" + orderId
-            + ",\"total\":" + calculatedTotal
-            + ",\"msg\":\"訂單建立成功\"}");
-    } catch (IllegalStateException e) {
-        if (conn != null) {
-            try { conn.rollback(); } catch (SQLException ignored) {}
-        }
-        response.setStatus(409);
-        out.print("{\"success\":false,\"msg\":\"" + jsonEscape(e.getMessage()) + "\"}");
     } catch (Exception e) {
-        if (conn != null) {
-            try { conn.rollback(); } catch (SQLException ignored) {}
-        }
-        application.log("Checkout failed for member ID " + userId, e);
-        response.setStatus(500);
-        out.print("{\"success\":false,\"msg\":\"系統暫時無法建立訂單，請稍後再試\"}");
-    } finally {
-        if (conn != null) {
-            try { conn.close(); } catch (SQLException ignored) {}
-        }
+        e.printStackTrace(); 
+        String errorMsg = e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "Unknown Error";
+        String jsonError = "{\"success\": false, \"msg\": \"\u5fac\u7aef\u767c\u751f\u932f\u8aa4\uff1a" + errorMsg + "\"}";
+        out.print(jsonError);
+        out.flush();
     }
 %>

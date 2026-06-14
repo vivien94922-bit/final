@@ -1,50 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
-<%@ include file="dbutil.jsp" %>
 <%
-    Integer userId = (Integer) session.getAttribute("user_id");
-    if (userId == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-
-    String orderIdText = request.getParameter("order_id");
-    String orderStatus = "";
-    boolean validOrder = false;
-
-    try {
-        int orderId = Integer.parseInt(orderIdText);
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                 "SELECT status FROM orders WHERE id = ? AND member_id = ?")) {
-            ps.setInt(1, orderId);
-            ps.setInt(2, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    validOrder = true;
-                    orderStatus = rs.getString("status");
-                }
-            }
-        }
-    } catch (Exception e) {
-        application.log("Unable to verify checkout success order", e);
-    }
-
-    if (!validOrder) {
-        orderIdText = "無法確認";
-        orderStatus = "請至會員中心查看";
-    } else if ("pending".equals(orderStatus)) {
-        orderStatus = "處理中";
-    } else if ("paid".equals(orderStatus)) {
-        orderStatus = "已付款";
-    } else if ("shipped".equals(orderStatus)) {
-        orderStatus = "已出貨";
-    } else if ("completed".equals(orderStatus)) {
-        orderStatus = "已完成";
-    } else if ("cancelled".equals(orderStatus)) {
-        orderStatus = "已取消";
-    } else {
-        orderStatus = "處理中";
+    // 透過網址列參數（URL Parameter）取得剛剛產生的訂單編號
+    String orderId = request.getParameter("order_id");
+    if (orderId == null || orderId.trim().isEmpty()) {
+        orderId = "------"; // 防呆機制：萬一網址沒帶參數就顯示橫線
     }
 %>
 <!DOCTYPE html>
@@ -206,7 +165,8 @@
 </head>
 <script>
     // 💡 結帳成功進入此頁時，順便把前端可能殘留的購物車暫存一次掃乾淨
-    localStorage.removeItem("cart");
+    localStorage.removeItem("cart"); // 如果你們前端有把購物車存進 localStorage，這行很關鍵
+    localStorage.clear(); 
 </script>
 <body>
 
@@ -223,17 +183,17 @@
             <div class="order-info-box">
                 <div class="info-row">
                     <span class="info-label">訂單編號</span>
-                    <span class="info-value">#<%= orderIdText %></span>
+                    <span class="info-value">#<%= orderId %></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">訂單狀態</span>
-                    <span class="info-value" style="color: #4caf50;"><%= orderStatus %></span>
+                    <span class="info-value" style="color: #4caf50;">處理中</span>
                 </div>
             </div>
             
             <div class="btn-group">
                 <a href="index.jsp" class="btn-primary">繼續購物</a>
-                <a href="member.jsp#orders" class="btn-secondary">查看訂單紀錄</a>
+                <a href="member_orders.jsp" class="btn-secondary">查看訂單紀錄</a>
             </div>
             
         </div>
@@ -241,9 +201,7 @@
 
     <footer>
         <p>&copy; 2026 STANDARD DAY. All Rights Reserved.</p>
-        <p><a href="privacy.html">隱私權政策</a></p>
     </footer>
 
-    <script src="cookie-consent.js" defer></script>
 </body>
 </html>

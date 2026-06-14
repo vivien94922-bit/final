@@ -23,7 +23,7 @@ try (Connection conn = getConnection()) {
 
     PreparedStatement ps = conn.prepareStatement(
         "SELECT c.cart_id, c.product_id, c.quantity, p.name, p.price, p.image " +
-        "FROM cart c JOIN product p ON c.product_id=p.id " +
+        "FROM cart c JOIN products p ON c.product_id=p.product_id " +
         "WHERE c.user_id=?"
     );
 

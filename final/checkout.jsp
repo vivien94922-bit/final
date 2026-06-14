@@ -73,60 +73,47 @@
             </div>
         </div>
 
-        <button type="submit" id="submitBtn" class="submit-btn" disabled>載入購物車中...</button>
+        <button type="submit" id="submitBtn" class="submit-btn">確認送出訂單</button>
     </form>
 </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // 1. 從網址抓取購物車傳過來的 amount 金額
+            const urlParams = new URLSearchParams(window.location.search);
+            const amount = urlParams.get('amount') || "0";
+            
+            // 2. 將金額動態渲染到畫面上的「商品小計」與「應付總計」
             const subtotalEl = document.getElementById("subtotal-display");
             const totalEl = document.getElementById("total-Amount");
-            const submitBtn = document.getElementById("submitBtn");
+            
+            if (subtotalEl) subtotalEl.innerText = "NT$" + parseInt(amount).toLocaleString();
+            if (totalEl) totalEl.innerText = "NT$" + parseInt(amount).toLocaleString();
 
-            // Display an estimate from the current server-side cart. The backend
-            // calculates and validates the authoritative total again at checkout.
-            fetch("getCartItems.jsp", { cache: "no-store" })
-                .then(res => {
-                    if (res.status === 401) {
-                        location.href = "login.jsp";
-                        return null;
-                    }
-                    if (!res.ok) throw new Error("無法取得購物車");
-                    return res.json();
-                })
-                .then(cart => {
-                    if (cart === null) return;
-                    const total = cart.reduce((sum, item) => {
-                        const price = Number(item.price);
-                        const quantity = Number(item.quantity);
-                        return sum + (price > 0 && quantity > 0 ? price * quantity : 0);
-                    }, 0);
-
-                    subtotalEl.innerText = "NT$" + total.toLocaleString();
-                    totalEl.innerText = "NT$" + total.toLocaleString();
-                    submitBtn.disabled = total <= 0;
-                    submitBtn.innerText = total > 0 ? "確認送出訂單" : "購物車沒有商品";
-                })
-                .catch(() => {
-                    submitBtn.disabled = true;
-                    submitBtn.innerText = "無法載入購物車";
-                });
-
+            // 3. 監聽表單送出事件
             const form = document.getElementById("checkoutForm");
             if (form) {
                 form.addEventListener("submit", function(e) {
-                    e.preventDefault();
+                    e.preventDefault(); // 阻擋表單預設跳轉，改用 fetch 非同步送出
 
+                    const submitBtn = document.getElementById("submitBtn");
                     submitBtn.disabled = true;
                     submitBtn.innerText = "訂單處理中...";
 
+                    // 4. 打包要傳送給 doCheckout.jsp 的資料
                     const params = new URLSearchParams();
                     params.append('recipient_name', document.getElementById('recipient_name').value);
                     params.append('recipient_phone', document.getElementById('recipient_phone').value);
                     params.append('recipient_address', document.getElementById('recipient_address').value);
+                    
+                    // 抓取被選中的付款方式 radio 值
                     const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
                     params.append('payment', selectedPayment);
 
+                    // 🌟 關鍵：將網址取得的真正金額塞進參數中送往後台
+                    params.append('total_amount', amount);
+
+                    // 5. 發送請求給後端做資料庫處理
                     fetch('doCheckout.jsp', {
                         method: 'POST',
                         headers: {
@@ -134,17 +121,16 @@
                         },
                         body: params.toString()
                     })
-                    .then(async res => {
-                        const data = await res.json();
-                        if (!res.ok && !data.msg) throw new Error("網路回應失敗");
-                        return data;
+                    .then(res => {
+                        if (!res.ok) throw new Error("網路回應失敗");
+                        return res.json();
                     })
                     .then(data => {
                         if (data.success) {
-                            location.href = 'checkout_success.jsp?order_id='
-                                + encodeURIComponent(data.order_id);
+                            // 結帳成功，直接跳轉到成功感謝頁面
+                            location.href = 'checkout_success.jsp';
                         } else {
-                            alert("結帳失敗：" + data.msg);
+                            alert("❌ 結帳失敗：" + data.msg);
                             submitBtn.disabled = false;
                             submitBtn.innerText = "確認送出訂單";
                         }
