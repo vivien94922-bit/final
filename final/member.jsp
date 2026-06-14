@@ -487,39 +487,52 @@ button {
 
     /* ==================== 收藏==================== */
 window.loadFavorites = function() {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    console.log("讀取到的資料:", favorites); // <--- 加入這行
-
     const box = document.getElementById("favorite-list");
     if (!box) return;
-    
-    if (favorites.length === 0) {
-        box.innerHTML = "<p>目前沒有收藏商品</p>";
-        return;
-    }
 
-    box.innerHTML = ""; 
-    favorites.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.dataset.id = item.id;
+    fetch("favorite_list.jsp")
+        .then(res => {
+            if (!res.ok) throw new Error("伺服器回應錯誤");
+            return res.json();
+        })
+        .then(data => {
+            console.log("收藏清單資料:", data);
 
-        // 【關鍵】如果 img 存進去的是錯誤路徑，這裡幫你修正成正確的專案目錄
-        const imgSrc = item.img.includes('/final/final/images/') ? item.img : '/final/final/images/' + item.img;
+            if (!data || data.length === 0) {
+                box.innerHTML = "<p>目前沒有收藏商品</p>";
+                return;
+            }
 
-        div.innerHTML = `
-            <a href="product.jsp?id=${item.id}" class="product-link">
-                <img src="/final/final/${item.img}" alt="${item.name}"> 
-            </a>
-            <div class="product-info">
-                <div class="product-name">${item.name}</div>
-                <div class="product-price">NT$${item.price}</div>
-            </div>
-            <img src="/final/final/images/heart.png" class="favorite-icon" onclick="toggleFavorite(this)">
-            <button class="add-cart-btn">加入購物車</button>
-        `;
-        box.appendChild(div);
-    });
+            // 使用 DocumentFragment 減少重繪次數 (效能優化)
+            const fragment = document.createDocumentFragment();
+
+            data.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "product";
+                div.dataset.id = item.id;
+                
+                // 採用字串拼接以保持你的習慣，但結構更清晰
+                div.innerHTML = 
+                    '<a href="/final-main/final/product.jsp?id=' + item.id + '" class="product-link">' +
+                        '<img src="' + item.img + '" alt="' + item.name + '" onerror="this.src=\'/final-main/images/default.jpg\'">' +
+                        '<div class="product-info">' +
+                            '<div class="product-name">' + item.name + '</div>' +
+                            '<div class="product-price">NT$' + item.price + '</div>' +
+                        '</div>' +
+                    '</a>' +
+                    '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
+                    '<img src="/final-main/images/love.png" class="favorite-icon">';
+                
+                fragment.appendChild(div);
+            });
+
+            box.innerHTML = ""; // 先清空
+            box.appendChild(fragment); // 一次性加入 DOM
+        })
+        .catch(err => {
+            console.error("載入收藏失敗:", err);
+            box.innerHTML = "<p style='color:red;'>載入失敗，請檢查網路連線。</p>";
+        });
 };
     /* ==================== 初始化與事件監聽 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
