@@ -1,50 +1,38 @@
-<%@ page contentType="application/json; charset=UTF-8" %>
+<%@ page contentType="application/json; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
 <%@ include file="dbutil.jsp" %>
 <%
-    // 確保只撈取該會員的資料
-    Integer memberId = (Integer) session.getAttribute("user_id");
-    
-    // 如果沒登入，回傳空陣列
-    if (memberId == null) {
-        out.print("[]");
-        return;
-    }
+    Integer userId = (Integer) session.getAttribute("user_id");
+    if (userId == null) { out.print("[]"); return; }
 
     Connection con = null;
     try {
         con = getConnection();
-        // 透過 JOIN 關聯 favorites 和 product 表，直接取得圖片路徑、價格與名稱
+        // 使用正確的表名 'favorite' 與欄位 'user_id'
         String sql = "SELECT p.id, p.name, p.price, p.image " +
-                     "FROM product p " +
-                     "JOIN favorites f ON p.id = f.product_id " +
-                     "WHERE f.member_id = ?";
-                     
+             "FROM product p " +
+             "JOIN favorite f ON p.id = f.product_id " +
+             "WHERE f.user_id = ? " +
+             "GROUP BY p.id " +
+             "ORDER BY MAX(f.created_at) DESC";
+ 
         PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, memberId);
+        ps.setInt(1, userId);
         ResultSet rs = ps.executeQuery();
 
-        out.print("[");
+        StringBuilder json = new StringBuilder("[");
         boolean first = true;
         while (rs.next()) {
-            if (!first) out.print(",");
+            if (!first) json.append(",");
             first = false;
-            
-            // 轉義名稱中的引號，避免 JSON 解析錯誤
-            String name = rs.getString("name").replace("\"", "\\\"");
-            
-            out.print("{");
-            out.print("\"id\":" + rs.getInt("id") + ",");
-            out.print("\"name\":\"" + name + "\",");
-            out.print("\"price\":" + rs.getInt("price") + ",");
-            out.print("\"img\":\"" + rs.getString("image") + "\"");
-            out.print("}");
+            json.append("{\"id\":").append(rs.getInt("id"))
+                .append(",\"name\":\"").append(rs.getString("name").replace("\"", "\\\""))
+                .append("\",\"price\":").append(rs.getInt("price"))
+                .append(",\"img\":\"").append(rs.getString("image")).append("\"}");
         }
-        out.print("]");
-        
+        json.append("]");
+        out.print(json.toString());
     } catch (Exception e) {
         e.printStackTrace();
-        out.print("[]"); // 出錯時回傳空陣列，避免前端報錯
-    } finally {
-        if (con != null) con.close();
-    }
+        out.print("[]");
+    } finally { if (con != null) con.close(); }
 %>
