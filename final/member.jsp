@@ -550,55 +550,74 @@ button {
       if (target) target.classList.add('active');
     }
 
-    /* ==================== 收藏==================== */
-window.loadFavorites = function() {
-    const box = document.getElementById("favorite-list");
-    if (!box) return;
-
-    fetch("favorite_list.jsp")
-        .then(res => {
-            if (!res.ok) throw new Error("伺服器回應錯誤");
-            return res.json();
-        })
-        .then(data => {
-            console.log("收藏清單資料:", data);
-
-            if (!data || data.length === 0) {
-                box.innerHTML = "<p>目前沒有收藏商品</p>";
-                return;
+    /* ==================== 收藏 ==================== */
+    window.loadFavorites = function() {
+        const box = document.getElementById("favorite-list");
+        if (!box) return;
+    
+        // 事件委派：統一處理容器內的點擊事件
+        box.addEventListener("click", function(e) {
+            if (e.target.classList.contains("favorite-icon")) {
+                const productDiv = e.target.closest(".product");
+                const productId = productDiv.dataset.id;
+                
+                if (confirm("確定要取消收藏嗎？")) {
+                    removeFavorite(productId, productDiv);
+                }
             }
-
-            // 使用 DocumentFragment 減少重繪次數 (效能優化)
-            const fragment = document.createDocumentFragment();
-
-            data.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "product";
-                div.dataset.id = item.id;
-                
-                // 採用字串拼接以保持你的習慣，但結構更清晰
-                div.innerHTML = 
-                    '<a href="product.jsp?id=' + item.id + '" class="product-link">' +
-                        '<img src="' + item.img + '" alt="' + item.name + '">' +
-                        '<div class="product-info">' +
-                            '<div class="product-name">' + item.name + '</div>' +
-                            '<div class="product-price">NT$' + item.price + '</div>' +
-                        '</div>' +
-                    '</a>' +
-                    '<button class="add-cart-btn">加入購物車</button>' +
-                    '<img src="images/love.png" class="favorite-icon">';
-                
-                fragment.appendChild(div);
-            });
-
-            box.innerHTML = ""; // 先清空
-            box.appendChild(fragment); // 一次性加入 DOM
-        })
-        .catch(err => {
-            console.error("載入收藏失敗:", err);
-            box.innerHTML = "<p style='color:red;'>載入失敗，請檢查網路連線。</p>";
         });
-};
+    
+        fetch("favorite_list.jsp")
+            .then(res => res.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    box.innerHTML = "<p>目前沒有收藏商品</p>";
+                    return;
+                }
+    
+                const fragment = document.createDocumentFragment();
+    
+                data.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "product";
+                    div.dataset.id = item.id;
+                    
+                    div.innerHTML = 
+                        '<a href="product.jsp?id=' + item.id + '" class="product-link">' +
+                            '<img src="' + item.img + '" alt="' + item.name + '">' +
+                            '<div class="product-info">' +
+                                '<div class="product-name">' + item.name + '</div>' +
+                                '<div class="product-price">NT$' + item.price + '</div>' +
+                            '</div>' +
+                        '</a>' +
+                        '<button class="add-cart-btn">加入購物車</button>' +
+                        '<img src="images/love.png" class="favorite-icon" title="取消收藏" style="cursor:pointer;">';
+                    
+                    fragment.appendChild(div);
+                });
+    
+                box.innerHTML = "";
+                box.appendChild(fragment);
+            })
+            .catch(err => {
+                console.error("載入收藏失敗:", err);
+                box.innerHTML = "<p style='color:red;'>載入失敗，請檢查網路連線。</p>";
+            });
+    };
+    
+    function removeFavorite(id, element) {
+        fetch("favorite_toggle.jsp?product_id=" + id, { method: "POST" })
+            .then(res => res.text()) 
+            .then(data => {
+                if (data.trim() === "remove") {
+                    element.remove(); // 成功移除
+                    alert("已取消收藏");
+                } else if (data.trim() === "add") {
+                    alert("已加入收藏");
+                }
+            })
+            .catch(err => console.error("請求失敗:", err));
+    }
     /* ==================== 初始化與事件監聽 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
       loadFavorites();
