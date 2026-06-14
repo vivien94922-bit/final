@@ -125,6 +125,16 @@ LOCK TABLES `favorite` WRITE;
 /*!40000 ALTER TABLE `favorite` ENABLE KEYS */;
 UNLOCK TABLES;
 
+-- 刪除同一用戶對同一商品的重複收藏，只保留 ID 最小的那一筆
+DELETE f1 FROM favorite f1
+INNER JOIN favorite f2 
+WHERE f1.id > f2.id 
+AND f1.user_id = f2.user_id 
+AND f1.product_id = f2.product_id;
+ALTER TABLE favorite ADD UNIQUE INDEX unique_user_product (user_id, product_id);
+-- 查詢 favorite 表的所有內容
+SELECT * FROM favorite;
+
 --
 -- Table structure for table `members`
 --
