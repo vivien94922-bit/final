@@ -1,32 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
 <%@ include file="dbutil.jsp" %>
-<%!
-private String memberEscapeHtml(String value) {
-    if (value == null) return "";
-    return value.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;");
-}
-
-private String memberOrderStatus(String status) {
-    if ("pending".equals(status)) return "處理中";
-    if ("paid".equals(status)) return "已付款";
-    if ("shipped".equals(status)) return "已出貨";
-    if ("completed".equals(status)) return "已完成";
-    if ("cancelled".equals(status)) return "已取消";
-    return status == null ? "" : status;
-}
-
-private String memberPaymentLabel(String payment) {
-    if ("credit".equals(payment)) return "信用卡";
-    if ("linepay".equals(payment)) return "LINE Pay";
-    if ("cod".equals(payment)) return "超商取貨付款";
-    return payment == null ? "" : payment;
-}
-%>
 <%
 Integer userId = (Integer) session.getAttribute("user_id");
 boolean isLogin = (userId != null);
@@ -332,32 +306,6 @@ button {
   display: flex;
   gap: 10px;
 }
-
-  .order-card {
-    max-width: 850px;
-    margin-bottom: 18px;
-    padding: 18px 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fff;
-  }
-
-  .order-summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
-  }
-
-  .order-items {
-    margin: 12px 0 0;
-    padding-left: 20px;
-  }
-
-  .order-items li {
-    margin-bottom: 6px;
-  }
   </style>
 </head>
 
@@ -425,77 +373,13 @@ button {
       <section id="like" class="content-section">
         <h2>收藏商品</h2>
         <div id="favorite-list" class="product-grid">
-          </div>
+          <!-- 收藏商品會動態生成在這裡 -->
+        </div>
       </section>
 
       <section id="orders" class="content-section">
         <h2>訂單紀錄</h2>
-        <% if (isLogin) {
-             boolean hasOrders = false;
-             boolean ordersLoadFailed = false;
-             String ordersSql =
-                 "SELECT id, total, payment, status, created_at " +
-                 "FROM orders WHERE member_id = ? ORDER BY created_at DESC, id DESC";
-             try (Connection orderConn = getConnection();
-                  PreparedStatement ordersPs = orderConn.prepareStatement(ordersSql)) {
-                 ordersPs.setInt(1, userId);
-                 try (ResultSet ordersRs = ordersPs.executeQuery()) {
-                     while (ordersRs.next()) {
-                         hasOrders = true;
-                         int currentOrderId = ordersRs.getInt("id");
-        %>
-          <div class="order-card">
-            <div class="order-summary">
-              <span><b>訂單編號：</b>#<%= currentOrderId %></span>
-              <span><b>日期：</b><%= memberEscapeHtml(ordersRs.getString("created_at")) %></span>
-              <span><b>付款：</b><%= memberEscapeHtml(memberPaymentLabel(ordersRs.getString("payment"))) %></span>
-              <span><b>狀態：</b><%= memberEscapeHtml(memberOrderStatus(ordersRs.getString("status"))) %></span>
-              <span><b>總金額：</b>NT$<%= ordersRs.getInt("total") %></span>
-            </div>
-            <ul class="order-items">
-              <%
-                  boolean hasItems = false;
-                  String itemsSql =
-                      "SELECT name, price, quantity, size FROM order_items " +
-                      "WHERE order_id = ? ORDER BY id";
-                  try (PreparedStatement itemsPs = orderConn.prepareStatement(itemsSql)) {
-                      itemsPs.setInt(1, currentOrderId);
-                      try (ResultSet itemsRs = itemsPs.executeQuery()) {
-                          while (itemsRs.next()) {
-                              hasItems = true;
-                              String itemSize = itemsRs.getString("size");
-              %>
-                <li>
-                  <%= memberEscapeHtml(itemsRs.getString("name")) %>
-                  <% if (itemSize != null && !itemSize.trim().isEmpty()) { %>
-                    （尺寸：<%= memberEscapeHtml(itemSize) %>）
-                  <% } %>
-                  × <%= itemsRs.getInt("quantity") %>
-                  ／ NT$<%= itemsRs.getInt("price") %>
-                </li>
-              <%
-                          }
-                      }
-                  }
-                  if (!hasItems) {
-              %>
-                <li>此舊訂單沒有商品明細</li>
-              <% } %>
-            </ul>
-          </div>
-        <%
-                     }
-                 }
-             } catch (Exception e) {
-                 ordersLoadFailed = true;
-                 application.log("Unable to load member orders for member ID " + userId, e);
-                 out.print("<p>目前無法載入訂單紀錄，請稍後再試。</p>");
-             }
-             if (!hasOrders && !ordersLoadFailed) {
-        %>
-          <p>目前尚無訂單</p>
-        <%   }
-           } %>
+        <p>目前尚無訂單</p>
       </section>
       
       <section id="question" class="content-section <%= !isLogin ? "active" : "" %>">
@@ -601,66 +485,42 @@ button {
       if (target) target.classList.add('active');
     }
 
-    /* ==================== 2. 收藏功能 ==================== */
-    window.loadFavorites = function() {
-        const box = document.getElementById("favorite-list");
-        if (!box) {
-            console.error("找不到 favorite-list 這個容器！");
-            return;
-        }
-        
-        fetch("favorite_list.jsp")
-            .then(res => res.json())
-            .then(data => {
-                box.innerHTML = ""; // 確實清空
-                if (!data || data.length === 0) {
-                    box.innerHTML = "<p>目前沒有收藏商品</p>";
-                    return;
-                }
+    /* ==================== 收藏==================== */
+window.loadFavorites = function() {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    console.log("讀取到的資料:", favorites); // <--- 加入這行
 
-                data.forEach(item => {
-                    const div = document.createElement("div");
-                    div.className = "product";
-                    div.dataset.id = item.id;
+    const box = document.getElementById("favorite-list");
+    if (!box) return;
+    
+    if (favorites.length === 0) {
+        box.innerHTML = "<p>目前沒有收藏商品</p>";
+        return;
+    }
 
-                    // 將內容拆開來寫，避免樣板字串錯誤
-                    div.innerHTML = 
-                        '<a href="/final-main/final/product.jsp?id=' + item.id + '">' +
-                            '<img src="' + item.img + '" alt="' + item.name + '">' +
-                            '<div class="product-info">' +
-                                '<div class="product-name">' + item.name + '</div>' +
-                                '<div class="product-price">NT$' + item.price + '</div>' +
-                            '</div>' +
-                        '</a>' +
-                        '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
-                        '<img src="/final-main/images/love.png" class="favorite-icon" onclick="toggleFavorite(this)">';
+    box.innerHTML = ""; 
+    favorites.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.dataset.id = item.id;
 
-                    document.getElementById("favorite-list").appendChild(div);
-                });
-            })
-            .catch(err => console.error("載入錯誤:", err));
-    };
+        // 【關鍵】如果 img 存進去的是錯誤路徑，這裡幫你修正成正確的專案目錄
+        const imgSrc = item.img.includes('/final/final/images/') ? item.img : '/final/final/images/' + item.img;
 
-    window.toggleFavorite = function(el) {
-        const p = el.closest(".product");
-        const id = p.dataset.id;
-        fetch("favorite_toggle.jsp", {
-            method: "POST",
-            headers: {"Content-Type":"application/x-www-form-urlencoded"},
-            body: "product_id=" + id
-        })
-        .then(res => res.text())
-        .then(result => {
-            if (result.trim() === "remove" && el.closest("#favorite-list")) {
-                p.remove();
-                const box = document.getElementById("favorite-list");
-                if (box.children.length === 0) box.innerHTML = "<p>目前沒有收藏商品</p>";
-            } else {
-                alert("已更新收藏狀態");
-            }
-        });
-    };
-        
+        div.innerHTML = `
+            <a href="product.jsp?id=${item.id}" class="product-link">
+                <img src="/final/final/${item.img}" alt="${item.name}"> 
+            </a>
+            <div class="product-info">
+                <div class="product-name">${item.name}</div>
+                <div class="product-price">NT$${item.price}</div>
+            </div>
+            <img src="/final/final/images/heart.png" class="favorite-icon" onclick="toggleFavorite(this)">
+            <button class="add-cart-btn">加入購物車</button>
+        `;
+        box.appendChild(div);
+    });
+};
     /* ==================== 初始化與事件監聽 ==================== */
     document.addEventListener('DOMContentLoaded', () => {
       loadFavorites();
@@ -680,6 +540,5 @@ button {
       }
     });
   </script>
-  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

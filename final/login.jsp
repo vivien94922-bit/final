@@ -111,11 +111,10 @@ body{
       <button class="login-btn" type="submit">登入</button>
     </form>
 
-    <a href="register.jsp" style="text-decoration: none;">
-  <div class="register-link">
-    還沒有帳號？立即註冊
+    <div class="register-link" onclick="location.href='register.jsp'">
+  還沒有帳號？立即註冊
+</div>
   </div>
-</a>
 
 </div>
 
