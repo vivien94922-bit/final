@@ -9,3 +9,7 @@ WEB-INF/classes/
 .idea/
 .vscode/
 *.iml
+
+# Local environment setup files
+LOCAL_SETUP.md
+setup-local.sh

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="webutil.jsp" %>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -36,10 +37,10 @@ ResultSet rs = ps.executeQuery();
     <div class="product" data-id="<%= id %>">
       <a href="product.jsp?id=<%= rs.getInt("id") %>" class="product-link">
 
-        <img src="<%= rs.getString("image") %>">
+        <img src="<%=escapeHtml(image)%>" alt="<%=escapeHtml(name)%>">
 
         <div class="product-info">
-          <div class="product-name"><%= rs.getString("name") %></div>
+          <div class="product-name"><%=escapeHtml(name)%></div>
           <div class="product-price">NT$<%= rs.getInt("price") %></div>
         </div>
 

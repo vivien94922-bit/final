@@ -96,6 +96,8 @@ body{
     color: #000;
     text-decoration: underline;
 }
+.privacy-consent{display:flex;align-items:flex-start;gap:8px;margin-top:12px;text-align:left;font-size:13px;line-height:1.5}
+.privacy-consent input{margin-top:3px}
 </style>
 </head>
 
@@ -112,6 +114,10 @@ body{
       <input class="register-input" type="text" name="name" placeholder="真實姓名" required>
       <input class="register-input" type="email" name="email" placeholder="電子信箱" required>
       <input class="register-input" type="text" name="phone" placeholder="行動電話" required>
+      <label class="privacy-consent">
+        <input type="checkbox" name="agree_privacy" value="yes" required>
+        <span>我已閱讀並同意<a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>及個人資料蒐集、處理與利用說明。</span>
+      </label>
 
       <button class="register-btn" type="submit">確認註冊</button>
     </form>

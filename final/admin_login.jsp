@@ -1,21 +1,29 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.sql.*" %>
+<%@ include file="dbutil.jsp" %>
 <%
 String msg = "";
-
-String username = request.getParameter("username");
-String password = request.getParameter("password");
-
-if(username != null){
-
-    if(username.equals("admin") && password.equals("1234")){
-
-        session.setAttribute("isAdmin", true);
-
-        response.sendRedirect("admin_orders.jsp");
-        return;
-
-    } else {
+request.setCharacterEncoding("UTF-8");
+if ("POST".equalsIgnoreCase(request.getMethod())) {
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(
+             "SELECT id,username,password,salt FROM members WHERE username=? AND role='admin'")) {
+        ps.setString(1, username == null ? "" : username.trim());
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next() && verifyPassword(password, rs.getString("salt"), rs.getString("password"))) {
+                session.setAttribute("isAdmin", Boolean.TRUE);
+                session.setAttribute("admin_id", rs.getInt("id"));
+                session.setAttribute("admin_username", rs.getString("username"));
+                response.sendRedirect("admin_orders.jsp");
+                return;
+            }
+        }
         msg = "帳號或密碼錯誤";
+    } catch (Exception e) {
+        application.log("Admin login failed", e);
+        msg = "系統暫時無法登入，請稍後再試";
     }
 }
 %>

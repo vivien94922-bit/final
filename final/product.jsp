@@ -2,6 +2,7 @@
 <%@ page import="java.sql.*"%>
 <%@ page isErrorPage="true" %>
 <%@ include file="dbutil.jsp" %>
+<%@ include file="webutil.jsp" %>
 <%@ include file="header.jsp" %>
 <%
     // ==========================================
@@ -108,7 +109,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><%=name%> - STANDARD DAY</title>
+<title><%=escapeHtml(name)%> - STANDARD DAY</title>
 <link rel="stylesheet" href="style.css">
 <style>
 /* ================= 基礎設定 ================= */
@@ -376,14 +377,14 @@ body {
 <body>
     <main class="product-container">
     <div class="product-images fade-up">
-      <img src="<%=nameImage%>" alt="<%=name%>">
+      <img src="<%=escapeHtml(nameImage)%>" alt="<%=escapeHtml(name)%>">
     </div>
 
     <div class="product-info fade-up">
-        <h1><%=name%></h1>
+        <h1><%=escapeHtml(name)%></h1>
 
         <div class="product-desc">
-          <%=description%>
+          <%=escapeHtml(description)%>
         </div>
 
         <div class="price">
@@ -450,9 +451,7 @@ body {
         <% if (userId != -1) { %>
             <form action="add.jsp" method="post">
                 <input type="hidden" name="product_id" value="<%=id%>">
-                <input type="hidden" name="user_id" value="<%=userId%>">
-
-                <input type="text" name="username" value="<%=sessionName%>" readonly>
+                <input type="text" value="<%=escapeHtml(sessionName)%>" readonly>
 
                 <select name="rating">
                     <option value="5">★★★★★</option>
@@ -490,7 +489,7 @@ body {
                 int commentUserId = rs3.getInt("user_id");
         %>
                 <div class="feedback-item" style="text-align: left;">
-                    <strong><%=rs3.getString("username")%></strong>
+                    <strong><%=escapeHtml(rs3.getString("username"))%></strong>
                     <span style="color: #f39c12;">
                         <%
                         for (int i = 0; i < rs3.getInt("rating"); i++) {
@@ -499,7 +498,7 @@ body {
                         %>
                     </span>
 
-                    <p><%=rs3.getString("content")%></p>
+                    <p><%=escapeHtml(rs3.getString("content"))%></p>
                     <small style="color:#999;"><%=rs3.getTimestamp("create_time")%></small>
 
                     <% if (userId != -1 && userId == commentUserId) { %>

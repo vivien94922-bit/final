@@ -22,8 +22,8 @@ sb.append("[");
 try (Connection conn = getConnection()) {
 
     PreparedStatement ps = conn.prepareStatement(
-        "SELECT c.cart_id, c.product_id, c.quantity, p.name, p.price, p.image " +
-        "FROM cart c JOIN products p ON c.product_id=p.product_id " +
+        "SELECT c.cart_id, c.product_id, c.quantity, c.size, p.name, p.price, p.image, p.stock " +
+        "FROM cart c JOIN product p ON c.product_id=p.id " +
         "WHERE c.user_id=?"
     );
 
@@ -41,6 +41,8 @@ try (Connection conn = getConnection()) {
           .append("\"name\":\"").append(rs.getString("name")).append("\",")
           .append("\"price\":").append(rs.getInt("price")).append(",")
           .append("\"quantity\":").append(rs.getInt("quantity")).append(",")
+          .append("\"size\":\"").append(rs.getString("size")).append("\",")
+          .append("\"stock\":").append(rs.getInt("stock")).append(",")
           .append("\"image\":\"").append(rs.getString("image")).append("\"")
           .append("}");
 

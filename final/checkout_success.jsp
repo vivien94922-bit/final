@@ -1,9 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    // 透過網址列參數（URL Parameter）取得剛剛產生的訂單編號
-    String orderId = request.getParameter("order_id");
-    if (orderId == null || orderId.trim().isEmpty()) {
-        orderId = "------"; // 防呆機制：萬一網址沒帶參數就顯示橫線
+    String orderId = "------";
+    try {
+        int parsedOrderId = Integer.parseInt(request.getParameter("order_id"));
+        if (parsedOrderId > 0) orderId = String.valueOf(parsedOrderId);
+    } catch (Exception ignored) {
     }
 %>
 <!DOCTYPE html>
@@ -164,9 +165,7 @@
     </style>
 </head>
 <script>
-    // 💡 結帳成功進入此頁時，順便把前端可能殘留的購物車暫存一次掃乾淨
-    localStorage.removeItem("cart"); // 如果你們前端有把購物車存進 localStorage，這行很關鍵
-    localStorage.clear(); 
+    localStorage.removeItem("cart");
 </script>
 <body>
 
@@ -193,7 +192,7 @@
             
             <div class="btn-group">
                 <a href="index.jsp" class="btn-primary">繼續購物</a>
-                <a href="member_orders.jsp" class="btn-secondary">查看訂單紀錄</a>
+                <a href="member.jsp#orders" class="btn-secondary">查看訂單紀錄</a>
             </div>
             
         </div>
@@ -202,6 +201,6 @@
     <footer>
         <p>&copy; 2026 STANDARD DAY. All Rights Reserved.</p>
     </footer>
-
+    <script src="cookie-consent.js" defer></script>
 </body>
 </html>
