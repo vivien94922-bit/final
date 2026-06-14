@@ -1,7 +1,12 @@
 <%@ page contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
-
+<%
+    // 🌟 強制瀏覽器每次都要向後台重新抓取資料，不准使用快取舊畫面！
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
 <%
 Integer userId = (Integer) session.getAttribute("user_id");
 
