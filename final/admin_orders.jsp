@@ -9,6 +9,16 @@
 %>
 <%@ page import="java.sql.*" %>
 <%@ include file="dbutil.jsp" %>
+<%!
+private String adminOrderEscapeHtml(String value) {
+    if (value == null) return "";
+    return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+}
+%>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -81,8 +91,9 @@
           <thead>
             <tr>
               <th>訂單ID</th>
-              <th>會員ID</th>
-              <th>收件人</th>
+	              <th>會員ID</th>
+	              <th>商品明細</th>
+	              <th>收件人</th>
               <th>電話</th>
               <th>地址</th>
               <th>總金額</th>
@@ -104,18 +115,50 @@
                       int memberId = rsOrders.getInt("member_id");
             %>
             <tr>
-              <td># <%= rsOrders.getInt("id") %></td>
-              <td><%= (memberId == 0) ? "訪客結帳" : memberId %></td>
-              <td><%= rsOrders.getString("name") %></td> <td><%= rsOrders.getString("phone") %></td>
-              <td><%= rsOrders.getString("address") %></td>
+	              <td># <%= rsOrders.getInt("id") %></td>
+	              <td><%= (memberId == 0) ? "訪客結帳" : memberId %></td>
+	              <td>
+	                <%
+	                  boolean hasItems = false;
+	                  String itemSql =
+	                      "SELECT name, price, quantity, size FROM order_items " +
+	                      "WHERE order_id = ? ORDER BY id";
+	                  try (PreparedStatement psItems = con.prepareStatement(itemSql)) {
+	                      psItems.setInt(1, rsOrders.getInt("id"));
+	                      try (ResultSet rsItems = psItems.executeQuery()) {
+	                          while (rsItems.next()) {
+	                              hasItems = true;
+	                              String itemSize = rsItems.getString("size");
+	                %>
+	                  <div style="margin-bottom:6px;">
+	                    <%= adminOrderEscapeHtml(rsItems.getString("name")) %>
+	                    <% if (itemSize != null && !itemSize.trim().isEmpty()) { %>
+	                      （<%= adminOrderEscapeHtml(itemSize) %>）
+	                    <% } %>
+	                    × <%= rsItems.getInt("quantity") %>
+	                    ／ NT$ <%= rsItems.getInt("price") %>
+	                  </div>
+	                <%
+	                          }
+	                      }
+	                  }
+	                  if (!hasItems) {
+	                %>
+	                  <span style="color:#888;">舊訂單：無商品明細</span>
+	                <% } %>
+	              </td>
+	              <td><%= adminOrderEscapeHtml(rsOrders.getString("name")) %></td>
+	              <td><%= adminOrderEscapeHtml(rsOrders.getString("phone")) %></td>
+              <td><%= adminOrderEscapeHtml(rsOrders.getString("address")) %></td>
               <td class="price-text">NT$ <%= rsOrders.getInt("total") %></td>
-              <td><%= rsOrders.getString("payment") %></td> <td><%= rsOrders.getString("status") %></td>
-              <td><%= rsOrders.getString("created_at") %></td>
+              <td><%= adminOrderEscapeHtml(rsOrders.getString("payment")) %></td>
+              <td><%= adminOrderEscapeHtml(rsOrders.getString("status")) %></td>
+              <td><%= adminOrderEscapeHtml(rsOrders.getString("created_at")) %></td>
             </tr>
             <% 
                   }
                   if (!hasOrders) {
-                      out.print("<tr><td colspan='9' style='text-align:center; color:#888; padding:30px;'>📭 目前還沒有任何訂單紀錄。</td></tr>");
+	                      out.print("<tr><td colspan='10' style='text-align:center; color:#888; padding:30px;'>目前還沒有任何訂單紀錄。</td></tr>");
                   }
               } 
             %>
