@@ -55,6 +55,7 @@ body{
     border:1px solid #ddd;
     border-radius: 10px;
     outline:none;
+    box-sizing: border-box; /* 確保寬度不會超出卡片 */
     transition: 0.3s;
 }
 
@@ -98,27 +99,25 @@ body{
 </head>
 
 <body>
-<!-- ===== 登入區 ===== -->
 <div class="login-wrapper">
 
   <div class="login-card">
     <div class="login-title">會員登入</div>
 
     <form action="login_process.jsp" method="post">
-      <input class="login-input" type="text" name="username" placeholder="帳號">
-      <input class="login-input" type="password" name="password" placeholder="密碼">
+      <input class="login-input" type="text" name="username" placeholder="帳號" required>
+      <input class="login-input" type="password" name="password" placeholder="密碼" required>
 
       <button class="login-btn" type="submit">登入</button>
     </form>
 
-    <div class="register-link" onclick="location.href='member.jsp#register'">
+    <div class="register-link" onclick="location.href='register.jsp'">
       還沒有帳號？立即註冊
     </div>
   </div>
 
 </div>
 
-<!-- Cookie 同意 -->
 <script src="cookie-consent.js" defer></script>
 
 </body>
