@@ -521,7 +521,7 @@ window.loadFavorites = function() {
                         '</div>' +
                     '</a>' +
                     '<button class="add-cart-btn" onclick="addToCart(\'' + item.id + '\')">加入購物車</button>' +
-                    '<img src="/final-main/images/love.png" class="favorite-icon">';
+                    '<img src="images/love.png" class="favorite-icon">';
                 
                 fragment.appendChild(div);
             });
