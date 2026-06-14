@@ -13,7 +13,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>後台管理中心</title>
+  <title>後台管理中心｜STANDARD DAY</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; display: flex; min-height: 100vh; }
     
@@ -49,6 +49,9 @@
     .btn-del { background-color: #dc3545; color: white; }
     .btn-cancel { background-color: #6c757d; color: white; }
     .btn-save { background-color: #007bff; color: white; }
+    
+    /* 價格突出樣式 */
+    .price-text { font-weight: 600; color: #d9534f; }
   </style>
 </head>
 <body>
@@ -82,33 +85,39 @@
               <th>收件人</th>
               <th>電話</th>
               <th>地址</th>
-              <th>付款方式</th>
               <th>總金額</th>
+              <th>付款方式</th>
               <th>狀態</th>
               <th>時間</th>
             </tr>
           </thead>
           <tbody>
             <%
-              PreparedStatement psOrders = con.prepareStatement("SELECT * FROM orders ORDER BY created_at DESC");
-              ResultSet rsOrders = psOrders.executeQuery();
-              while(rsOrders.next()){
+              // 🌟 核心修正：指定撈取確切有的欄位名稱，避免 SELECT * 抓到舊殘留欄位
+              String orderSql = "SELECT id, member_id, name, phone, address, total, payment, status, created_at FROM orders ORDER BY id DESC";
+              try (PreparedStatement psOrders = con.prepareStatement(orderSql);
+                   ResultSet rsOrders = psOrders.executeQuery()) {
+                   
+                  boolean hasOrders = false;
+                  while(rsOrders.next()){
+                      hasOrders = true;
+                      int memberId = rsOrders.getInt("member_id");
             %>
             <tr>
-              <td><%= rsOrders.getInt("id") %></td>
-              <td><%= rsOrders.getInt("member_id") %></td>
-              <td><%= rsOrders.getString("recipient_name") %></td>
-              <td><%= rsOrders.getString("phone") %></td>
+              <td># <%= rsOrders.getInt("id") %></td>
+              <td><%= (memberId == 0) ? "訪客結帳" : memberId %></td>
+              <td><%= rsOrders.getString("name") %></td> <td><%= rsOrders.getString("phone") %></td>
               <td><%= rsOrders.getString("address") %></td>
-              <td><%= rsOrders.getString("payment") %></td>
-              <td><%= rsOrders.getInt("total") %></td>
-              <td><%= rsOrders.getString("status") %></td>
+              <td class="price-text">NT$ <%= rsOrders.getInt("total") %></td>
+              <td><%= rsOrders.getString("payment") %></td> <td><%= rsOrders.getString("status") %></td>
               <td><%= rsOrders.getString("created_at") %></td>
             </tr>
             <% 
+                  }
+                  if (!hasOrders) {
+                      out.print("<tr><td colspan='9' style='text-align:center; color:#888; padding:30px;'>📭 目前還沒有任何訂單紀錄。</td></tr>");
+                  }
               } 
-              rsOrders.close();
-              psOrders.close();
             %>
           </tbody>
         </table>
@@ -152,7 +161,6 @@
           </thead>
           <tbody>
             <%
-              // 💡 這裡已經徹底把舊欄位 id 改成你的真實欄位 product_id 了！
               PreparedStatement psProds = con.prepareStatement("SELECT product_id, name, price, image FROM products ORDER BY product_id DESC");
               ResultSet rsProds = psProds.executeQuery();
               while(rsProds.next()) {
@@ -203,7 +211,7 @@
   <%
     // 💡 頁面安全關閉連線機制
     } catch(Exception e) {
-        out.println("<p style='color:red; padding:20px;'>資料庫發生錯誤：" + e.getMessage() + "</p>");
+        out.println("<main class='admin-content'><div class='box' style='color:red; font-weight:bold;'>資料庫發生錯誤：" + e.getMessage() + "</div></main>");
     } finally {
         if(con != null) try { con.close(); } catch(Exception e){}
     }
