@@ -1,8 +1,8 @@
 /* =============================================================
- * Cookie 同意提示（組員D：個資法 / Cookie 告知，延伸功能 6）
+ * Cookie 使用告知（組員D：個資法 / Cookie 告知，延伸功能 6）
  * -------------------------------------------------------------
- * 首次造訪且尚未同意時，於畫面底部顯示同意條，
- * 按下「我同意」後寫入 cookie（有效 1 年），下次不再顯示。
+ * 首次造訪且尚未確認時，於畫面底部顯示告知條，
+ * 按下「我知道了」後寫入 cookie（有效 1 年），下次不再顯示。
  * 自帶樣式，頁面只需引入這一支 <script> 即可。
  * ============================================================= */
 (function () {
@@ -13,8 +13,9 @@
 
   function setConsentCookie() {
     var oneYear = 365 * 24 * 60 * 60; // 秒
+    var secure = location.protocol === "https:" ? "; Secure" : "";
     document.cookie =
-      "cookie_consent=yes; max-age=" + oneYear + "; path=/; SameSite=Lax";
+      "cookie_consent=yes; max-age=" + oneYear + "; path=/; SameSite=Lax" + secure;
   }
 
   function injectStyle() {
@@ -41,11 +42,10 @@
     var bar = document.createElement("div");
     bar.id = "cookie-consent-bar";
     bar.innerHTML =
-      "<p>本網站依《個人資料保護法》蒐集並使用您的個人資料，" +
-      "並使用 Cookie 以維持登入狀態、購物車與改善瀏覽體驗。" +
-      "繼續使用即表示您同意，詳情請見 " +
+      "<p>本網站使用必要 Cookie 以維持登入狀態，並使用 Cookie 記錄您已閱讀本告知。" +
+      "個人資料的蒐集與利用方式請見 " +
       '<a href="privacy.html">隱私權政策</a>。</p>' +
-      '<button type="button" id="cookie-accept-btn">我同意</button>';
+      '<button type="button" id="cookie-accept-btn">我知道了</button>';
     document.body.appendChild(bar);
 
     document

@@ -18,6 +18,8 @@ USE shopdb;
 -- 因含外鍵，重建時依相依順序先刪除
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS cart;
 DROP TABLE IF EXISTS product_comment;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS members;
@@ -74,6 +76,18 @@ CREATE TABLE product_comment (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -------------------------------------------------------------
+-- 購物車（加入購物車 / 結帳）
+-- -------------------------------------------------------------
+CREATE TABLE cart (
+  cart_id    INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity   INT NOT NULL DEFAULT 1,
+  CONSTRAINT fk_cart_member  FOREIGN KEY (user_id)    REFERENCES members(id),
+  CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------------
 -- 訪客計數器（單列）
 -- -------------------------------------------------------------
 CREATE TABLE counter (
@@ -86,15 +100,15 @@ CREATE TABLE counter (
 --   結構先行設計，邏輯由組員B實作
 -- -------------------------------------------------------------
 CREATE TABLE orders (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  member_id      INT,
-  recipient_name VARCHAR(50),
-  phone          VARCHAR(20),
-  address        VARCHAR(255),
-  payment        VARCHAR(20),
-  total          INT,
-  status         VARCHAR(20) NOT NULL DEFAULT 'pending',
-  created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  member_id  INT,
+  name       VARCHAR(50),
+  phone      VARCHAR(20),
+  address    VARCHAR(255),
+  payment    VARCHAR(20),
+  total      INT,
+  status     VARCHAR(20) NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_member FOREIGN KEY (member_id) REFERENCES members(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -118,11 +132,11 @@ CREATE TABLE order_items (
 INSERT INTO counter (id, count) VALUES (1, 0);
 
 -- 會員（密碼皆已雜湊，請用下列「明文」登入測試）
---   admin / admin1234   （角色 admin）
+--   admin / 1234        （角色 admin，與管理者登入頁一致）
 --   demo  / demo1234    （角色 user）
 INSERT INTO members (username, password, salt, name, email, phone, role) VALUES
 ('admin',
- 'd74ce70c3de590d522ddc28c0e80380fd9c193fc866899a68c52215595569089',
+ '417e41bcaeea95de21c78932c6e390b530dc13fb5e99d1ceee28eac2e024f817',
  'a1b2c3d4e5f60718',
  '管理員', 'admin@standardday.com', '0900000000', 'admin'),
 ('demo',

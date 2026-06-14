@@ -2,9 +2,11 @@
 <%@ page import="java.sql.*"%>
 <%@ include file="dbutil.jsp" %>
 <%
-    // 1. 安全性檢查：通常會檢查是否有管理者登入的 Session
-    // Integer adminId = (Integer) session.getAttribute("admin_id");
-    // if (adminId == null) { out.println("<script>alert('請先登入管理員！'); location.href='admin_login.jsp';</script>"); return; }
+    Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+    if (isAdmin == null || !isAdmin) {
+        response.sendRedirect("admin_login.jsp");
+        return;
+    }
 
     request.setCharacterEncoding("UTF-8");
     String action = request.getParameter("action");
@@ -23,7 +25,7 @@
             
             int price = (priceStr != null && !priceStr.isEmpty()) ? Integer.parseInt(priceStr) : 0;
 
-            String sql = "INSERT INTO products (name, price, img) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO product (name, price, image) VALUES (?, ?, ?)";
             ps = conn.prepareStatement(sql);
             ps.setString(1, name);
             ps.setInt(2, price);
@@ -43,7 +45,7 @@
             int pId = Integer.parseInt(pIdStr);
             int price = (priceStr != null && !priceStr.isEmpty()) ? Integer.parseInt(priceStr) : 0;
 
-            String sql = "UPDATE products SET name = ?, price = ?, img = ? WHERE id = ?";
+            String sql = "UPDATE product SET name = ?, price = ?, image = ? WHERE id = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, name);
             ps.setInt(2, price);
@@ -59,7 +61,7 @@
             String pIdStr = request.getParameter("p_id");
             int pId = Integer.parseInt(pIdStr);
 
-            String sql = "DELETE FROM products WHERE id = ?";
+            String sql = "DELETE FROM product WHERE id = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, pId);
             ps.executeUpdate();

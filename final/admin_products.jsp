@@ -1,6 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
 <%@ include file="dbutil.jsp" %>
+<%
+    Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+    if (isAdmin == null || !isAdmin) {
+        response.sendRedirect("admin_login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -76,7 +83,7 @@
           ResultSet rs = null;
           try {
               conn = getConnection();
-              String sql = "SELECT id, name, price, img FROM products ORDER BY id DESC";
+              String sql = "SELECT id, name, price, image FROM product ORDER BY id DESC";
               ps = conn.prepareStatement(sql);
               rs = ps.executeQuery();
               
@@ -84,8 +91,7 @@
                   String id = rs.getString("id");
                   String name = rs.getString("name");
                   int price = rs.getInt("price");
-                  String img = rs.getString("img");
-        <%
+                  String img = rs.getString("image");
         %>
                   <tr id="row-<%= id %>">
                     
@@ -163,5 +169,6 @@
       }
     }
   </script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

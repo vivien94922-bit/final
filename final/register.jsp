@@ -113,6 +113,13 @@ body{
       <input class="register-input" type="email" name="email" placeholder="電子信箱" required>
       <input class="register-input" type="text" name="phone" placeholder="行動電話" required>
 
+      <label style="display:block;font-size:12px;color:#666;margin:10px 0;text-align:left;line-height:1.6;">
+        <input type="checkbox" name="agree" value="yes" required>
+        我已閱讀並同意
+        <a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>，
+        並同意本站蒐集、處理及利用上述個人資料。
+      </label>
+
       <button class="register-btn" type="submit">確認註冊</button>
     </form>
 

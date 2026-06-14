@@ -563,5 +563,6 @@ button {
       }
     });
   </script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>
