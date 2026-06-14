@@ -1,6 +1,32 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*"%>
 <%@ include file="dbutil.jsp" %>
+<%!
+private String memberEscapeHtml(String value) {
+    if (value == null) return "";
+    return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+}
+
+private String memberOrderStatus(String status) {
+    if ("pending".equals(status)) return "處理中";
+    if ("paid".equals(status)) return "已付款";
+    if ("shipped".equals(status)) return "已出貨";
+    if ("completed".equals(status)) return "已完成";
+    if ("cancelled".equals(status)) return "已取消";
+    return status == null ? "" : status;
+}
+
+private String memberPaymentLabel(String payment) {
+    if ("credit".equals(payment)) return "信用卡";
+    if ("linepay".equals(payment)) return "LINE Pay";
+    if ("cod".equals(payment)) return "超商取貨付款";
+    return payment == null ? "" : payment;
+}
+%>
 <%
 Integer userId = (Integer) session.getAttribute("user_id");
 boolean isLogin = (userId != null);
@@ -306,6 +332,32 @@ button {
   display: flex;
   gap: 10px;
 }
+
+  .order-card {
+    max-width: 850px;
+    margin-bottom: 18px;
+    padding: 18px 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .order-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .order-items {
+    margin: 12px 0 0;
+    padding-left: 20px;
+  }
+
+  .order-items li {
+    margin-bottom: 6px;
+  }
   </style>
 </head>
 
@@ -378,7 +430,72 @@ button {
 
       <section id="orders" class="content-section">
         <h2>訂單紀錄</h2>
-        <p>目前尚無訂單</p>
+        <% if (isLogin) {
+             boolean hasOrders = false;
+             boolean ordersLoadFailed = false;
+             String ordersSql =
+                 "SELECT id, total, payment, status, created_at " +
+                 "FROM orders WHERE member_id = ? ORDER BY created_at DESC, id DESC";
+             try (Connection orderConn = getConnection();
+                  PreparedStatement ordersPs = orderConn.prepareStatement(ordersSql)) {
+                 ordersPs.setInt(1, userId);
+                 try (ResultSet ordersRs = ordersPs.executeQuery()) {
+                     while (ordersRs.next()) {
+                         hasOrders = true;
+                         int currentOrderId = ordersRs.getInt("id");
+        %>
+          <div class="order-card">
+            <div class="order-summary">
+              <span><b>訂單編號：</b>#<%= currentOrderId %></span>
+              <span><b>日期：</b><%= memberEscapeHtml(ordersRs.getString("created_at")) %></span>
+              <span><b>付款：</b><%= memberEscapeHtml(memberPaymentLabel(ordersRs.getString("payment"))) %></span>
+              <span><b>狀態：</b><%= memberEscapeHtml(memberOrderStatus(ordersRs.getString("status"))) %></span>
+              <span><b>總金額：</b>NT$<%= ordersRs.getInt("total") %></span>
+            </div>
+            <ul class="order-items">
+              <%
+                  boolean hasItems = false;
+                  String itemsSql =
+                      "SELECT name, price, quantity, size FROM order_items " +
+                      "WHERE order_id = ? ORDER BY id";
+                  try (PreparedStatement itemsPs = orderConn.prepareStatement(itemsSql)) {
+                      itemsPs.setInt(1, currentOrderId);
+                      try (ResultSet itemsRs = itemsPs.executeQuery()) {
+                          while (itemsRs.next()) {
+                              hasItems = true;
+                              String itemSize = itemsRs.getString("size");
+              %>
+                <li>
+                  <%= memberEscapeHtml(itemsRs.getString("name")) %>
+                  <% if (itemSize != null && !itemSize.trim().isEmpty()) { %>
+                    （尺寸：<%= memberEscapeHtml(itemSize) %>）
+                  <% } %>
+                  × <%= itemsRs.getInt("quantity") %>
+                  ／ NT$<%= itemsRs.getInt("price") %>
+                </li>
+              <%
+                          }
+                      }
+                  }
+                  if (!hasItems) {
+              %>
+                <li>此舊訂單沒有商品明細</li>
+              <% } %>
+            </ul>
+          </div>
+        <%
+                     }
+                 }
+             } catch (Exception e) {
+                 ordersLoadFailed = true;
+                 application.log("Unable to load member orders for member ID " + userId, e);
+                 out.print("<p>目前無法載入訂單紀錄，請稍後再試。</p>");
+             }
+             if (!hasOrders && !ordersLoadFailed) {
+        %>
+          <p>目前尚無訂單</p>
+        <%   }
+           } %>
       </section>
       
       <section id="question" class="content-section <%= !isLogin ? "active" : "" %>">
