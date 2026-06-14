@@ -585,6 +585,7 @@ async function addToCart(productId) {
     }
 }
 </script>
+<script src="cookie-consent.js" defer></script>
 
 </body>
 </html>

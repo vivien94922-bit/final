@@ -37,7 +37,7 @@
     <div class="nav-icons">
       <a href="about.jsp" title="關於我們"><img src="../images/info.png" alt="About"></a>
       <a href="member.jsp" title="會員中心"><img src="../images/user.png" alt="Member"></a>
-      <a href="cart.html" title="購物車"><img src="../images/shopping_cart.png" alt="Cart"></a>
+      <a href="cart.jsp" title="購物車"><img src="../images/shopping_cart.png" alt="Cart"></a>
     </div>
   </header>
 
@@ -66,25 +66,40 @@
       <li>統計訪客人數等不可識別個人的彙整分析。</li>
     </ul>
 
-    <h2>三、Cookie 的使用</h2>
-    <p>
-      本網站使用 Cookie 與瀏覽器本機儲存（localStorage）來維持登入狀態、保存購物車與收藏，
-      並記錄您對本政策的同意。您可於瀏覽器設定中停用 Cookie，但部分功能（如登入、購物車）可能因此無法正常運作。
-    </p>
+    <h2>三、利用期間、地區、對象及方式</h2>
+    <ul>
+      <li>利用期間：會員資料於帳號存續期間使用；訂單資料依課程展示及必要作業期間保存。</li>
+      <li>利用地區：本網站服務及課程展示所在地，以臺灣地區為主。</li>
+      <li>利用對象：本課程專題團隊及提供網站運作所必要之服務人員。</li>
+      <li>利用方式：以自動化或非自動化方式提供登入、購物車、訂單、留言與客服功能。</li>
+    </ul>
 
-    <h2>四、資料安全</h2>
+    <h2>四、Cookie 的使用</h2>
+    <ul>
+      <li><code>JSESSIONID</code>：維持登入與工作階段，於工作階段結束後失效。</li>
+      <li><code>cookie_consent</code>：記錄您已閱讀 Cookie 使用告知，最長保存一年。</li>
+    </ul>
+    <p>您可透過瀏覽器設定刪除或停用 Cookie，但登入、購物車等功能可能無法正常使用。</p>
+
+    <h2>五、資料安全</h2>
     <ul>
       <li>所有資料庫查詢皆採用參數化查詢（PreparedStatement），防止 SQL 資料隱碼注入。</li>
       <li>會員密碼採加鹽雜湊儲存，即使資料外洩亦難以還原明文。</li>
     </ul>
 
-    <h2>五、您的權利</h2>
+    <h2>六、您的權利</h2>
     <p>
       依《個人資料保護法》，您得就本網站保有之個人資料，請求查詢、閱覽、複製、補充、更正，
       或請求停止蒐集、處理、利用及刪除。如需行使上述權利，請透過下列方式與我們聯繫。
     </p>
 
-    <h2>六、聯絡我們</h2>
+    <h2>七、不提供資料的影響</h2>
+    <p>
+      您可自由選擇是否提供個人資料；若不提供會員註冊所需資料，將無法使用登入、收藏與購物車功能；
+      若不提供收件與聯絡資料，將無法完成訂單。
+    </p>
+
+    <h2>八、聯絡我們</h2>
     <ul>
       <li>客服信箱：service@standardday.com</li>
       <li>客服電話：03-1234-4321</li>
@@ -100,5 +115,6 @@
     <p>© 2025 STANDARD DAY. All rights reserved.</p>
   </footer>
 
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

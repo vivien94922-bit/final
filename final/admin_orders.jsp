@@ -161,10 +161,10 @@
           </thead>
           <tbody>
             <%
-              PreparedStatement psProds = con.prepareStatement("SELECT product_id, name, price, image FROM products ORDER BY product_id DESC");
+              PreparedStatement psProds = con.prepareStatement("SELECT id, name, price, image FROM product ORDER BY id DESC");
               ResultSet rsProds = psProds.executeQuery();
               while(rsProds.next()) {
-                  String id = rsProds.getString("product_id");
+                  String id = rsProds.getString("id");
                   String name = rsProds.getString("name");
                   int price = rsProds.getInt("price");
                   String img = rsProds.getString("image");
@@ -253,5 +253,6 @@
       }
     }
   </script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

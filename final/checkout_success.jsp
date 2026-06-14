@@ -193,7 +193,7 @@
             
             <div class="btn-group">
                 <a href="index.jsp" class="btn-primary">繼續購物</a>
-                <a href="member_orders.jsp" class="btn-secondary">查看訂單紀錄</a>
+                <a href="member.jsp#orders" class="btn-secondary">查看訂單紀錄</a>
             </div>
             
         </div>
@@ -201,7 +201,9 @@
 
     <footer>
         <p>&copy; 2026 STANDARD DAY. All Rights Reserved.</p>
+        <p><a href="privacy.html">隱私權政策</a></p>
     </footer>
 
+    <script src="cookie-consent.js" defer></script>
 </body>
 </html>
