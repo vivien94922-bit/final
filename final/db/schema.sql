@@ -165,20 +165,6 @@ INSERT INTO product (id, name, price, image, description, category, stock) VALUE
 (14, '斜肩氣質荷葉邊上衣',     350,  '../images/14.jpg', '斜肩荷葉邊設計上衣，甜美修飾肩線，約會穿搭推薦。', 'tops',    33),
 (15, '短版聯名渲染上衣',       440,  '../images/15.jpg', '聯名渲染印花短版上衣，個性獨特，穿出時尚態度。',   'tops',    31);
 
--- 測試訂單（demo 會員）
--- 供管理者訂單列表、會員中心與訂單明細初始測試使用
-INSERT INTO orders
-  (id, member_id, name, phone, address, payment, total, status, created_at)
-VALUES
-  (1, 2, '示範會員', '0911111111', '桃園市中壢區測試路 1 號',
-   'credit', 2240, 'pending', '2026-06-10 12:00:00');
-
-INSERT INTO order_items
-  (order_id, product_id, name, price, size, quantity)
-VALUES
-  (1, 1, '夢幻粉色大衣',   1280, 'M', 1),
-  (1, 2, '百搭基礎牛仔褲',  960, 'L', 1);
-
 -- 商品留言（示範：依 create_time 由新到舊排序，最新在最上）
 INSERT INTO product_comment (product_id, user_id, username, rating, content, create_time) VALUES
 (1, 2, 'demo', 5, '這件粉色大衣超暖又好看！', '2026-06-01 10:00:00'),
@@ -199,6 +185,3 @@ CREATE TABLE favorites (
   CONSTRAINT fk_fav_member  FOREIGN KEY (member_id)  REFERENCES members(id) ON DELETE CASCADE,
   CONSTRAINT fk_fav_product  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 供 demo 會員測試收藏列表
-INSERT INTO favorites (member_id, product_id) VALUES (2, 1);
