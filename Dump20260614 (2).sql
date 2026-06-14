@@ -78,11 +78,6 @@ LOCK TABLES `cart_items` WRITE;
 /*!40000 ALTER TABLE `cart_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
-USE shopdb;
-ALTER TABLE cart ADD COLUMN size VARCHAR(10) NOT NULL DEFAULT 'M';
-
-DESCRIBE shopdb.cart;
-
 --
 -- Table structure for table `counter`
 --
